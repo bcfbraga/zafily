@@ -125,7 +125,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   if (!live) {
     return (
       <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">
-        Live não encontrada.
+        Vitrine não encontrada.
       </div>
     );
   }
@@ -138,7 +138,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       <div className="border-b border-zinc-800 sticky top-0 z-10 bg-zinc-950">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between gap-4">
           <Link href="/app/vitrine" className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors shrink-0">
-            <ArrowLeft className="w-4 h-4" /> Suas lives
+            <ArrowLeft className="w-4 h-4" /> Suas vitrines
           </Link>
           <div className="flex items-center gap-2">
             <StatusBadge status={live.status} />
@@ -279,19 +279,19 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
             onClick={() => setShowEditModal(true)}
             className="mt-5 h-9 px-4 text-sm font-medium text-zinc-300 hover:text-white bg-zinc-800 border border-zinc-700 hover:border-zinc-500 rounded-xl transition-colors"
           >
-            Editar dados da live
+            Editar dados da vitrine
           </button>
         </section>
 
         {/* ── Seção 3: Excluir ─────────────────────────────────── */}
         <section className="bg-red-950/20 border border-red-900/40 rounded-2xl p-6">
           <h2 className="font-semibold text-red-400 mb-1">Excluir live</h2>
-          <p className="text-sm text-zinc-400 mb-4">Remove esta live permanentemente. Não poderá ser desfeito.</p>
+          <p className="text-sm text-zinc-400 mb-4">Remove esta vitrine permanentemente. Não poderá ser desfeito.</p>
           <button
             onClick={() => setShowDeleteConfirm(true)}
             className="h-9 px-4 text-sm font-semibold text-red-400 border border-red-800/60 hover:bg-red-900/30 rounded-xl transition-colors"
           >
-            Excluir live
+            Excluir vitrine
           </button>
         </section>
       </div>
@@ -311,7 +311,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowDeleteConfirm(false)} />
           <div className="relative bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h3 className="font-semibold text-white mb-2">Excluir live?</h3>
+            <h3 className="font-semibold text-white mb-2">Excluir vitrine?</h3>
             <p className="text-sm text-zinc-400 mb-5">Todos os produtos vinculados também serão removidos. Não há como desfazer.</p>
             <div className="flex gap-3">
               <button
@@ -388,7 +388,7 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-semibold text-white">Editar dados da live</h3>
+          <h3 className="font-semibold text-white">Editar dados da vitrine</h3>
           <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
             <X className="w-4 h-4" />
           </button>

@@ -92,7 +92,7 @@ export default function VitrinePage() {
             href="/app/vitrine/nova"
             className="flex items-center gap-1.5 h-9 px-4 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-colors"
           >
-            <Plus className="w-4 h-4" /> Nova live
+            <Plus className="w-4 h-4" /> Nova vitrine
           </Link>
         </div>
       </div>
@@ -108,7 +108,7 @@ export default function VitrinePage() {
                 Olá{profile?.displayName ? `, ${profile.displayName.split(" ")[0]}` : ""}.
               </h1>
               <p className="text-zinc-400 text-sm mt-1">
-                Gerencie as lives de{profile ? ` @${profile.username}` : ""}.
+                Gerencie as vitrines de{profile ? ` @${profile.username}` : ""}.
               </p>
             </>
           )}
@@ -127,14 +127,14 @@ export default function VitrinePage() {
               <Globe className="w-6 h-6 text-violet-400" />
             </div>
             <div>
-              <p className="text-white font-semibold text-lg">Nenhuma live ainda</p>
+              <p className="text-white font-semibold text-lg">Nenhuma vitrine ainda</p>
               <p className="text-zinc-400 text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
             </div>
             <Link
               href="/app/vitrine/nova"
               className="flex items-center gap-1.5 h-10 px-5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-colors"
             >
-              <Plus className="w-4 h-4" /> Criar primeira live
+              <Plus className="w-4 h-4" /> Criar primeira vitrine
             </Link>
           </div>
         ) : (
@@ -217,9 +217,9 @@ export default function VitrinePage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmId(null)} />
           <div className="relative bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h3 className="font-semibold text-white mb-2">Excluir live?</h3>
+            <h3 className="font-semibold text-white mb-2">Excluir vitrine?</h3>
             <p className="text-sm text-zinc-400 mb-5">
-              Esta ação remove a live e todos os produtos vinculados permanentemente. Não poderá ser desfeito.
+              Esta ação remove a vitrine e todos os produtos vinculados permanentemente. Não poderá ser desfeito.
             </p>
             <div className="flex gap-3">
               <button

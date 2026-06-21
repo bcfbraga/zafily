@@ -53,14 +53,14 @@ export default function NovaLivePage() {
       <div className="border-b border-zinc-800 bg-zinc-950 sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-6 h-16 flex items-center">
           <Link href="/app/vitrine" className="flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Voltar para suas lives
+            <ArrowLeft className="w-4 h-4" /> Voltar para suas vitrines
           </Link>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-white mb-1">Nova live</h1>
-        <p className="text-zinc-400 text-sm mb-8">Salve como rascunho agora e publique quando estiver pronta.</p>
+        <h1 className="text-2xl font-bold text-white mb-1">Nova vitrine</h1>
+        <p className="text-zinc-400 text-sm mb-8">Salve como rascunho e publique quando estiver pronta.</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Title */}
@@ -79,7 +79,7 @@ export default function NovaLivePage() {
           {/* Date + Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-300">Data da live</label>
+              <label className="text-sm font-medium text-zinc-300">Data da vitrine</label>
               <input
                 type="date"
                 value={date}
@@ -100,7 +100,7 @@ export default function NovaLivePage() {
 
           {/* Image upload */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-300">Imagem da live</label>
+            <label className="text-sm font-medium text-zinc-300">Imagem da vitrine</label>
             <label className="block cursor-pointer">
               <input
                 type="file"
