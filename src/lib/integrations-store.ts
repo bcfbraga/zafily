@@ -1,12 +1,4 @@
-/**
- * Storage abstraction for affiliate integrations.
- *
- * Current implementation: in-memory Map (resets on cold start).
- * Replace the four functions below with real DB calls (Supabase, Postgres, etc.)
- * without touching any API route or UI code.
- *
- * Schema reference: migrations/001_affiliate_integrations.sql
- */
+import { supabase } from "./supabase";
 
 export type IntegrationStatus =
   | "connected"
@@ -20,51 +12,97 @@ export interface AwinIntegration {
   provider: "awin";
   advertiserId: number;
   publisherId: string;
-  encryptedToken: string; // never send to frontend
+  encryptedToken: string;
   status: IntegrationStatus;
   lastCheckedAt: string;
   createdAt: string;
   updatedAt: string;
 }
 
-// In-memory store — swap this Map for a real DB client
-const store = new Map<string, AwinIntegration>();
+type Row = {
+  id: string;
+  user_id: string;
+  provider: string;
+  advertiser_id: number;
+  publisher_id: string;
+  encrypted_token: string;
+  status: string;
+  last_checked_at: string;
+  created_at: string;
+  updated_at: string;
+};
 
-function key(userId: string) {
-  return `integration:${userId}:awin`;
+function toModel(row: Row): AwinIntegration {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    provider: "awin",
+    advertiserId: row.advertiser_id,
+    publisherId: row.publisher_id,
+    encryptedToken: row.encrypted_token,
+    status: row.status as IntegrationStatus,
+    lastCheckedAt: row.last_checked_at,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
 }
 
 export async function getIntegration(userId: string): Promise<AwinIntegration | null> {
-  return store.get(key(userId)) ?? null;
+  const { data, error } = await supabase
+    .from("affiliate_integrations")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("provider", "awin")
+    .maybeSingle();
+
+  if (error) throw new Error(error.message);
+  if (!data) return null;
+  return toModel(data as Row);
 }
 
 export async function upsertIntegration(
   data: Omit<AwinIntegration, "id" | "createdAt" | "updatedAt">
 ): Promise<AwinIntegration> {
-  const existing = store.get(key(data.userId));
-  const now = new Date().toISOString();
-  const record: AwinIntegration = {
-    id: existing?.id ?? crypto.randomUUID(),
-    createdAt: existing?.createdAt ?? now,
-    updatedAt: now,
-    ...data,
-  };
-  store.set(key(data.userId), record);
-  return record;
+  const { data: row, error } = await supabase
+    .from("affiliate_integrations")
+    .upsert(
+      {
+        user_id: data.userId,
+        provider: data.provider,
+        advertiser_id: data.advertiserId,
+        publisher_id: data.publisherId,
+        encrypted_token: data.encryptedToken,
+        status: data.status,
+        last_checked_at: data.lastCheckedAt,
+      },
+      { onConflict: "user_id,provider" }
+    )
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return toModel(row as Row);
 }
 
 export async function updateIntegrationStatus(
   userId: string,
   status: IntegrationStatus
 ): Promise<void> {
-  const record = store.get(key(userId));
-  if (!record) return;
-  record.status = status;
-  record.lastCheckedAt = new Date().toISOString();
-  record.updatedAt = new Date().toISOString();
-  store.set(key(userId), record);
+  const { error } = await supabase
+    .from("affiliate_integrations")
+    .update({ status, last_checked_at: new Date().toISOString() })
+    .eq("user_id", userId)
+    .eq("provider", "awin");
+
+  if (error) throw new Error(error.message);
 }
 
 export async function deleteIntegration(userId: string): Promise<void> {
-  store.delete(key(userId));
+  const { error } = await supabase
+    .from("affiliate_integrations")
+    .delete()
+    .eq("user_id", userId)
+    .eq("provider", "awin");
+
+  if (error) throw new Error(error.message);
 }
