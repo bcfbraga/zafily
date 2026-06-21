@@ -51,6 +51,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [confirmingRemoveId, setConfirmingRemoveId] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddProducts, setShowAddProducts] = useState(false);
@@ -202,23 +203,22 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-8 space-y-8">
-        <h1 className="text-xl font-bold text-white truncate">{live.title}</h1>
 
         {/* ── Seção 1: Dados da vitrine ───────────────────────────── */}
-        <section className="bg-[#20203A] border border-white/[0.08] rounded-2xl p-6">
-          <div className="flex items-start gap-4">
-            <div className="w-20 h-20 rounded-xl bg-[#29294A] overflow-hidden shrink-0">
+        <section className="bg-[#20203A] border border-white/[0.08] rounded-2xl p-4">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-[#29294A] overflow-hidden shrink-0">
               {live.imageUrl ? (
                 <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-7 h-7 text-[#7E78B8]" />
+                  <Package className="w-6 h-6 text-[#7E78B8]" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-white truncate mb-1">{live.title}</h2>
-              <div className="flex items-center gap-3 text-xs text-[#B8B4E8] flex-wrap">
+              <h2 className="font-semibold text-white truncate text-sm">{live.title}</h2>
+              <div className="flex items-center gap-3 text-xs text-[#B8B4E8] flex-wrap mt-0.5">
                 {live.liveDate && (
                   <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />
                     {new Date(live.liveDate + "T00:00:00").toLocaleDateString("pt-BR")}
@@ -230,20 +230,20 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                 <span>{live.products.length} produto{live.products.length !== 1 ? "s" : ""}</span>
               </div>
             </div>
-          </div>
-          <div className="flex gap-2 mt-5">
-            <button
-              onClick={() => setShowEditModal(true)}
-              className="h-9 px-4 text-sm font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-xl transition-colors"
-            >
-              Editar dados
-            </button>
-            <button
-              onClick={() => setShowAddProducts(v => !v)}
-              className="h-9 px-4 text-sm font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-xl transition-colors"
-            >
-              Adicionar mais produtos
-            </button>
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="h-8 px-3 text-xs font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-lg transition-colors"
+              >
+                Editar dados
+              </button>
+              <button
+                onClick={() => setShowAddProducts(v => !v)}
+                className="h-8 px-3 text-xs font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-lg transition-colors"
+              >
+                + Produtos
+              </button>
+            </div>
           </div>
         </section>
 
@@ -334,12 +334,32 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   </button>
                   {/* Remove button */}
                   <button
-                    onClick={() => removeProduct(product.id)}
+                    onClick={() => setConfirmingRemoveId(product.id)}
                     disabled={removingId === product.id}
                     className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-red-600 transition-all"
                   >
                     {removingId === product.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
                   </button>
+                  {/* Confirm remove overlay */}
+                  {confirmingRemoveId === product.id && (
+                    <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center gap-2 rounded-xl z-10 p-3">
+                      <p className="text-xs text-white font-medium text-center">Excluir produto?</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setConfirmingRemoveId(null); removeProduct(product.id); }}
+                          className="h-7 px-3 text-xs bg-red-600 hover:bg-red-500 text-white rounded-lg transition-colors"
+                        >
+                          Excluir
+                        </button>
+                        <button
+                          onClick={() => setConfirmingRemoveId(null)}
+                          className="h-7 px-3 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
