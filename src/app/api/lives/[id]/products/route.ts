@@ -15,9 +15,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const live = await getLive(id, userId);
   if (!live) return NextResponse.json({ error: "Live não encontrada" }, { status: 404 });
 
-  const { urls } = await req.json() as { urls: string[] };
-  if (!Array.isArray(urls) || urls.length === 0) {
+  const { urls: rawUrls } = await req.json() as { urls: string[] };
+  if (!Array.isArray(rawUrls) || rawUrls.length === 0) {
     return NextResponse.json({ error: "Nenhuma URL fornecida" }, { status: 400 });
+  }
+
+  // Filtra apenas entradas que são URLs válidas (ignora texto livre, espaços, etc.)
+  const urls = rawUrls.filter(u => {
+    try { const p = new URL(u.trim()); return p.protocol === "https:" || p.protocol === "http:"; }
+    catch { return false; }
+  });
+
+  if (urls.length === 0) {
+    return NextResponse.json({ error: "Nenhuma URL válida encontrada" }, { status: 400 });
   }
 
   const current = await countProducts(id);
