@@ -11,7 +11,6 @@ const AFFILIATE_DOMAINS = [
   "shareasale.com", "linksynergy.com", "prf.hn", "clktr.ac",
   "minhacea.cea.com.br",
 ];
-
 const AFFILIATE_PARAMS = ["awc=", "lcea=", "pub_ref=", "clickid=", "aff_id="];
 
 function isAffiliateUrl(url: string): boolean {
@@ -20,35 +19,89 @@ function isAffiliateUrl(url: string): boolean {
     if (AFFILIATE_DOMAINS.some(d => hostname.includes(d))) return true;
     if (AFFILIATE_PARAMS.some(p => search.includes(p))) return true;
     return false;
-  } catch {
-    return false;
-  }
+  } catch { return false; }
 }
 
 async function resolveUrl(url: string): Promise<string> {
   try {
     const res = await fetch(url, {
       method: "HEAD",
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; Zafily/1.0; +https://zafily.com.br)" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Zafily/1.0)" },
       redirect: "follow",
       signal: AbortSignal.timeout(8000),
     });
     return res.url || url;
-  } catch {
-    return url;
-  }
+  } catch { return url; }
 }
 
 function decodeHtml(str: string): string {
   return str
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">")
-    .replace(/&quot;/gi, '"')
-    .replace(/&#39;/gi, "'")
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)));
+    .replace(/&amp;/gi, "&").replace(/&lt;/gi, "<").replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").replace(/&nbsp;/gi, " ")
+    .replace(/&#(\d+);/g, (_, c) => String.fromCharCode(Number(c)));
 }
+
+// ── VTEX API ─────────────────────────────────────────────────────────────────
+// Detects VTEX product URLs (ending in /p or /p?sku=...) and calls the catalog API
+
+function getVtexSlug(url: string): { origin: string; slug: string } | null {
+  try {
+    const u = new URL(url);
+    // VTEX product URLs end with /p or /p?sku=xxx
+    if (!/\/p(\?.*)?$/.test(u.pathname)) return null;
+    const slug = u.pathname.replace(/\/p$/, "").replace(/^\//, "");
+    if (!slug) return null;
+    return { origin: u.origin, slug };
+  } catch { return null; }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchVtexProduct(origin: string, slug: string): Promise<UrlMetadata | null> {
+  try {
+    const apiUrl = `${origin}/api/catalog_system/pub/products/search/${encodeURIComponent(slug)}?map=ft`;
+    const res = await fetch(apiUrl, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) return null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data: any[] = await res.json();
+    if (!Array.isArray(data) || data.length === 0) return null;
+
+    const product = data[0];
+    const name: string = product.productName ?? product.productTitle ?? null;
+
+    // First SKU image
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const items: any[] = product.items ?? [];
+    let imageUrl: string | null = null;
+    if (items.length > 0 && items[0].images?.length > 0) {
+      imageUrl = items[0].images[0].imageUrl ?? null;
+    }
+
+    // Price from first SKU seller
+    let price: string | null = null;
+    if (items.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const seller = items[0].sellers?.[0];
+      const priceVal = seller?.commertialOffer?.Price ?? seller?.commertialOffer?.ListPrice;
+      if (priceVal != null) {
+        price = `R$ ${Number(priceVal).toFixed(2).replace(".", ",")}`;
+      }
+    }
+
+    // Category from categoryTree (last leaf)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const categoryTree: any[] = product.categoryTree ?? [];
+    const category: string | null = categoryTree.length > 0
+      ? categoryTree[categoryTree.length - 1].name ?? null
+      : null;
+
+    return { name, imageUrl, price, category, productUrl: `${origin}/${slug}/p` };
+  } catch { return null; }
+}
+
+// ── HTML fallback ────────────────────────────────────────────────────────────
 
 function extractMeta(html: string, property: string): string | null {
   const patterns = [
@@ -83,121 +136,97 @@ function extractLdJson(html: string): Record<string, unknown>[] {
   return blocks;
 }
 
-// Extract Product-type LD+JSON blocks specifically
 function findProductLd(blocks: Record<string, unknown>[]): Record<string, unknown> | null {
   for (const obj of blocks) {
-    const type = (obj as Record<string, unknown>)["@type"];
-    if (type === "Product" || type === "product") return obj;
-    // Some sites nest inside @graph
-    const graph = (obj as Record<string, unknown>)["@graph"];
+    const type = obj["@type"];
+    if (type === "Product") return obj;
+    const graph = obj["@graph"];
     if (Array.isArray(graph)) {
-      const product = graph.find((g: unknown) => (g as Record<string, unknown>)?.["@type"] === "Product");
-      if (product) return product as Record<string, unknown>;
+      const p = graph.find((g: unknown) => (g as Record<string, unknown>)?.["@type"] === "Product");
+      if (p) return p as Record<string, unknown>;
     }
   }
   return null;
 }
 
-function extractProductName(html: string, ldBlocks: Record<string, unknown>[]): string | null {
-  // 1. JSON-LD Product name (most reliable)
+function extractFromHtml(html: string): Omit<UrlMetadata, "productUrl"> {
+  const ldBlocks = extractLdJson(html);
   const product = findProductLd(ldBlocks);
-  if (product?.name && typeof product.name === "string") return decodeHtml(product.name);
 
-  // 2. og:title — but skip if it's just the site name (no " | " separator and very short)
-  const ogTitle = extractMeta(html, "og:title");
-  if (ogTitle && ogTitle.includes("|")) {
-    // "Product Name | Site Name" — take the first part
-    return decodeHtml(ogTitle.split("|")[0].trim());
+  // Name
+  let name: string | null = null;
+  if (product?.name && typeof product.name === "string") name = decodeHtml(product.name);
+  if (!name) {
+    const ogTitle = extractMeta(html, "og:title");
+    if (ogTitle?.includes("|")) name = ogTitle.split("|")[0].trim();
+    else if (ogTitle && ogTitle.length > 10) name = ogTitle;
   }
-  if (ogTitle && ogTitle.length > 10) return ogTitle;
+  if (!name) {
+    const t = extractTitle(html);
+    if (t?.includes("|")) name = t.split("|")[0].trim();
+    else if (t?.includes(" - ")) name = t.split(" - ")[0].trim();
+    else name = t;
+  }
 
-  // 3. twitter:title
-  const twTitle = extractMeta(html, "twitter:title");
-  if (twTitle && twTitle.includes("|")) return decodeHtml(twTitle.split("|")[0].trim());
-  if (twTitle && twTitle.length > 10) return twTitle;
-
-  // 4. <title> tag — strip " | Site" suffix
-  const title = extractTitle(html);
-  if (title && title.includes("|")) return decodeHtml(title.split("|")[0].trim());
-  if (title && title.includes(" - ")) return decodeHtml(title.split(" - ")[0].trim());
-  return title;
-}
-
-function extractProductImage(html: string, ldBlocks: Record<string, unknown>[]): string | null {
-  // 1. JSON-LD Product image
-  const product = findProductLd(ldBlocks);
+  // Image
+  let imageUrl: string | null = null;
   if (product?.image) {
     const img = product.image;
-    if (typeof img === "string") return img;
-    if (Array.isArray(img) && typeof img[0] === "string") return img[0];
-    if (typeof img === "object" && img !== null && typeof (img as Record<string, unknown>).url === "string") {
-      return (img as Record<string, unknown>).url as string;
-    }
+    if (typeof img === "string") imageUrl = img;
+    else if (Array.isArray(img) && typeof img[0] === "string") imageUrl = img[0];
+    else if (typeof img === "object" && img !== null && typeof (img as Record<string, unknown>).url === "string")
+      imageUrl = (img as Record<string, unknown>).url as string;
   }
+  if (!imageUrl) imageUrl = extractMeta(html, "og:image") || extractMeta(html, "twitter:image");
 
-  // 2. og:image
-  return extractMeta(html, "og:image") || extractMeta(html, "twitter:image");
-}
-
-function extractPrice(html: string, ldBlocks: Record<string, unknown>[]): string | null {
-  // 1. JSON-LD Product offers
-  const product = findProductLd(ldBlocks);
+  // Price
+  let price: string | null = null;
   if (product) {
     const offers = product.offers;
     const offer = Array.isArray(offers) ? offers[0] : offers;
-    const price = (offer as Record<string, unknown>)?.price ?? product.price;
-    if (price != null) {
-      const num = parseFloat(String(price));
-      if (!isNaN(num)) return `R$ ${num.toFixed(2).replace(".", ",")}`;
-      return String(price);
+    const p = (offer as Record<string, unknown>)?.price ?? product.price;
+    if (p != null) {
+      const num = parseFloat(String(p));
+      price = !isNaN(num) ? `R$ ${num.toFixed(2).replace(".", ",")}` : String(p);
     }
   }
+  if (!price) price = extractMeta(html, "og:price:amount") || extractMeta(html, "product:price:amount");
 
-  // 2. Generic LD blocks
-  for (const obj of ldBlocks) {
-    const offers = (obj as Record<string, unknown>)?.offers;
-    const offer = Array.isArray(offers) ? offers[0] : offers;
-    const price = (offer as Record<string, unknown>)?.price ?? (obj as Record<string, unknown>)?.price;
-    if (price != null) {
-      const num = parseFloat(String(price));
-      if (!isNaN(num)) return `R$ ${num.toFixed(2).replace(".", ",")}`;
+  // Category
+  let category: string | null = null;
+  if (product?.category && typeof product.category === "string") category = product.category;
+  if (!category) {
+    for (const obj of ldBlocks) {
+      const cat = (obj as Record<string, unknown>)?.category;
+      if (cat && typeof cat === "string") { category = cat; break; }
     }
   }
+  if (!category) category = extractMeta(html, "og:category") || extractMeta(html, "product:category") || null;
 
-  return extractMeta(html, "og:price:amount") || extractMeta(html, "product:price:amount") || null;
+  return { name, imageUrl, price, category };
 }
 
-function extractCategory(html: string, ldBlocks: Record<string, unknown>[]): string | null {
-  const product = findProductLd(ldBlocks);
-  if (product?.category && typeof product.category === "string") return product.category;
-
-  for (const obj of ldBlocks) {
-    const cat = (obj as Record<string, unknown>)?.category;
-    if (cat && typeof cat === "string") return cat;
-  }
-
-  return (
-    extractMeta(html, "og:category") ||
-    extractMeta(html, "product:category") ||
-    extractMeta(html, "product:catalog_group_name") ||
-    null
-  );
-}
+// ── Main entry ───────────────────────────────────────────────────────────────
 
 export async function fetchUrlMetadata(affiliateUrl: string): Promise<UrlMetadata> {
   const empty: UrlMetadata = { name: null, imageUrl: null, price: null, category: null, productUrl: null };
 
   try {
-    // Passo 1: resolve redirect se for link de afiliado ou encurtado
-    const productUrl = isAffiliateUrl(affiliateUrl)
-      ? await resolveUrl(affiliateUrl)
-      : affiliateUrl;
+    // Passo 1: resolve redirects de links de afiliado
+    const productUrl = isAffiliateUrl(affiliateUrl) ? await resolveUrl(affiliateUrl) : affiliateUrl;
 
-    // Passo 2: busca página do produto
+    // Passo 2a: VTEX API (C&A, Renner, Hering, etc.)
+    const vtex = getVtexSlug(productUrl);
+    if (vtex) {
+      const result = await fetchVtexProduct(vtex.origin, vtex.slug);
+      if (result?.name) return result;
+    }
+
+    // Passo 2b: HTML fallback para outros sites
     const res = await fetch(productUrl, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml",
         "Accept-Language": "pt-BR,pt;q=0.9",
       },
       signal: AbortSignal.timeout(12000),
@@ -205,16 +234,9 @@ export async function fetchUrlMetadata(affiliateUrl: string): Promise<UrlMetadat
     });
 
     if (!res.ok) return { ...empty, productUrl };
-
     const html = await res.text();
-    const ldBlocks = extractLdJson(html);
-
-    const name = extractProductName(html, ldBlocks);
-    const imageUrl = extractProductImage(html, ldBlocks);
-    const price = extractPrice(html, ldBlocks);
-    const category = extractCategory(html, ldBlocks);
-
-    return { name, imageUrl, price, category, productUrl };
+    const meta = extractFromHtml(html);
+    return { ...meta, productUrl };
   } catch {
     return empty;
   }
