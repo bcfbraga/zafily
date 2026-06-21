@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   Plug,
   BarChart2,
+  ShoppingBag,
   Settings,
   ChevronRight,
   Zap,
@@ -19,6 +20,7 @@ import {
 
 const navItems = [
   { label: "Dashboard", href: "/app", icon: LayoutDashboard, exact: true },
+  { label: "Minha Vitrine", href: "/app/vitrine", icon: ShoppingBag },
   { label: "Plataformas", href: "/app/platforms", icon: Plug },
   { label: "Performance", href: "/app/performance", icon: BarChart2 },
   { label: "Integrações", href: "/app/integrations", icon: Zap },
