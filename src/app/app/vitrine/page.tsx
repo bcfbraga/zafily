@@ -30,7 +30,7 @@ function StatusBadge({ status }: { status: "draft" | "published" }) {
       <CheckCircle2 className="w-3 h-3" /> Publicada
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-zinc-800 text-zinc-400 border border-zinc-700">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#29294A] text-[#B8B4E8] border border-white/[0.12]">
       <FileText className="w-3 h-3" /> Rascunho
     </span>
   );
@@ -78,19 +78,19 @@ export default function VitrinePage() {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-[#111126] text-white">
       {/* Header */}
-      <div className="border-b border-zinc-800 bg-zinc-950 sticky top-0 z-10">
+      <div className="border-b border-white/[0.08] bg-[#111126] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-violet-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-[#6C63FF] flex items-center justify-center">
               <Globe className="w-4 h-4 text-white" />
             </div>
             <span className="font-semibold text-white">Minha Vitrine</span>
           </div>
           <Link
             href="/app/vitrine/nova"
-            className="flex items-center gap-1.5 h-9 px-4 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-colors"
+            className="flex items-center gap-1.5 h-9 px-4 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-lg transition-colors"
           >
             <Plus className="w-4 h-4" /> Nova vitrine
           </Link>
@@ -101,13 +101,13 @@ export default function VitrinePage() {
         {/* Greeting */}
         <div className="mb-8">
           {loading ? (
-            <div className="h-7 w-48 bg-zinc-800 rounded animate-pulse mb-2" />
+            <div className="h-7 w-48 bg-[#29294A] rounded animate-pulse mb-2" />
           ) : (
             <>
               <h1 className="text-2xl font-bold text-white">
                 Olá{profile?.displayName ? `, ${profile.displayName.split(" ")[0]}` : ""}.
               </h1>
-              <p className="text-zinc-400 text-sm mt-1">
+              <p className="text-[#B8B4E8] text-sm mt-1">
                 Gerencie as vitrines de{profile ? ` @${profile.username}` : ""}.
               </p>
             </>
@@ -118,21 +118,21 @@ export default function VitrinePage() {
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map(i => (
-              <div key={i} className="h-32 rounded-xl bg-zinc-900 border border-zinc-800 animate-pulse" />
+              <div key={i} className="h-32 rounded-xl bg-[#20203A] border border-white/[0.08] animate-pulse" />
             ))}
           </div>
         ) : lives.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-violet-900/40 flex items-center justify-center">
-              <Globe className="w-6 h-6 text-violet-400" />
+            <div className="w-14 h-14 rounded-full bg-[#6C63FF]/20 flex items-center justify-center">
+              <Globe className="w-6 h-6 text-[#6C63FF]" />
             </div>
             <div>
               <p className="text-white font-semibold text-lg">Nenhuma vitrine ainda</p>
-              <p className="text-zinc-400 text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
+              <p className="text-[#B8B4E8] text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
             </div>
             <Link
               href="/app/vitrine/nova"
-              className="flex items-center gap-1.5 h-10 px-5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-1.5 h-10 px-5 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" /> Criar primeira vitrine
             </Link>
@@ -142,7 +142,7 @@ export default function VitrinePage() {
             {lives.map(live => (
               <div
                 key={live.id}
-                className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors"
+                className="bg-[#20203A] border border-white/[0.08] rounded-xl p-5 hover:border-white/[0.12] transition-colors"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -150,7 +150,7 @@ export default function VitrinePage() {
                       <h3 className="font-semibold text-white truncate">{live.title}</h3>
                       <StatusBadge status={live.status} />
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-zinc-400 flex-wrap">
+                    <div className="flex items-center gap-4 text-xs text-[#B8B4E8] flex-wrap">
                       {live.liveDate && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -170,13 +170,13 @@ export default function VitrinePage() {
                         href={`${baseUrl}/vitrine/${profile.username}/${live.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 mt-2 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#7C75FF] mt-2 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
                         {`/vitrine/${profile.username}/${live.slug}`}
                       </a>
                     )}
-                    <p className="text-[11px] text-zinc-600 mt-1">
+                    <p className="text-[11px] text-[#7E78B8] mt-1">
                       Atualizada em {new Date(live.updatedAt).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
@@ -186,21 +186,21 @@ export default function VitrinePage() {
                       onClick={() => toggleStatus(live)}
                       className={`h-8 px-3 text-xs font-semibold rounded-lg border transition-colors ${
                         live.status === "published"
-                          ? "border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
-                          : "border-violet-700 text-violet-400 hover:bg-violet-600 hover:text-white hover:border-violet-600"
+                          ? "border-white/[0.12] text-[#B8B4E8] hover:text-white hover:border-white/[0.20]"
+                          : "border-[#6C63FF]/40 text-[#6C63FF] hover:bg-[#6C63FF] hover:text-white hover:border-[#6C63FF]"
                       }`}
                     >
                       {live.status === "published" ? "Despublicar" : "Publicar"}
                     </button>
                     <Link
                       href={`/app/vitrine/${live.id}`}
-                      className="h-8 px-3 text-xs font-semibold rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors flex items-center gap-1"
+                      className="h-8 px-3 text-xs font-semibold rounded-lg bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] hover:text-white hover:border-white/[0.20] transition-colors flex items-center gap-1"
                     >
                       <Pencil className="w-3 h-3" /> Editar
                     </Link>
                     <button
                       onClick={() => setConfirmId(live.id)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-[#7E78B8] hover:text-red-400 hover:bg-red-900/20 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -216,9 +216,9 @@ export default function VitrinePage() {
       {confirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmId(null)} />
-          <div className="relative bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+          <div className="relative bg-[#20203A] border border-white/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <h3 className="font-semibold text-white mb-2">Excluir vitrine?</h3>
-            <p className="text-sm text-zinc-400 mb-5">
+            <p className="text-sm text-[#B8B4E8] mb-5">
               Esta ação remove a vitrine e todos os produtos vinculados permanentemente. Não poderá ser desfeito.
             </p>
             <div className="flex gap-3">
@@ -231,7 +231,7 @@ export default function VitrinePage() {
               </button>
               <button
                 onClick={() => setConfirmId(null)}
-                className="flex-1 h-10 bg-zinc-800 border border-zinc-700 text-zinc-300 text-sm font-medium rounded-lg hover:border-zinc-500 transition-colors"
+                className="flex-1 h-10 bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] text-sm font-medium rounded-lg hover:border-white/[0.20] transition-colors"
               >
                 Cancelar
               </button>
