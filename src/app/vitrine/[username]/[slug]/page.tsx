@@ -50,13 +50,9 @@ export default async function VitrinePage({ params }: Props) {
 
         {/* Title block */}
         <div className="mb-2">
-          <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-2">
-            Vitrine @{profile.username}
-          </p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight mb-1">
+          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight mb-4">
             {live.title}
           </h1>
-          <p className="text-sm text-zinc-500 italic mb-4">escolhidos pra você ;)</p>
 
           {/* Meta pills */}
           <div className="flex items-center gap-3 flex-wrap text-xs text-zinc-400">
