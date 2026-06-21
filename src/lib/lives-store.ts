@@ -24,6 +24,8 @@ export interface LiveProduct {
   name: string | null;
   imageUrl: string | null;
   price: string | null;
+  category: string | null;
+  productUrl: string | null;
   position: number;
   createdAt: string;
 }
@@ -215,6 +217,8 @@ function rowToProduct(row: Record<string, unknown>): LiveProduct {
     name: (row.name as string) ?? null,
     imageUrl: (row.image_url as string) ?? null,
     price: (row.price as string) ?? null,
+    category: (row.category as string) ?? null,
+    productUrl: (row.product_url as string) ?? null,
     position: row.position as number,
     createdAt: row.created_at as string,
   };
@@ -238,7 +242,7 @@ export async function countProducts(liveId: string): Promise<number> {
 
 export async function addProduct(
   liveId: string,
-  data: { url: string; name?: string | null; imageUrl?: string | null; price?: string | null; position: number }
+  data: { url: string; name?: string | null; imageUrl?: string | null; price?: string | null; category?: string | null; productUrl?: string | null; position: number }
 ): Promise<LiveProduct> {
   const db: DB = getSupabase();
   const { data: row } = await db
@@ -249,6 +253,8 @@ export async function addProduct(
       name: data.name ?? null,
       image_url: data.imageUrl ?? null,
       price: data.price ?? null,
+      category: data.category ?? null,
+      product_url: data.productUrl ?? null,
       position: data.position,
     })
     .select()

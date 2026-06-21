@@ -2,6 +2,42 @@ export interface UrlMetadata {
   name: string | null;
   imageUrl: string | null;
   price: string | null;
+  category: string | null;
+  productUrl: string | null;
+}
+
+// Domains that are known affiliate/redirect links and need resolution
+const AFFILIATE_DOMAINS = [
+  "awin1.com", "tidd.ly", "go.redirectingat.com", "rstyle.me",
+  "shareasale.com", "linksynergy.com", "prf.hn", "clktr.ac",
+  "minhacea.cea.com.br",
+];
+
+const AFFILIATE_PARAMS = ["awc=", "lcea=", "pub_ref=", "clickid=", "aff_id="];
+
+function isAffiliateUrl(url: string): boolean {
+  try {
+    const { hostname, search } = new URL(url);
+    if (AFFILIATE_DOMAINS.some(d => hostname.includes(d))) return true;
+    if (AFFILIATE_PARAMS.some(p => search.includes(p))) return true;
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveUrl(url: string): Promise<string> {
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Zafily/1.0; +https://zafily.com.br)" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(8000),
+    });
+    return res.url || url;
+  } catch {
+    return url;
+  }
 }
 
 function extractMeta(html: string, property: string): string | null {
@@ -23,53 +59,76 @@ function extractTitle(html: string): string | null {
   return m?.[1]?.trim() ?? null;
 }
 
-function extractPrice(html: string): string | null {
-  // JSON-LD price
-  const ldMatch = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
-  if (ldMatch) {
-    for (const block of ldMatch) {
-      const inner = block.replace(/<\/?script[^>]*>/gi, "");
-      try {
-        const obj = JSON.parse(inner);
-        const price =
-          obj?.offers?.price ??
-          obj?.offers?.[0]?.price ??
-          obj?.price;
-        const currency =
-          obj?.offers?.priceCurrency ??
-          obj?.offers?.[0]?.priceCurrency ??
-          "";
-        if (price) return currency ? `${currency} ${price}` : String(price);
-      } catch { /* ignore */ }
-    }
+function extractLdJson(html: string): Record<string, unknown>[] {
+  const blocks: Record<string, unknown>[] = [];
+  const matches = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) ?? [];
+  for (const block of matches) {
+    const inner = block.replace(/<\/?script[^>]*>/gi, "");
+    try {
+      const obj = JSON.parse(inner);
+      if (Array.isArray(obj)) blocks.push(...obj);
+      else blocks.push(obj);
+    } catch { /* ignore */ }
   }
-
-  // og:price:amount
-  const ogPrice = extractMeta(html, "og:price:amount");
-  if (ogPrice) return ogPrice;
-
-  // product:price:amount (Open Graph)
-  const productPrice = extractMeta(html, "product:price:amount");
-  if (productPrice) return productPrice;
-
-  return null;
+  return blocks;
 }
 
-export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
+function extractPrice(html: string, ldBlocks: Record<string, unknown>[]): string | null {
+  // JSON-LD
+  for (const obj of ldBlocks) {
+    const offers = (obj as Record<string, unknown>)?.offers;
+    const offerObj = Array.isArray(offers) ? offers[0] : offers;
+    const price = (offerObj as Record<string, unknown>)?.price ?? (obj as Record<string, unknown>)?.price;
+    if (price != null) return String(price);
+  }
+
+  // og:price:amount or product:price:amount
+  return (
+    extractMeta(html, "og:price:amount") ||
+    extractMeta(html, "product:price:amount") ||
+    null
+  );
+}
+
+function extractCategory(html: string, ldBlocks: Record<string, unknown>[]): string | null {
+  // JSON-LD category
+  for (const obj of ldBlocks) {
+    const cat = (obj as Record<string, unknown>)?.category;
+    if (cat && typeof cat === "string") return cat;
+  }
+
+  // og:category or product:category
+  return (
+    extractMeta(html, "og:category") ||
+    extractMeta(html, "product:category") ||
+    extractMeta(html, "product:catalog_group_name") ||
+    null
+  );
+}
+
+export async function fetchUrlMetadata(affiliateUrl: string): Promise<UrlMetadata> {
+  const empty: UrlMetadata = { name: null, imageUrl: null, price: null, category: null, productUrl: null };
+
   try {
-    const res = await fetch(url, {
+    // Passo 1: resolve redirect se for link de afiliado ou encurtado
+    const productUrl = isAffiliateUrl(affiliateUrl)
+      ? await resolveUrl(affiliateUrl)
+      : affiliateUrl;
+
+    // Passo 2: busca página do produto
+    const res = await fetch(productUrl, {
       headers: {
-        "User-Agent":
-          "Mozilla/5.0 (compatible; Zafily/1.0; +https://zafily.com.br)",
+        "User-Agent": "Mozilla/5.0 (compatible; Zafily/1.0; +https://zafily.com.br)",
         Accept: "text/html,application/xhtml+xml",
       },
       signal: AbortSignal.timeout(10000),
       redirect: "follow",
     });
 
-    if (!res.ok) return { name: null, imageUrl: null, price: null };
+    if (!res.ok) return { ...empty, productUrl };
 
     const html = await res.text();
+    const ldBlocks = extractLdJson(html);
 
     const name =
       extractMeta(html, "og:title") ||
@@ -80,10 +139,11 @@ export async function fetchUrlMetadata(url: string): Promise<UrlMetadata> {
       extractMeta(html, "og:image") ||
       extractMeta(html, "twitter:image");
 
-    const price = extractPrice(html);
+    const price = extractPrice(html, ldBlocks);
+    const category = extractCategory(html, ldBlocks);
 
-    return { name, imageUrl, price };
+    return { name, imageUrl, price, category, productUrl };
   } catch {
-    return { name: null, imageUrl: null, price: null };
+    return empty;
   }
 }

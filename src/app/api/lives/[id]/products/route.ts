@@ -35,6 +35,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         name: meta.name,
         imageUrl: meta.imageUrl,
         price: meta.price,
+        category: meta.category,
+        productUrl: meta.productUrl,
         position: current + i,
       });
     })
