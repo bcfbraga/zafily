@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const userId = getUserId(req);
+    const userId = await getUserId(req);
     const encryptedToken = encrypt(apiToken);
     const now = new Date().toISOString();
 

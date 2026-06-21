@@ -1,4 +1,8 @@
-import { supabase } from "./supabase";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+import { getSupabase } from "./supabase";
+// Cast db to any to avoid Supabase type errors without a generated schema
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DB = any;
 
 export type IntegrationStatus =
   | "connected"
@@ -48,7 +52,8 @@ function toModel(row: Row): AwinIntegration {
 }
 
 export async function getIntegration(userId: string): Promise<AwinIntegration | null> {
-  const { data, error } = await supabase
+  const db: DB = getSupabase();
+  const { data, error } = await db
     .from("affiliate_integrations")
     .select("*")
     .eq("user_id", userId)
@@ -63,7 +68,9 @@ export async function getIntegration(userId: string): Promise<AwinIntegration | 
 export async function upsertIntegration(
   data: Omit<AwinIntegration, "id" | "createdAt" | "updatedAt">
 ): Promise<AwinIntegration> {
-  const { data: row, error } = await supabase
+  const db: DB = getSupabase();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: row, error } = await (db as any)
     .from("affiliate_integrations")
     .upsert(
       {
@@ -88,7 +95,8 @@ export async function updateIntegrationStatus(
   userId: string,
   status: IntegrationStatus
 ): Promise<void> {
-  const { error } = await supabase
+  const db: DB = getSupabase();
+  const { error } = await db
     .from("affiliate_integrations")
     .update({ status, last_checked_at: new Date().toISOString() })
     .eq("user_id", userId)
@@ -98,7 +106,8 @@ export async function updateIntegrationStatus(
 }
 
 export async function deleteIntegration(userId: string): Promise<void> {
-  const { error } = await supabase
+  const db: DB = getSupabase();
+  const { error } = await db
     .from("affiliate_integrations")
     .delete()
     .eq("user_id", userId)

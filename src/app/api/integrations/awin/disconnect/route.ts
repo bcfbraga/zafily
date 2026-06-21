@@ -4,7 +4,7 @@ import { getUserId } from "@/lib/auth";
 
 export async function DELETE(req: NextRequest) {
   try {
-    const userId = getUserId(req);
+    const userId = await getUserId(req);
     await deleteIntegration(userId);
     return NextResponse.json({ ok: true });
   } catch (err) {

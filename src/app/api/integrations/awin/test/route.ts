@@ -6,7 +6,7 @@ import { getUserId } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const userId = getUserId(req);
+    const userId = await getUserId(req);
     const integration = await getIntegration(userId);
 
     if (!integration) {
