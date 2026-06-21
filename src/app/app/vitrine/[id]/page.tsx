@@ -55,7 +55,23 @@ function shortCat(cat: string | null) {
 // ── Price helpers ────────────────────────────────────────────────────────────
 function parsePrice(raw: string | null): number | null {
   if (!raw) return null;
-  const n = parseFloat(raw.replace(/[^\d,]/g, "").replace(",", "."));
+  // Remove currency symbol and spaces, keep digits, dots and commas
+  const clean = raw.replace(/[^\d.,]/g, "");
+  // If both dot and comma exist: last one is decimal separator (e.g. "1.299,90" or "1,299.90")
+  const lastDot   = clean.lastIndexOf(".");
+  const lastComma = clean.lastIndexOf(",");
+  let normalized: string;
+  if (lastDot > -1 && lastComma > -1) {
+    // whichever comes last is the decimal separator
+    normalized = lastComma > lastDot
+      ? clean.replace(/\./g, "").replace(",", ".")
+      : clean.replace(/,/g, "");
+  } else if (lastComma > -1) {
+    normalized = clean.replace(",", ".");
+  } else {
+    normalized = clean;
+  }
+  const n = parseFloat(normalized);
   return isNaN(n) ? null : n;
 }
 
@@ -134,7 +150,7 @@ function VitrinePreview({ live }: { live: Live }) {
             <p className="text-sm">Nenhum produto ainda</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             {filtered.map((p, i) => {
               const disc = discountedPrice(p.price, live.discount);
               return (
