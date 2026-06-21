@@ -3,9 +3,10 @@ import { Bell, Search } from "lucide-react";
 interface TopbarProps {
   title: string;
   description?: string;
+  action?: React.ReactNode;
 }
 
-export function Topbar({ title, description }: TopbarProps) {
+export function Topbar({ title, description, action }: TopbarProps) {
   return (
     <header className="h-[72px] shrink-0 border-b border-[rgba(255,255,255,0.08)] flex items-center justify-between px-8 bg-[#111126]">
       <div>
@@ -13,6 +14,7 @@ export function Topbar({ title, description }: TopbarProps) {
         {description && <p className="text-xs text-[#7E78B8] mt-0.5">{description}</p>}
       </div>
       <div className="flex items-center gap-3">
+        {action}
         <button className="w-9 h-9 flex items-center justify-center rounded-[10px] bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.08)] text-[#7E78B8] hover:text-white transition-colors">
           <Search className="w-4 h-4" />
         </button>

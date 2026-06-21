@@ -7,6 +7,7 @@ import {
   Plus, Pencil, Trash2, Globe, Calendar, Clock,
   CheckCircle2, FileText, ExternalLink
 } from "lucide-react";
+import { Topbar } from "@/components/zafily/Topbar";
 
 interface Live {
   id: string;
@@ -79,23 +80,14 @@ export default function VitrinePage() {
 
   return (
     <div className="min-h-screen bg-[#111126] text-white">
-      {/* Header */}
-      <div className="border-b border-white/[0.08] bg-[#111126] sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#6C63FF] flex items-center justify-center">
-              <Globe className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-semibold text-white">Minha Vitrine</span>
-          </div>
-          <Link
-            href="/app/vitrine/nova"
-            className="flex items-center gap-1.5 h-9 px-4 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Nova vitrine
-          </Link>
-        </div>
-      </div>
+      <Topbar title="Minha Vitrine" action={
+        <Link
+          href="/app/vitrine/nova"
+          className="flex items-center gap-1.5 h-8 px-4 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-xs font-semibold rounded-lg transition-colors"
+        >
+          <Plus className="w-3.5 h-3.5" /> Nova vitrine
+        </Link>
+      } />
 
       <div className="max-w-4xl mx-auto px-6 py-8">
         {/* Greeting */}
