@@ -53,6 +53,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showAddProducts, setShowAddProducts] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
@@ -87,6 +88,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     if (!res.ok) { setFetchError(data.error ?? "Erro ao buscar produtos"); return; }
     setLive(prev => prev ? { ...prev, products: [...prev.products, ...data.products] } : prev);
     setUrlsText("");
+    setShowAddProducts(false);
   }
 
   async function removeProduct(productId: string) {
@@ -177,9 +179,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h2 className="font-semibold text-white truncate">{live.title}</h2>
-              </div>
+              <h2 className="font-semibold text-white truncate mb-1">{live.title}</h2>
               <div className="flex items-center gap-3 text-xs text-[#B8B4E8] flex-wrap">
                 {live.liveDate && (
                   <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />
@@ -193,46 +193,62 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               </div>
             </div>
           </div>
+          <div className="flex gap-2 mt-5">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="h-9 px-4 text-sm font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-xl transition-colors"
+            >
+              Editar dados
+            </button>
+            <button
+              onClick={() => setShowAddProducts(v => !v)}
+              className="h-9 px-4 text-sm font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-xl transition-colors"
+            >
+              Adicionar mais produtos
+            </button>
+          </div>
         </section>
 
-        {/* ── Seção 2: Adicionar produtos ───────────────────────── */}
-        <section className="bg-[#20203A] border border-white/[0.08] rounded-2xl p-6 space-y-4">
-          <h2 className="font-semibold text-white">Adicione produtos</h2>
-          <div className="space-y-2">
-            <textarea
-              value={urlsText}
-              onChange={e => setUrlsText(e.target.value)}
-              placeholder={"https://www.cea.com.br/produto...\nhttps://www.cea.com.br/produto..."}
-              rows={5}
-              disabled={fetching}
-              className="w-full bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 resize-none transition-all disabled:opacity-50"
-            />
-            <div className="text-xs text-[#7E78B8]">
-              <span>{urls.length} de {slotsLeft} slots disponíveis</span>
+        {/* ── Seção 2: Adicionar produtos (visível apenas quando ativada ou sem produtos) ── */}
+        {(showAddProducts || productCount === 0) && (
+          <section className="bg-[#20203A] border border-white/[0.08] rounded-2xl p-6 space-y-4">
+            <h2 className="font-semibold text-white">Adicione produtos</h2>
+            <div className="space-y-2">
+              <textarea
+                value={urlsText}
+                onChange={e => setUrlsText(e.target.value)}
+                placeholder={"https://www.cea.com.br/produto...\nhttps://www.cea.com.br/produto..."}
+                rows={5}
+                disabled={fetching}
+                className="w-full bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 resize-none transition-all disabled:opacity-50"
+              />
+              <div className="text-xs text-[#7E78B8]">
+                <span>{urls.length} de {slotsLeft} slots disponíveis</span>
+              </div>
             </div>
-          </div>
 
-          {fetchError && (
-            <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-300">{fetchError}</div>
-          )}
+            {fetchError && (
+              <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-300">{fetchError}</div>
+            )}
 
-          <div className="flex gap-2">
-            <button
-              onClick={fetchProducts}
-              disabled={fetching || urls.length === 0 || slotsLeft <= 0}
-              className="flex items-center gap-2 h-10 px-5 bg-[#6C63FF] hover:bg-[#7C75FF] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
-            >
-              {fetching ? <><Loader2 className="w-4 h-4 animate-spin" /> Buscando...</> : "Buscar produtos"}
-            </button>
-            <button
-              onClick={() => setUrlsText("")}
-              disabled={fetching}
-              className="h-10 px-4 text-sm text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] rounded-xl transition-colors"
-            >
-              Limpar
-            </button>
-          </div>
-        </section>
+            <div className="flex gap-2">
+              <button
+                onClick={fetchProducts}
+                disabled={fetching || urls.length === 0 || slotsLeft <= 0}
+                className="flex items-center gap-2 h-10 px-5 bg-[#6C63FF] hover:bg-[#7C75FF] disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-colors"
+              >
+                {fetching ? <><Loader2 className="w-4 h-4 animate-spin" /> Buscando...</> : "Buscar produtos"}
+              </button>
+              <button
+                onClick={() => setUrlsText("")}
+                disabled={fetching}
+                className="h-10 px-4 text-sm text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] rounded-xl transition-colors"
+              >
+                Limpar
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Products grid */}
         {live.products.length > 0 && (
