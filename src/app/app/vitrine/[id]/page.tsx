@@ -179,7 +179,6 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <h2 className="font-semibold text-white truncate">{live.title}</h2>
-                <StatusBadge status={live.status} />
               </div>
               <div className="flex items-center gap-3 text-xs text-[#B8B4E8] flex-wrap">
                 {live.liveDate && (
@@ -194,12 +193,6 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               </div>
             </div>
           </div>
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="mt-5 h-9 px-4 text-sm font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-xl transition-colors"
-          >
-            Editar vitrine
-          </button>
         </section>
 
         {/* ── Seção 2: Adicionar produtos ───────────────────────── */}
