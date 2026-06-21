@@ -134,7 +134,8 @@ export default function VitrinePage() {
             {lives.map(live => (
               <div
                 key={live.id}
-                className="bg-[#20203A] border border-white/[0.08] rounded-xl p-5 hover:border-white/[0.12] transition-colors"
+                onClick={() => router.push(`/app/vitrine/${live.id}`)}
+                className="bg-[#20203A] border border-white/[0.08] rounded-xl p-5 hover:border-white/[0.16] hover:bg-[#252540] transition-colors cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -162,6 +163,7 @@ export default function VitrinePage() {
                         href={`${baseUrl}/vitrine/${profile.username}/${live.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={e => e.stopPropagation()}
                         className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#7C75FF] mt-2 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
@@ -173,7 +175,7 @@ export default function VitrinePage() {
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2 shrink-0" onClick={e => e.stopPropagation()}>
                     <button
                       onClick={() => toggleStatus(live)}
                       className={`h-8 px-3 text-xs font-semibold rounded-lg border transition-colors ${
@@ -184,12 +186,6 @@ export default function VitrinePage() {
                     >
                       {live.status === "published" ? "Despublicar" : "Publicar"}
                     </button>
-                    <Link
-                      href={`/app/vitrine/${live.id}`}
-                      className="h-8 px-3 text-xs font-semibold rounded-lg bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] hover:text-white hover:border-white/[0.20] transition-colors flex items-center gap-1"
-                    >
-                      <Pencil className="w-3 h-3" /> Editar
-                    </Link>
                     <button
                       onClick={() => setConfirmId(live.id)}
                       className="w-8 h-8 flex items-center justify-center rounded-lg text-[#7E78B8] hover:text-red-400 hover:bg-red-900/20 transition-colors"

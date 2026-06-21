@@ -12,6 +12,8 @@ export interface Live {
   liveTime: string | null;
   imageUrl: string | null;
   status: "draft" | "published";
+  store: string | null;
+  discount: number | null;
   createdAt: string;
   updatedAt: string;
   productCount?: number;
@@ -104,6 +106,8 @@ function rowToLive(row: Record<string, unknown>, count?: number): Live {
     liveTime: (row.live_time as string) ?? null,
     imageUrl: (row.image_url as string) ?? null,
     status: row.status as "draft" | "published",
+    store: (row.store as string) ?? null,
+    discount: (row.discount as number) ?? null,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
     productCount: count,
@@ -156,7 +160,7 @@ export async function getPublicLive(username: string, slug: string): Promise<(Li
 
 export async function createLive(
   userId: string,
-  data: { title: string; liveDate?: string; liveTime?: string; imageUrl?: string }
+  data: { title: string; liveDate?: string; liveTime?: string; imageUrl?: string; store?: string }
 ): Promise<Live> {
   const db: DB = getSupabase();
   const base = generateSlug(data.title);
@@ -171,6 +175,7 @@ export async function createLive(
       live_date: data.liveDate ?? null,
       live_time: data.liveTime ?? null,
       image_url: data.imageUrl ?? null,
+      store: data.store ?? null,
       status: "draft",
     })
     .select()
@@ -182,7 +187,7 @@ export async function createLive(
 export async function updateLive(
   id: string,
   userId: string,
-  data: { title?: string; liveDate?: string | null; liveTime?: string | null; imageUrl?: string | null; status?: "draft" | "published" }
+  data: { title?: string; liveDate?: string | null; liveTime?: string | null; imageUrl?: string | null; status?: "draft" | "published"; store?: string | null; discount?: number | null }
 ): Promise<Live> {
   const db: DB = getSupabase();
   const { data: row } = await db
@@ -193,6 +198,8 @@ export async function updateLive(
       ...(data.liveTime !== undefined && { live_time: data.liveTime }),
       ...(data.imageUrl !== undefined && { image_url: data.imageUrl }),
       ...(data.status !== undefined && { status: data.status }),
+      ...(data.store !== undefined && { store: data.store }),
+      ...(data.discount !== undefined && { discount: data.discount }),
     })
     .eq("id", id)
     .eq("user_id", userId)

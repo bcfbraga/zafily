@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     liveDate: body.liveDate ?? undefined,
     liveTime: body.liveTime ?? undefined,
     imageUrl: body.imageUrl ?? undefined,
+    store: body.store ?? undefined,
   });
   return NextResponse.json(live, { status: 201 });
 }

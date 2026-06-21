@@ -26,6 +26,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     liveDate: body.liveDate,
     liveTime: body.liveTime,
     imageUrl: body.imageUrl,
+    store: body.store !== undefined ? (body.store ?? null) : undefined,
+    discount: body.discount !== undefined ? (body.discount === null ? null : Number(body.discount)) : undefined,
   });
   return NextResponse.json(live);
 }
