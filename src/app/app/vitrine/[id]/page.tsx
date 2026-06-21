@@ -185,7 +185,7 @@ function VitrinePreview({ live }: { live: Live }) {
                       <div>
                         <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
                         <p className="text-sm font-bold text-rose-600 leading-tight">{disc.discounted}</p>
-                        <p className="text-[9px] text-rose-400 font-medium mt-0.5">preço especial da live ✦</p>
+                        <p className="text-[9px] text-rose-400 font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
                       </div>
                     ) : (
                       p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
