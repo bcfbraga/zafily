@@ -22,7 +22,6 @@ import {
 const navItems = [
   { label: "Minha Vitrine", href: "/app/vitrine", icon: ShoppingBag },
   { label: "Minha CEA", href: "/app/cea", icon: Link2 },
-  { label: "Plataformas", href: "/app/platforms", icon: Plug },
   { label: "Performance", href: "/app/performance", icon: BarChart2 },
   { label: "Integrações", href: "/app/integrations", icon: Zap },
 ];
