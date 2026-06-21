@@ -21,7 +21,7 @@ import {
 
 const navItems = [
   { label: "Dashboard", href: "/app", icon: LayoutDashboard, exact: true },
-  { label: "Import links", href: "/app/import", icon: Link2 },
+  { label: "Importar links", href: "/app/import", icon: Link2 },
   { label: "Produtos", href: "/app/products", icon: Package },
   { label: "Plataformas", href: "/app/platforms", icon: Plug },
   { label: "Performance", href: "/app/performance", icon: BarChart2 },

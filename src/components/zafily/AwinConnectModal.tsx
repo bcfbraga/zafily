@@ -29,13 +29,13 @@ export function AwinConnectModal({ onClose, onSuccess }: Props) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error ?? "Connection failed. Please try again.");
+        setError(data.error ?? "Falha na conexão. Tente novamente.");
         return;
       }
 
       onSuccess(data);
     } catch {
-      setError("Could not reach the server. Check your connection and try again.");
+      setError("Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.");
     } finally {
       setLoading(false);
     }
