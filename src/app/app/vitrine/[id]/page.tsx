@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Loader2, X, Upload, Calendar, Clock,
-  Package, CheckCircle2, FileText, Trash2, ExternalLink, Pencil
+  Package, CheckCircle2, FileText, Trash2, ExternalLink, Pencil, Copy, Check, GripVertical
 } from "lucide-react";
 
 interface Product {
@@ -54,10 +54,14 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddProducts, setShowAddProducts] = useState(false);
+  const [showPublishSuccess, setShowPublishSuccess] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -106,8 +110,42 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "published" }),
     });
-    if (res.ok) setLive(prev => prev ? { ...prev, status: "published" } : prev);
+    if (res.ok) {
+      setLive(prev => prev ? { ...prev, status: "published" } : prev);
+      setShowPublishSuccess(true);
+    }
     setTogglingStatus(false);
+  }
+
+  async function copyPublicLink(url: string) {
+    await navigator.clipboard.writeText(url);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  }
+
+  function handleDragStart(index: number) {
+    setDragIndex(index);
+  }
+
+  function handleDragOver(e: React.DragEvent, index: number) {
+    e.preventDefault();
+    setOverIndex(index);
+  }
+
+  async function handleDrop() {
+    if (dragIndex === null || overIndex === null || dragIndex === overIndex || !live) {
+      setDragIndex(null); setOverIndex(null); return;
+    }
+    const reordered = [...live.products];
+    const [moved] = reordered.splice(dragIndex, 1);
+    reordered.splice(overIndex, 0, moved);
+    setLive(prev => prev ? { ...prev, products: reordered } : prev);
+    setDragIndex(null); setOverIndex(null);
+    await fetch(`/api/lives/${id}/products/reorder`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order: reordered.map(p => p.id) }),
+    });
   }
 
   async function handleDelete() {
@@ -254,8 +292,26 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
         {live.products.length > 0 && (
           <section>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {live.products.map(product => (
-                <div key={product.id} className="bg-[#20203A] border border-white/[0.08] rounded-xl overflow-hidden group relative">
+              {live.products.map((product, i) => (
+                <div
+                  key={product.id}
+                  draggable
+                  onDragStart={() => handleDragStart(i)}
+                  onDragOver={e => handleDragOver(e, i)}
+                  onDrop={handleDrop}
+                  onDragEnd={() => { setDragIndex(null); setOverIndex(null); }}
+                  className={`bg-[#20203A] border rounded-xl overflow-hidden group relative cursor-grab active:cursor-grabbing transition-all ${
+                    overIndex === i && dragIndex !== i
+                      ? "border-[#6C63FF] scale-[1.02]"
+                      : dragIndex === i
+                      ? "border-white/[0.08] opacity-40"
+                      : "border-white/[0.08]"
+                  }`}
+                >
+                  {/* Drag handle */}
+                  <div className="absolute top-1.5 left-1.5 w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white/60">
+                    <GripVertical className="w-3.5 h-3.5" />
+                  </div>
                   <div className="aspect-square bg-[#29294A] overflow-hidden">
                     {product.imageUrl ? (
                       <img src={product.imageUrl} alt={product.name ?? ""} className="w-full h-full object-cover" />
@@ -269,6 +325,13 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     <p className="text-xs font-medium text-white line-clamp-2 leading-snug">{product.name ?? "Produto sem nome"}</p>
                     {product.price && <p className="text-xs text-[#6C63FF] font-semibold mt-1">{product.price}</p>}
                   </div>
+                  {/* Edit button */}
+                  <button
+                    onClick={() => setEditingProduct(product)}
+                    className="absolute bottom-[52px] right-1.5 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-[#6C63FF] transition-all"
+                  >
+                    <Pencil className="w-3 h-3" />
+                  </button>
                   {/* Remove button */}
                   <button
                     onClick={() => removeProduct(product.id)}
@@ -277,13 +340,6 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   >
                     {removingId === product.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
                   </button>
-                  {/* Edit button */}
-                  <button
-                    onClick={() => setEditingProduct(product)}
-                    className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-[#6C63FF] transition-all"
-                  >
-                    <Pencil className="w-3 h-3" />
-                  </button>
                 </div>
               ))}
             </div>
@@ -291,6 +347,50 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
         )}
 
       </div>
+
+      {/* ── Publish success modal ──────────────────────────────── */}
+      {showPublishSuccess && publicUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowPublishSuccess(false)} />
+          <div className="relative bg-[#20203A] border border-white/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="flex flex-col items-center text-center gap-3 mb-5">
+              <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-white text-lg">Vitrine publicada!</h3>
+                <p className="text-sm text-[#B8B4E8] mt-1">Sua vitrine já está disponível para suas seguidoras.</p>
+              </div>
+            </div>
+            <div
+              onClick={() => copyPublicLink(publicUrl)}
+              className="flex items-center gap-2 bg-[#29294A] border border-white/[0.12] hover:border-[#6C63FF]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5"
+            >
+              <span className="flex-1 text-xs text-[#B8B4E8] truncate">{publicUrl}</span>
+              {copiedLink
+                ? <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                : <Copy className="w-4 h-4 text-[#7E78B8] group-hover:text-white shrink-0 transition-colors" />
+              }
+            </div>
+            <div className="flex gap-3">
+              <a
+                href={publicUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors"
+              >
+                Minha vitrine
+              </a>
+              <button
+                onClick={() => setShowPublishSuccess(false)}
+                className="flex-1 h-10 bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] text-sm font-medium rounded-xl hover:border-white/[0.20] transition-colors"
+              >
+                Fechar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Edit vitrine modal ─────────────────────────────────── */}
       {showEditModal && (
