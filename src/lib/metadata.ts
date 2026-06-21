@@ -9,13 +9,32 @@ export interface UrlMetadata {
 const AFFILIATE_DOMAINS = [
   "awin1.com", "tidd.ly", "go.redirectingat.com", "rstyle.me",
   "shareasale.com", "linksynergy.com", "prf.hn", "clktr.ac",
-  "minhacea.cea.com.br",
 ];
-const AFFILIATE_PARAMS = ["awc=", "lcea=", "pub_ref=", "clickid=", "aff_id="];
+const AFFILIATE_PARAMS = ["awc=", "pub_ref=", "clickid=", "aff_id="];
+
+// ── Minha C&A resolver ───────────────────────────────────────────────────────
+// minhacea.cea.com.br/?lcea=BASE64 → calls api.cea.com.br to get the real URL
+
+async function resolveMinhaCea(url: string): Promise<string | null> {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.includes("minhacea.cea.com.br")) return null;
+    const lcea = u.searchParams.get("lcea");
+    if (!lcea) return null;
+    const res = await fetch(`https://api.cea.com.br/minhacea/link/v1/${lcea}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) return null;
+    const data = await res.json() as { success: boolean; data: string };
+    return data.success && data.data ? data.data : null;
+  } catch { return null; }
+}
 
 function isAffiliateUrl(url: string): boolean {
   try {
     const { hostname, search } = new URL(url);
+    if (hostname.includes("minhacea.cea.com.br")) return true;
     if (AFFILIATE_DOMAINS.some(d => hostname.includes(d))) return true;
     if (AFFILIATE_PARAMS.some(p => search.includes(p))) return true;
     return false;
@@ -23,6 +42,11 @@ function isAffiliateUrl(url: string): boolean {
 }
 
 async function resolveUrl(url: string): Promise<string> {
+  // Minha C&A links need special API resolution
+  const minhaCea = await resolveMinhaCea(url);
+  if (minhaCea) return minhaCea;
+
+  // Generic redirect follow via HEAD
   try {
     const res = await fetch(url, {
       method: "HEAD",
