@@ -71,7 +71,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   const urls = urlsText.split("\n").map(l => l.trim()).filter(Boolean);
   const productCount = live?.products.length ?? 0;
-  const slotsLeft = 20 - productCount;
+  const slotsLeft = 40 - productCount;
 
   async function fetchProducts() {
     if (urls.length === 0) return;
