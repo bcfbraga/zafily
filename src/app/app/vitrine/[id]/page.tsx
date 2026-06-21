@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft, Loader2, X, Upload, Calendar, Clock,
-  Package, CheckCircle2, FileText, Trash2, ExternalLink
+  Package, CheckCircle2, FileText, Trash2, ExternalLink, Pencil
 } from "lucide-react";
 
 interface Product {
@@ -51,6 +51,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -95,16 +96,15 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     setRemovingId(null);
   }
 
-  async function toggleStatus() {
+  async function publishVitrine() {
     if (!live) return;
     setTogglingStatus(true);
-    const next = live.status === "published" ? "draft" : "published";
     const res = await fetch(`/api/lives/${id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: next }),
+      body: JSON.stringify({ status: "published" }),
     });
-    if (res.ok) setLive(prev => prev ? { ...prev, status: next } : prev);
+    if (res.ok) setLive(prev => prev ? { ...prev, status: "published" } : prev);
     setTogglingStatus(false);
   }
 
@@ -142,17 +142,15 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           </Link>
           <div className="flex items-center gap-2">
             <StatusBadge status={live.status} />
-            <button
-              onClick={toggleStatus}
-              disabled={togglingStatus}
-              className={`h-8 px-3 text-xs font-semibold rounded-lg border transition-colors disabled:opacity-50 ${
-                live.status === "published"
-                  ? "border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
-                  : "border-violet-700 text-violet-400 hover:bg-violet-600 hover:text-white hover:border-violet-600"
-              }`}
-            >
-              {togglingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : live.status === "published" ? "Despublicar" : "Publicar"}
-            </button>
+            {live.status === "draft" && (
+              <button
+                onClick={publishVitrine}
+                disabled={togglingStatus}
+                className="h-8 px-3 text-xs font-semibold rounded-lg border border-violet-700 text-violet-400 hover:bg-violet-600 hover:text-white hover:border-violet-600 transition-colors disabled:opacity-50"
+              >
+                {togglingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Publicar"}
+              </button>
+            )}
             {publicUrl && live.status === "published" && (
               <a href={publicUrl} target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 flex items-center justify-center rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white transition-colors">
@@ -206,10 +204,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
         {/* Products grid */}
         {live.products.length > 0 && (
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
-              {live.products.length} produto{live.products.length !== 1 ? "s" : ""} adicionado{live.products.length !== 1 ? "s" : ""}
-            </h3>
+          <section>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {live.products.map(product => (
                 <div key={product.id} className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden group relative">
@@ -226,6 +221,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     <p className="text-xs font-medium text-white line-clamp-2 leading-snug">{product.name ?? "Produto sem nome"}</p>
                     {product.price && <p className="text-xs text-violet-400 font-semibold mt-1">{product.price}</p>}
                   </div>
+                  {/* Remove button */}
                   <button
                     onClick={() => removeProduct(product.id)}
                     disabled={removingId === product.id}
@@ -233,13 +229,20 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   >
                     {removingId === product.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
                   </button>
+                  {/* Edit button */}
+                  <button
+                    onClick={() => setEditingProduct(product)}
+                    className="absolute top-1.5 left-1.5 w-6 h-6 rounded-full bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-violet-600 transition-all"
+                  >
+                    <Pencil className="w-3 h-3" />
+                  </button>
                 </div>
               ))}
             </div>
           </section>
         )}
 
-        {/* ── Seção 2: Dados da live ───────────────────────────── */}
+        {/* ── Seção 2: Dados da vitrine ───────────────────────────── */}
         <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-20 h-20 rounded-xl bg-zinc-800 overflow-hidden shrink-0">
@@ -273,13 +276,13 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
             onClick={() => setShowEditModal(true)}
             className="mt-5 h-9 px-4 text-sm font-medium text-zinc-300 hover:text-white bg-zinc-800 border border-zinc-700 hover:border-zinc-500 rounded-xl transition-colors"
           >
-            Editar dados da vitrine
+            Editar vitrine
           </button>
         </section>
 
         {/* ── Seção 3: Excluir ─────────────────────────────────── */}
         <section className="bg-red-950/20 border border-red-900/40 rounded-2xl p-6">
-          <h2 className="font-semibold text-red-400 mb-1">Excluir live</h2>
+          <h2 className="font-semibold text-red-400 mb-1">Excluir vitrine</h2>
           <p className="text-sm text-zinc-400 mb-4">Remove esta vitrine permanentemente. Não poderá ser desfeito.</p>
           <button
             onClick={() => setShowDeleteConfirm(true)}
@@ -290,13 +293,29 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
         </section>
       </div>
 
-      {/* ── Edit modal ─────────────────────────────────────────── */}
+      {/* ── Edit vitrine modal ─────────────────────────────────── */}
       {showEditModal && (
         <EditModal
           live={live}
           onClose={() => setShowEditModal(false)}
           onSave={(updated) => { setLive(prev => prev ? { ...prev, ...updated } : prev); setShowEditModal(false); }}
           liveId={id}
+        />
+      )}
+
+      {/* ── Edit product side sheet ────────────────────────────── */}
+      {editingProduct && (
+        <EditProductSheet
+          product={editingProduct}
+          liveId={id}
+          onClose={() => setEditingProduct(null)}
+          onSave={(updated) => {
+            setLive(prev => prev ? {
+              ...prev,
+              products: prev.products.map(p => p.id === updated.id ? { ...p, ...updated } : p)
+            } : prev);
+            setEditingProduct(null);
+          }}
         />
       )}
 
@@ -329,7 +348,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   );
 }
 
-// ── Edit Modal ──────────────────────────────────────────────────────────────
+// ── Edit Vitrine Modal ───────────────────────────────────────────────────────
 
 interface EditModalProps {
   live: Live;
@@ -437,5 +456,109 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
         </form>
       </div>
     </div>
+  );
+}
+
+// ── Edit Product Side Sheet ──────────────────────────────────────────────────
+
+interface EditProductSheetProps {
+  product: Product;
+  liveId: string;
+  onClose: () => void;
+  onSave: (data: Pick<Product, "id" | "name" | "price">) => void;
+}
+
+function EditProductSheet({ product, liveId, onClose, onSave }: EditProductSheetProps) {
+  const [name, setName] = useState(product.name ?? "");
+  const [price, setPrice] = useState(product.price ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    setSaving(true);
+    setError(null);
+    const res = await fetch(`/api/lives/${liveId}/products/${product.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: name.trim() || null, price: price.trim() || null }),
+    });
+    const data = await res.json();
+    setSaving(false);
+    if (!res.ok) { setError(data.error ?? "Erro ao salvar"); return; }
+    onSave({ id: product.id, name: data.name, price: data.price });
+  }
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-sm bg-zinc-900 border-l border-zinc-700 shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-800">
+          <h3 className="font-semibold text-white">Editar produto</h3>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Product preview */}
+        <div className="px-6 py-4 border-b border-zinc-800 flex items-center gap-3">
+          <div className="w-14 h-14 rounded-lg bg-zinc-800 overflow-hidden shrink-0">
+            {product.imageUrl ? (
+              <img src={product.imageUrl} alt={product.name ?? ""} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <Package className="w-6 h-6 text-zinc-600" />
+              </div>
+            )}
+          </div>
+          <a href={product.url} target="_blank" rel="noopener noreferrer"
+            className="text-xs text-violet-400 hover:text-violet-300 truncate flex items-center gap-1">
+            <ExternalLink className="w-3 h-3 shrink-0" />
+            <span className="truncate">{product.url}</span>
+          </a>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSave} className="flex-1 overflow-y-auto px-6 py-6 space-y-5">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-300">Nome do produto</label>
+            <input
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              placeholder="Ex: Vestido Floral Verão"
+              className="w-full h-11 bg-zinc-800 border border-zinc-700 text-white placeholder:text-zinc-500 rounded-xl px-4 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-300">Preço</label>
+            <input
+              type="text"
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              placeholder="Ex: R$ 89,90"
+              className="w-full h-11 bg-zinc-800 border border-zinc-700 text-white placeholder:text-zinc-500 rounded-xl px-4 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 transition-all"
+            />
+          </div>
+          {error && <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-300">{error}</div>}
+        </form>
+
+        {/* Footer */}
+        <div className="px-6 py-4 border-t border-zinc-800 flex gap-3">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="flex-1 h-10 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+          >
+            {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
+          </button>
+          <button type="button" onClick={onClose}
+            className="h-10 px-4 bg-zinc-800 border border-zinc-700 text-zinc-300 text-sm rounded-xl hover:border-zinc-500 transition-colors">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </>
   );
 }
