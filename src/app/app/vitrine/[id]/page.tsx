@@ -8,6 +8,7 @@ import {
   Package, CheckCircle2, FileText, ExternalLink, Pencil,
   Copy, Check, GripVertical, Plus, ShoppingBag
 } from "lucide-react";
+import { StoreSelect } from "@/components/zafily/StoreSelect";
 
 interface Product {
   id: string;
@@ -609,17 +610,7 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
           {/* Store */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#B8B4E8]">Loja</label>
-            <div className="relative">
-              <select value={store} onChange={e => setStore(e.target.value)}
-                className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white rounded-xl px-4 pr-10 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all appearance-none cursor-pointer">
-                <option value="cea">C&amp;A</option>
-                <option value="renner">Renner</option>
-                <option value="riachuelo">Riachuelo</option>
-              </select>
-              <svg className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7E78B8] pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
+            <StoreSelect value={store} onChange={setStore} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
