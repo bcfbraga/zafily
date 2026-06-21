@@ -141,7 +141,7 @@ export default function NovaLivePage() {
               disabled={saving || uploading}
               className="flex-1 h-11 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
             >
-              {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar rascunho"}
+              {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Criando...</> : "Criar vitrine"}
             </button>
             <Link
               href="/app/vitrine"
