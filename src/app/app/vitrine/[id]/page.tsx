@@ -168,11 +168,6 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
         {/* ── Seção 1: Adicionar produtos ───────────────────────── */}
         <section className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
-          <div>
-            <h2 className="font-semibold text-white mb-1">Cole os links dos produtos</h2>
-            <p className="text-sm text-zinc-400">Adicione um link de afiliado por linha. Vamos buscar as informações de todos para você.</p>
-          </div>
-
           <div className="space-y-2">
             <textarea
               value={urlsText}
@@ -182,9 +177,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               disabled={fetching}
               className="w-full bg-zinc-800 border border-zinc-700 text-white placeholder:text-zinc-600 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 resize-none transition-all disabled:opacity-50"
             />
-            <div className="flex items-center justify-between text-xs text-zinc-500">
+            <div className="text-xs text-zinc-500">
               <span>{urls.length} de {slotsLeft} slots disponíveis</span>
-              <span className="text-zinc-600">Mantemos o link completo para suas seguidoras comprarem por ele.</span>
             </div>
           </div>
 
