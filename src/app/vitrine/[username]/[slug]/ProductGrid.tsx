@@ -16,11 +16,18 @@ interface Props {
   products: Product[];
 }
 
+function shortCategory(cat: string | null): string | null {
+  if (!cat) return null;
+  const parts = cat.split("/").map(s => s.trim()).filter(Boolean);
+  return parts[parts.length - 1] ?? null;
+}
+
 export function ProductGrid({ products }: Props) {
-  const categories = ["Tudo", ...Array.from(new Set(products.map(p => p.category).filter(Boolean) as string[]))];
+  const productsWithShortCat = products.map(p => ({ ...p, category: shortCategory(p.category) }));
+  const categories = ["Tudo", ...Array.from(new Set(productsWithShortCat.map(p => p.category).filter(Boolean) as string[]))];
   const [active, setActive] = useState("Tudo");
 
-  const filtered = active === "Tudo" ? products : products.filter(p => p.category === active);
+  const filtered = active === "Tudo" ? productsWithShortCat : productsWithShortCat.filter(p => p.category === active);
 
   return (
     <div>
