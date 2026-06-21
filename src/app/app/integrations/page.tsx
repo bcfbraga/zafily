@@ -31,28 +31,6 @@ export default function IntegrationsPage() {
             <AwinCard />
           </div>
 
-          {/* Coming soon */}
-          <div>
-            <h2 className="font-heading font-semibold text-white mb-4">Em breve</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {["Hotmart", "Monetizze", "Eduzz", "Lomadee"].map((name) => (
-                <div
-                  key={name}
-                  className="bg-[#20203A] border border-[rgba(255,255,255,0.06)] rounded-[16px] p-4 flex items-center gap-3 opacity-50"
-                >
-                  <div className="w-9 h-9 rounded-[10px] bg-[rgba(255,255,255,0.06)] flex items-center justify-center">
-                    <span className="text-xs font-semibold text-[#7E78B8]">
-                      {name.slice(0, 2)}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-white">{name}</p>
-                    <p className="text-[11px] text-[#7E78B8]">Em breve</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </main>
     </>
