@@ -12,6 +12,7 @@ import {
   BarChart2,
   Settings,
   ChevronRight,
+  Zap,
 } from "lucide-react";
 
 const navItems = [
@@ -20,6 +21,7 @@ const navItems = [
   { label: "Products", href: "/app/products", icon: Package },
   { label: "Platforms", href: "/app/platforms", icon: Plug },
   { label: "Performance", href: "/app/performance", icon: BarChart2 },
+  { label: "Integrações", href: "/app/integrations", icon: Zap },
 ];
 
 export function Sidebar() {
