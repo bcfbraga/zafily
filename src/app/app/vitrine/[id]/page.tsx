@@ -337,62 +337,62 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       <div className="flex-1 flex overflow-hidden">
 
         {/* LEFT: Edit panel */}
-        <div className="w-[360px] shrink-0 border-r border-white/[0.08] overflow-y-auto bg-[#111126] p-4 space-y-4">
+        <div className="w-[360px] shrink-0 border-r border-white/[0.08] overflow-y-auto bg-[#111126] p-5 space-y-5">
 
-          {/* Vitrine info card */}
-          <div className="bg-[#20203A] border border-white/[0.08] rounded-2xl p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-[#29294A] overflow-hidden shrink-0">
-                {live.imageUrl ? (
-                  <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <Package className="w-5 h-5 text-[#7E78B8]" />
-                  </div>
+          {/* Vitrine info */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#29294A] overflow-hidden shrink-0">
+              {live.imageUrl ? (
+                <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <Package className="w-4 h-4 text-[#7E78B8]" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-white text-sm truncate">{live.title}</p>
+              <div className="flex items-center gap-2 text-xs text-[#B8B4E8] mt-0.5 flex-wrap">
+                {live.liveDate && (
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    {new Date(live.liveDate + "T00:00:00").toLocaleDateString("pt-BR")}
+                  </span>
+                )}
+                <span>{productCount} produto{productCount !== 1 ? "s" : ""}</span>
+                {live.discount && (
+                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/20">
+                    -{live.discount}% OFF
+                  </span>
                 )}
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-white text-sm truncate">{live.title}</p>
-                <div className="flex items-center gap-2 text-xs text-[#B8B4E8] mt-0.5 flex-wrap">
-                  {live.liveDate && (
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {new Date(live.liveDate + "T00:00:00").toLocaleDateString("pt-BR")}
-                    </span>
-                  )}
-                  <span>{productCount} produto{productCount !== 1 ? "s" : ""}</span>
-                  {live.discount && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/20">
-                      -{live.discount}% OFF
-                    </span>
-                  )}
-                </div>
-              </div>
             </div>
-            <div className="flex gap-2 mt-3">
-              <button
-                onClick={() => setShowEditModal(true)}
-                className="flex-1 h-8 text-xs font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-lg transition-colors"
-              >
-                Editar dados
-              </button>
-              <button
-                onClick={() => setShowAddProducts(v => !v)}
-                className={`flex-1 h-8 text-xs font-medium rounded-lg border transition-colors flex items-center justify-center gap-1 ${
-                  showAddProducts
-                    ? "bg-[#6C63FF]/20 border-[#6C63FF]/40 text-[#6C63FF]"
-                    : "text-[#B8B4E8] hover:text-white bg-[#29294A] border-white/[0.12] hover:border-white/[0.20]"
-                }`}
-              >
-                <Plus className="w-3 h-3" /> Produtos
-              </button>
-            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowEditModal(true)}
+              className="flex-1 h-8 text-xs font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-lg transition-colors"
+            >
+              Editar dados
+            </button>
+            <button
+              onClick={() => setShowAddProducts(v => !v)}
+              className={`flex-1 h-8 text-xs font-medium rounded-lg border transition-colors flex items-center justify-center gap-1 ${
+                showAddProducts
+                  ? "bg-[#6C63FF]/20 border-[#6C63FF]/40 text-[#6C63FF]"
+                  : "text-[#B8B4E8] hover:text-white bg-[#29294A] border-white/[0.12] hover:border-white/[0.20]"
+              }`}
+            >
+              <Plus className="w-3 h-3" /> Produtos
+            </button>
           </div>
 
           {/* Add products section */}
           {(showAddProducts || productCount === 0) && (
-            <div className="bg-[#20203A] border border-white/[0.08] rounded-2xl p-4 space-y-3">
-              <p className="text-xs font-semibold text-white">Adicionar produtos</p>
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-[#7E78B8] uppercase tracking-wider">Adicionar produtos</p>
               <textarea
                 value={urlsText}
                 onChange={e => setUrlsText(e.target.value)}
