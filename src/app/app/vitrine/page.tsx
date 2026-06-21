@@ -89,7 +89,7 @@ export default function VitrinePage() {
         </Link>
       } />
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="px-8 py-8">
         {/* Greeting */}
         <div className="mb-8">
           {loading ? (
