@@ -9,8 +9,6 @@ import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
 import {
   LayoutDashboard,
-  Link2,
-  Package,
   Plug,
   BarChart2,
   Settings,
@@ -21,8 +19,6 @@ import {
 
 const navItems = [
   { label: "Dashboard", href: "/app", icon: LayoutDashboard, exact: true },
-  { label: "Importar links", href: "/app/import", icon: Link2 },
-  { label: "Produtos", href: "/app/products", icon: Package },
   { label: "Plataformas", href: "/app/platforms", icon: Plug },
   { label: "Performance", href: "/app/performance", icon: BarChart2 },
   { label: "Integrações", href: "/app/integrations", icon: Zap },
