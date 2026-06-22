@@ -88,12 +88,30 @@ function discountedPrice(raw: string | null, pct: number | null): { original: st
 }
 
 // ── Live preview (right panel) ───────────────────────────────────────────────
-function VitrinePreview({ live }: { live: Live }) {
+function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProducts: Product[]) => void }) {
   const [activeCategory, setActiveCategory] = useState("Tudo");
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [overIdx, setOverIdx] = useState<number | null>(null);
 
   const products = live.products.map(p => ({ ...p, category: shortCat(p.category) }));
   const categories = ["Tudo", ...Array.from(new Set(products.map(p => p.category).filter(Boolean) as string[]))];
-  const filtered = activeCategory === "Tudo" ? products : products.filter(p => p.category === activeCategory);
+  const filteredWithOrig = products
+    .map((p, origIdx) => ({ ...p, origIdx }))
+    .filter(p => activeCategory === "Tudo" || p.category === activeCategory);
+  const filtered = filteredWithOrig;
+
+  function handleDrop() {
+    if (dragIdx === null || overIdx === null || dragIdx === overIdx) {
+      setDragIdx(null); setOverIdx(null); return;
+    }
+    const fromOrig = filteredWithOrig[dragIdx].origIdx;
+    const toOrig   = filteredWithOrig[overIdx].origIdx;
+    const newProducts = [...live.products];
+    const [moved] = newProducts.splice(fromOrig, 1);
+    newProducts.splice(toOrig, 0, moved);
+    onReorder?.(newProducts);
+    setDragIdx(null); setOverIdx(null);
+  }
 
   return (
     <div className="min-h-full bg-white text-zinc-900 font-sans">
@@ -155,7 +173,17 @@ function VitrinePreview({ live }: { live: Live }) {
             {filtered.map((p, i) => {
               const disc = discountedPrice(p.price, live.discount);
               return (
-                <div key={p.id} className="rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm">
+                <div
+                  key={p.id}
+                  draggable
+                  onDragStart={() => setDragIdx(i)}
+                  onDragOver={e => { e.preventDefault(); setOverIdx(i); }}
+                  onDrop={handleDrop}
+                  onDragEnd={() => { setDragIdx(null); setOverIdx(null); }}
+                  className={`rounded-2xl overflow-hidden border bg-white shadow-sm cursor-grab active:cursor-grabbing transition-all ${
+                    overIdx === i && dragIdx !== i ? "border-violet-400 scale-[1.02]" : dragIdx === i ? "border-zinc-200 opacity-40" : "border-zinc-100"
+                  }`}
+                >
                   <div className="relative aspect-[3/4] bg-zinc-50 overflow-hidden">
                     {p.imageUrl ? (
                       <img src={p.imageUrl} alt={p.name ?? ""} className="w-full h-full object-cover" />
@@ -563,7 +591,14 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
         {/* RIGHT: Preview panel */}
         <div className="flex-1 overflow-y-auto">
-          <VitrinePreview live={live} />
+          <VitrinePreview live={live} onReorder={async (newProducts) => {
+            setLive(prev => prev ? { ...prev, products: newProducts } : prev);
+            await fetch(`/api/lives/${id}/products/reorder`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ order: newProducts.map(p => p.id) }),
+            });
+          }} />
         </div>
       </div>
 
