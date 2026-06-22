@@ -33,12 +33,18 @@ export async function PATCH(
   const live = await getLive(id, userId);
   if (!live) return NextResponse.json({ error: "Live não encontrada" }, { status: 404 });
 
-  const { name, price, category, size } = await req.json();
+  const body = await req.json();
+  const patch: Record<string, unknown> = {};
+  if ("name"     in body) patch.name     = body.name     ?? null;
+  if ("price"    in body) patch.price    = body.price    ?? null;
+  if ("category" in body) patch.category = body.category ?? null;
+  if ("size"     in body) patch.size     = body.size     ?? null;
+  if (Object.keys(patch).length === 0) return NextResponse.json({ error: "Nenhum campo" }, { status: 400 });
   const supabase = getSupabase();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from("live_products")
-    .update({ name: name ?? null, price: price ?? null, category: category ?? null, size: size ?? null })
+    .update(patch)
     .eq("id", productId)
     .eq("live_id", id)
     .select()

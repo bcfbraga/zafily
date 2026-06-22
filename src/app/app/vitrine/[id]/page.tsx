@@ -216,7 +216,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
-  const [confirmingRemoveId, setConfirmingRemoveId] = useState<string | null>(null);
+  const [confirmClearAll, setConfirmClearAll] = useState(false);
+  const [clearingAll, setClearingAll] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showAddProducts, setShowAddProducts] = useState(false);
@@ -266,6 +267,15 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     await fetch(`/api/lives/${id}/products/${productId}`, { method: "DELETE" });
     setLive(prev => prev ? { ...prev, products: prev.products.filter(p => p.id !== productId) } : prev);
     setRemovingId(null);
+  }
+
+  async function clearAllProducts() {
+    if (!live) return;
+    setClearingAll(true);
+    await Promise.all(live.products.map(p => fetch(`/api/lives/${id}/products/${p.id}`, { method: "DELETE" })));
+    setLive(prev => prev ? { ...prev, products: [] } : prev);
+    setClearingAll(false);
+    setConfirmClearAll(false);
   }
 
   async function publishVitrine() {
@@ -517,22 +527,36 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                       className="w-6 h-6 rounded-lg bg-[#29294A] flex items-center justify-center text-[#B8B4E8] hover:text-white hover:bg-[#6C63FF] transition-colors">
                       <Pencil className="w-3 h-3" />
                     </button>
-                    <button onClick={() => setConfirmingRemoveId(product.id)} disabled={removingId === product.id}
+                    <button onClick={() => removeProduct(product.id)} disabled={removingId === product.id}
                       className="w-6 h-6 rounded-lg bg-[#29294A] flex items-center justify-center text-[#B8B4E8] hover:text-white hover:bg-red-600 transition-colors">
                       {removingId === product.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
                     </button>
                   </div>
-                  {/* Confirm remove */}
-                  {confirmingRemoveId === product.id && (
-                    <div className="absolute inset-0 bg-black/80 flex items-center justify-center gap-2 rounded-xl z-10 p-3">
-                      <button onClick={() => { setConfirmingRemoveId(null); removeProduct(product.id); }}
-                        className="h-7 px-3 text-xs bg-red-600 hover:bg-red-500 text-white rounded-lg">Excluir</button>
-                      <button onClick={() => setConfirmingRemoveId(null)}
-                        className="h-7 px-3 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg">Cancelar</button>
-                    </div>
-                  )}
                 </div>
               ))}
+
+              {/* Clear all */}
+              {live.products.length > 0 && (
+                <div className="pt-1">
+                  {confirmClearAll ? (
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-900/20 border border-red-600/30">
+                      <p className="text-xs text-red-300 flex-1">Remover todos os {live.products.length} produtos?</p>
+                      <button onClick={clearAllProducts} disabled={clearingAll}
+                        className="h-7 px-3 text-xs bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50 flex items-center gap-1">
+                        {clearingAll && <Loader2 className="w-3 h-3 animate-spin" />}
+                        Confirmar
+                      </button>
+                      <button onClick={() => setConfirmClearAll(false)}
+                        className="h-7 px-3 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg">Cancelar</button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmClearAll(true)}
+                      className="w-full h-8 text-xs text-[#7E78B8] hover:text-red-400 border border-dashed border-white/[0.08] hover:border-red-600/30 rounded-xl transition-colors">
+                      Limpar tudo
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
