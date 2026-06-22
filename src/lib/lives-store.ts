@@ -27,6 +27,7 @@ export interface LiveProduct {
   imageUrl: string | null;
   price: string | null;
   category: string | null;
+  size: string | null;
   productUrl: string | null;
   position: number;
   createdAt: string;
@@ -225,6 +226,7 @@ function rowToProduct(row: Record<string, unknown>): LiveProduct {
     imageUrl: (row.image_url as string) ?? null,
     price: (row.price as string) ?? null,
     category: (row.category as string) ?? null,
+    size: (row.size as string) ?? null,
     productUrl: (row.product_url as string) ?? null,
     position: row.position as number,
     createdAt: row.created_at as string,

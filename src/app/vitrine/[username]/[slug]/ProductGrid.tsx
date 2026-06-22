@@ -10,6 +10,7 @@ interface Product {
   imageUrl: string | null;
   price: string | null;
   category: string | null;
+  size: string | null;
 }
 
 interface Props {
@@ -99,6 +100,9 @@ export function ProductGrid({ products }: Props) {
                 <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1 flex-1">
                   {product.name ?? "Produto"}
                 </p>
+                {product.size && (
+                  <p className="text-[10px] text-zinc-400 mb-1">Tam. {product.size}</p>
+                )}
                 {product.price && (
                   <p className="text-sm font-bold text-zinc-900 mb-2">
                     {typeof product.price === "number"

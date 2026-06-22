@@ -742,14 +742,14 @@ interface EditProductModalProps {
   product: Product;
   liveId: string;
   onClose: () => void;
-  onSave: (data: Pick<Product, "id" | "name" | "price">) => void;
+  onSave: (data: Pick<Product, "id" | "name" | "price" | "category" | "size">) => void;
 }
 
 function EditProductModal({ product, liveId, onClose, onSave }: EditProductModalProps) {
   const [name, setName] = useState(product.name ?? "");
   const [price, setPrice] = useState(product.price ?? "");
   const [category, setCategory] = useState(shortCat(product.category) ?? "");
-  const [size, setSize] = useState("");
+  const [size, setSize] = useState(product.size ?? "");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -770,7 +770,7 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setError(data.error ?? "Erro ao salvar"); return; }
-    onSave({ id: product.id, name: data.name, price: data.price });
+    onSave({ id: product.id, name: data.name, price: data.price, category: data.category ?? null, size: data.size ?? null });
   }
 
   return (
