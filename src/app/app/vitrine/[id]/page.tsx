@@ -17,6 +17,7 @@ interface Product {
   imageUrl: string | null;
   price: string | null;
   category: string | null;
+  size: string | null;
   position: number;
 }
 
@@ -225,6 +226,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [username, setUsername] = useState<string | null>(null);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [editingSizeId, setEditingSizeId] = useState<string | null>(null);
+  const [sizeInputVal, setSizeInputVal] = useState("");
 
   useEffect(() => {
     Promise.all([
@@ -284,6 +287,22 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     await navigator.clipboard.writeText(url);
     setCopiedLink(true);
     setTimeout(() => setCopiedLink(false), 2000);
+  }
+
+  function openSizeEdit(product: Product) {
+    setEditingSizeId(product.id);
+    setSizeInputVal(product.size ?? "");
+  }
+
+  async function saveSize(productId: string) {
+    const size = sizeInputVal.trim() || null;
+    setEditingSizeId(null);
+    setLive(prev => prev ? { ...prev, products: prev.products.map(p => p.id === productId ? { ...p, size } : p) } : prev);
+    await fetch(`/api/lives/${id}/products/${productId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ size }),
+    });
   }
 
   function handleDragStart(index: number) { setDragIndex(index); }
@@ -466,7 +485,32 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-white truncate leading-tight">{product.name ?? "Sem nome"}</p>
-                    {product.price && <p className="text-[10px] text-[#6C63FF] font-semibold mt-0.5">{product.price}</p>}
+                    <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                      {product.price && <span className="text-[10px] text-[#6C63FF] font-semibold">{product.price}</span>}
+                      {/* Inline size field */}
+                      {editingSizeId === product.id ? (
+                        <input
+                          autoFocus
+                          value={sizeInputVal}
+                          onChange={e => setSizeInputVal(e.target.value)}
+                          onBlur={() => saveSize(product.id)}
+                          onKeyDown={e => { if (e.key === "Enter") saveSize(product.id); if (e.key === "Escape") setEditingSizeId(null); }}
+                          placeholder="ex: M, 38"
+                          className="h-4 w-16 bg-transparent border-b border-[#6C63FF] text-[10px] text-white placeholder:text-[#7E78B8] focus:outline-none"
+                        />
+                      ) : (
+                        <button
+                          onClick={() => openSizeEdit(product)}
+                          className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
+                            product.size
+                              ? "border-[#6C63FF]/40 text-[#6C63FF] bg-[#6C63FF]/10 hover:bg-[#6C63FF]/20"
+                              : "border-white/[0.10] text-[#7E78B8] hover:text-[#B8B4E8] hover:border-white/[0.20]"
+                          }`}
+                        >
+                          {product.size ?? "+ tamanho"}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                     <button onClick={() => setEditingProduct(product)}
