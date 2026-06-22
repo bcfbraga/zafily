@@ -118,9 +118,9 @@ function VitrinePreview({ live }: { live: Live }) {
 
         {/* Discount banner */}
         {live.discount && (
-          <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-rose-50 border border-rose-200">
-            <span className="text-rose-600 text-xs font-bold">{live.discount}% OFF</span>
-            <span className="text-rose-500 text-xs">· cupom exclusivo desta live</span>
+          <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200">
+            <span className="text-violet-700 text-xs font-bold">{live.discount}% OFF</span>
+            <span className="text-violet-500 text-xs">· cupom exclusivo desta live</span>
           </div>
         )}
         {!live.discount && <div className="mb-5" />}
@@ -155,7 +155,7 @@ function VitrinePreview({ live }: { live: Live }) {
             {filtered.map((p, i) => {
               const disc = discountedPrice(p.price, live.discount);
               return (
-                <div key={p.id} className={`rounded-2xl overflow-hidden border bg-white shadow-sm ${disc ? "border-rose-200" : "border-zinc-100"}`}>
+                <div key={p.id} className="rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm">
                   <div className="relative aspect-[3/4] bg-zinc-50 overflow-hidden">
                     {p.imageUrl ? (
                       <img src={p.imageUrl} alt={p.name ?? ""} className="w-full h-full object-cover" />
@@ -168,7 +168,7 @@ function VitrinePreview({ live }: { live: Live }) {
                       {i + 1}
                     </span>
                     {disc && (
-                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-bold shadow">
+                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-violet-600 text-white text-[10px] font-bold shadow">
                         -{live.discount}%
                       </span>
                     )}
@@ -185,13 +185,13 @@ function VitrinePreview({ live }: { live: Live }) {
                     {disc ? (
                       <div>
                         <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
-                        <p className="text-sm font-bold text-rose-600 leading-tight">{disc.discounted}</p>
-                        <p className="text-[9px] text-rose-400 font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
+                        <p className="text-sm font-bold text-violet-700 leading-tight">{disc.discounted}</p>
+                        <p className="text-[9px] text-violet-400 font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
                       </div>
                     ) : (
                       p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
                     )}
-                    <div className={`mt-2 w-full h-7 rounded-lg flex items-center justify-center text-[10px] font-semibold tracking-wide ${disc ? "bg-rose-500 text-white" : "bg-zinc-900 text-white"}`}>
+                    <div className="mt-2 w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-[10px] font-semibold tracking-wide">
                       VER PRODUTO →
                     </div>
                   </div>
@@ -667,10 +667,26 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
             <input type="text" value={title} onChange={e => setTitle(e.target.value)} required
               className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
           </div>
-          {/* Store */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#B8B4E8]">Loja</label>
-            <StoreSelect value={store} onChange={setStore} />
+          {/* Store + Discount on same row */}
+          <div className="grid grid-cols-[1fr_100px] gap-3 items-end">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#B8B4E8]">Loja</label>
+              <StoreSelect value={store} onChange={setStore} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#B8B4E8]">
+                Desconto <span className="text-[#7E78B8] font-normal">(opcional)</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number" min="1" max="99" value={discount}
+                  onChange={e => setDiscount(e.target.value)}
+                  placeholder="Ex: 10"
+                  className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-3 pr-8 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#7E78B8]">%</span>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -703,28 +719,6 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
               )}
             </label>
           </div>
-          {/* Discount */}
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#B8B4E8]">
-              Cupom de desconto exclusivo
-              <span className="ml-1.5 text-xs font-normal text-[#7E78B8]">(opcional)</span>
-            </label>
-            <div className="relative">
-              <input
-                type="number" min="1" max="99" value={discount}
-                onChange={e => setDiscount(e.target.value)}
-                placeholder="Ex: 10"
-                className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 pr-10 text-sm focus:outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-400/20 transition-all"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-[#7E78B8] font-medium">%</span>
-            </div>
-            {discount && (
-              <p className="text-xs text-rose-400">
-                Os preços serão exibidos com {discount}% de desconto na vitrine pública.
-              </p>
-            )}
-          </div>
-
           {error && <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-300">{error}</div>}
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving || uploading}
