@@ -72,6 +72,14 @@ export default async function VitrinePage({ params }: Props) {
           </div>
         </div>
 
+        {/* Discount banner */}
+        {live.discount && (
+          <div className="inline-flex items-center gap-1.5 mt-4 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200">
+            <span className="text-violet-700 text-xs font-bold">{live.discount}% OFF</span>
+            <span className="text-violet-500 text-xs">· cupom exclusivo desta live</span>
+          </div>
+        )}
+
         <div className="border-t border-zinc-100 mt-6 mb-8" />
 
         {/* ── Products ──────────────────────────────────────────── */}
@@ -82,7 +90,7 @@ export default async function VitrinePage({ params }: Props) {
             </p>
           </div>
         ) : (
-          <ProductGrid products={live.products} />
+          <ProductGrid products={live.products} discount={live.discount} />
         )}
       </div>
 
