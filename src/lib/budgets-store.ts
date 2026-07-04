@@ -5,6 +5,7 @@ import { generateSlug, getOrCreateProfile, getProfileByUsername } from "./lives-
 type DB = any;
 
 export { getOrCreateProfile, getProfileByUsername };
+export { SCOPE_DEFAULT_NOTES } from "./scope-defaults";
 
 export interface ValuePoint {
   title: string;

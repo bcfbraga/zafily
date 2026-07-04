@@ -289,8 +289,11 @@
 
 .sectionTitle h2 {
   margin: 0;
-  font-family: "Playfair Display", Georgia, serif;
-  font-size: clamp(34px, 4vw, 48px);
+  color: var(--berry);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .28em;
+  text-transform: uppercase;
   line-height: 1.1;
 }
 

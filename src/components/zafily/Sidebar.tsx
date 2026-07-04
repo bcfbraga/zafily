@@ -29,13 +29,21 @@ export function Sidebar() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const isProposalEditor = /^\/app\/orcamentos\/[^/]+$/.test(pathname) && !pathname.endsWith("/novo");
 
   useEffect(() => {
-    const saved = localStorage.getItem(COLLAPSED_KEY);
-    if (saved === "1") setCollapsed(true);
     const supabase = createClient();
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
   }, []);
+
+  useEffect(() => {
+    if (isProposalEditor) {
+      setCollapsed(true);
+      return;
+    }
+    const saved = localStorage.getItem(COLLAPSED_KEY);
+    setCollapsed(saved === "1");
+  }, [isProposalEditor]);
 
   function toggle() {
     setCollapsed(c => {

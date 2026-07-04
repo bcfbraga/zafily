@@ -7,12 +7,13 @@ import {
   ExternalLink, Copy, Check, Download, Pencil, Eye, EyeOff,
   Minus, Plus, GripVertical, Trash2, PlusCircle
 } from "lucide-react";
-import { ProposalView, HOURS_ITEM, type ProposalProfile } from "@/components/zafily/ProposalView";
+import { ProposalView, HOURS_ITEM, formatDateBR, type ProposalProfile } from "@/components/zafily/ProposalView";
+import { SCOPE_DEFAULT_NOTES } from "@/lib/scope-defaults";
 
 const SCOPE_PRESETS: { key: string; hint?: string; defaultNotes?: string }[] = [
-  { key: "Reels / Feed", defaultNotes: "Vídeo de até 60s publicado no feed e nos stories, com edição, trilha sonora e legenda." },
-  { key: "Sequência de Stories", defaultNotes: "Sequência de stories apresentando o produto ou serviço de forma natural, com link ou chamada para ação." },
-  { key: HOURS_ITEM, hint: "quantidade em horas", defaultNotes: "Registro em fotos e stories ao vivo durante o evento, com menção à marca." },
+  { key: "Reels / Feed", defaultNotes: SCOPE_DEFAULT_NOTES["Reels / Feed"] },
+  { key: "Sequência de Stories", defaultNotes: SCOPE_DEFAULT_NOTES["Sequência de Stories"] },
+  { key: HOURS_ITEM, hint: "quantidade em horas", defaultNotes: SCOPE_DEFAULT_NOTES[HOURS_ITEM] },
   { key: "Roteiro" },
   { key: "Gravação" },
   { key: "Deslocamento" },
@@ -269,29 +270,6 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
     reorderScopeItems(reordered);
   }
 
-  function setFinalValueLocal(raw: string) {
-    const value = raw.trim() ? Number(raw.replace(",", ".")) : null;
-    setBudget(prev => prev ? { ...prev, finalValue: value === null || isNaN(value) ? null : value } : prev);
-  }
-
-  async function saveFinalValue(raw: string) {
-    const value = raw.trim() ? Number(raw.replace(",", ".")) : null;
-    await fetch(`/api/budgets/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ finalValue: value === null || isNaN(value) ? null : value }),
-    });
-  }
-
-  async function setExpiresAt(value: string) {
-    setBudget(prev => prev ? { ...prev, expiresAt: value || null } : prev);
-    await fetch(`/api/budgets/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ expiresAt: value || null }),
-    });
-  }
-
   async function toggleSectionVisibility(field: "valueHidden" | "conditionsHidden") {
     if (!budget) return;
     const next = !budget[field];
@@ -387,59 +365,47 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
         <div className="w-[360px] shrink-0 border-r border-black/[0.08] overflow-y-auto bg-[#F6F6FB] p-5 space-y-5">
 
           {/* Budget info */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0 flex items-center justify-center">
-              {budget.clientLogoUrl ? (
-                <img src={budget.clientLogoUrl} alt={budget.clientName ?? ""} className="w-full h-full object-contain" />
-              ) : (
-                <Package className="w-4 h-4 text-[#716C8C]" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[#16162B] text-sm truncate">{budget.title}</p>
-              <div className="flex items-center gap-2 text-xs text-[#4B4768] mt-0.5 flex-wrap">
-                {budget.clientName && <span>{budget.clientName}</span>}
-                {budget.finalValue != null && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-[#6C63FF]/20 text-[#6C63FF] text-[10px] font-bold">
-                    {formatBRL(budget.finalValue)}
-                  </span>
+          <div className="relative rounded-xl border border-black/[0.08] bg-white p-3 space-y-3">
+            <button
+              onClick={() => setShowEditModal(true)}
+              title="Editar dados"
+              className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-md text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <div className="flex items-center gap-3 pr-8">
+              <div className="w-10 h-10 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0 flex items-center justify-center">
+                {budget.clientLogoUrl ? (
+                  <img src={budget.clientLogoUrl} alt={budget.clientName ?? ""} className="w-full h-full object-contain" />
+                ) : (
+                  <Package className="w-4 h-4 text-[#716C8C]" />
                 )}
               </div>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setShowEditModal(true)}
-            className="w-full h-8 text-xs font-medium text-[#4B4768] hover:text-[#16162B] bg-[#F1F0F7] border border-black/[0.12] hover:border-black/[0.20] rounded-lg transition-colors"
-          >
-            Editar dados
-          </button>
-
-          {/* Investment + validity */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1">
-              <label className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider">Valor do investimento</label>
-              <div className="relative">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-[#716C8C]">R$</span>
-                <input
-                  key={budget.id}
-                  type="text" inputMode="decimal"
-                  defaultValue={budget.finalValue != null ? String(budget.finalValue) : ""}
-                  onChange={e => setFinalValueLocal(e.target.value.replace(/[^\d.,]/g, ""))}
-                  onBlur={e => saveFinalValue(e.target.value.replace(/[^\d.,]/g, ""))}
-                  placeholder="0,00"
-                  className="w-full h-8 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-lg pl-7 pr-2 text-xs focus:outline-none focus:border-[#6C63FF] transition-all"
-                />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-[#16162B] text-sm truncate">{budget.title}</p>
+                <div className="flex items-center gap-2 text-xs text-[#4B4768] mt-0.5 flex-wrap">
+                  {budget.clientName && <span>{budget.clientName}</span>}
+                  {budget.finalValue != null && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-[#6C63FF]/20 text-[#6C63FF] text-[10px] font-bold">
+                      {formatBRL(budget.finalValue)}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider">Validade da proposta</label>
-              <input
-                type="date"
-                value={budget.expiresAt ?? ""}
-                onChange={e => setExpiresAt(e.target.value)}
-                className="w-full h-8 bg-white border border-black/[0.12] text-[#16162B] rounded-lg px-2 text-xs focus:outline-none focus:border-[#6C63FF] transition-all"
-              />
+            <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-black/[0.06]">
+              <div>
+                <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider">Valor do investimento</p>
+                <p className="text-sm font-semibold text-[#16162B] mt-0.5">
+                  {budget.finalValue != null ? formatBRL(budget.finalValue) : "—"}
+                </p>
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider">Validade da proposta</p>
+                <p className="text-sm font-semibold text-[#16162B] mt-0.5">
+                  {budget.expiresAt ? formatDateBR(budget.expiresAt) : "—"}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -640,6 +606,8 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
   const [clientPhone, setClientPhone] = useState(budget.clientPhone ?? "");
   const [clientLogoUrl, setClientLogoUrl] = useState<string | null>(budget.clientLogoUrl);
   const [logoPreview, setLogoPreview] = useState<string | null>(budget.clientLogoUrl);
+  const [finalValue, setFinalValue] = useState(budget.finalValue != null ? String(budget.finalValue) : "");
+  const [expiresAt, setExpiresAt] = useState(budget.expiresAt ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -662,6 +630,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
     e.preventDefault();
     if (!title.trim()) { setError("Título obrigatório"); return; }
     setSaving(true);
+    const parsedValue = finalValue.trim() ? Number(finalValue.replace(",", ".")) : null;
     const res = await fetch(`/api/budgets/${budgetId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -670,6 +639,8 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
         clientName: clientName || null,
         clientPhone: clientPhone || null,
         clientLogoUrl,
+        finalValue: parsedValue === null || isNaN(parsedValue) ? null : parsedValue,
+        expiresAt: expiresAt || null,
       }),
     });
     const data = await res.json();
@@ -680,6 +651,8 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
       clientName: data.clientName ?? null,
       clientPhone: data.clientPhone ?? null,
       clientLogoUrl: data.clientLogoUrl ?? null,
+      finalValue: data.finalValue ?? null,
+      expiresAt: data.expiresAt ?? null,
     });
   }
 
@@ -709,6 +682,25 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[#4B4768]">Telefone</label>
               <input type="text" value={clientPhone} onChange={e => setClientPhone(e.target.value)}
+                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#4B4768]">Valor do investimento</label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">R$</span>
+                <input
+                  type="text" inputMode="decimal" value={finalValue}
+                  onChange={e => setFinalValue(e.target.value.replace(/[^\d.,]/g, ""))}
+                  placeholder="0,00"
+                  className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl pl-9 pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#4B4768]">Validade da proposta</label>
+              <input type="date" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}
                 className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
             </div>
           </div>

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { listBudgets, createBudget, addItem } from "@/lib/budgets-store";
+import { listBudgets, createBudget, addItem, SCOPE_DEFAULT_NOTES } from "@/lib/budgets-store";
 
 export async function GET(req: NextRequest) {
   let userId: string;
@@ -30,7 +30,9 @@ export async function POST(req: NextRequest) {
 
   const scopeItems: string[] = Array.isArray(body.scopeItems) ? body.scopeItems : [];
   if (scopeItems.length > 0) {
-    await Promise.all(scopeItems.map(description => addItem(budget.id, { description, quantity: 1 })));
+    await Promise.all(scopeItems.map(description =>
+      addItem(budget.id, { description, quantity: 1, notes: SCOPE_DEFAULT_NOTES[description] ?? null })
+    ));
   }
 
   return NextResponse.json(budget, { status: 201 });
