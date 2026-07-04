@@ -27,11 +27,11 @@ interface Profile {
 
 function StatusBadge({ status }: { status: "draft" | "published" }) {
   return status === "published" ? (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-900/60 text-emerald-300 border border-emerald-700/40">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
       <CheckCircle2 className="w-3 h-3" /> Publicada
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#29294A] text-[#B8B4E8] border border-white/[0.12]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F1F0F7] text-[#4B4768] border border-black/[0.12]">
       <FileText className="w-3 h-3" /> Rascunho
     </span>
   );
@@ -79,38 +79,22 @@ export default function VitrinePage() {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
-    <div className="min-h-screen bg-[#111126] text-white">
+    <div className="min-h-screen bg-[#F6F6FB] text-[#16162B]">
       <Topbar title="Minha Vitrine" action={
         <Link
           href="/app/vitrine/nova"
-          className="flex items-center gap-1.5 h-8 px-4 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-xs font-semibold rounded-lg transition-colors"
+          className="flex items-center gap-1.5 h-8 px-4 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-xs font-semibold rounded-lg transition-colors"
         >
           <Plus className="w-3.5 h-3.5" /> Nova vitrine
         </Link>
       } />
 
       <div className="px-8 py-8">
-        {/* Greeting */}
-        <div className="mb-8">
-          {loading ? (
-            <div className="h-7 w-48 bg-[#29294A] rounded animate-pulse mb-2" />
-          ) : (
-            <>
-              <h1 className="text-2xl font-bold text-white">
-                Olá{profile?.displayName ? `, ${profile.displayName.split(" ")[0]}` : ""}.
-              </h1>
-              <p className="text-[#B8B4E8] text-sm mt-1">
-                Gerencie as vitrines de{profile ? ` @${profile.username}` : ""}.
-              </p>
-            </>
-          )}
-        </div>
-
         {/* Lives list */}
         {loading ? (
           <div className="space-y-3">
             {[1, 2].map(i => (
-              <div key={i} className="h-32 rounded-xl bg-[#20203A] border border-white/[0.08] animate-pulse" />
+              <div key={i} className="h-32 rounded-xl bg-white border border-black/[0.08] animate-pulse" />
             ))}
           </div>
         ) : lives.length === 0 ? (
@@ -119,12 +103,12 @@ export default function VitrinePage() {
               <Globe className="w-6 h-6 text-[#6C63FF]" />
             </div>
             <div>
-              <p className="text-white font-semibold text-lg">Nenhuma vitrine ainda</p>
-              <p className="text-[#B8B4E8] text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
+              <p className="text-[#16162B] font-semibold text-lg">Nenhuma vitrine ainda</p>
+              <p className="text-[#4B4768] text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
             </div>
             <Link
               href="/app/vitrine/nova"
-              className="flex items-center gap-1.5 h-10 px-5 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-1.5 h-10 px-5 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" /> Criar primeira vitrine
             </Link>
@@ -135,15 +119,15 @@ export default function VitrinePage() {
               <div
                 key={live.id}
                 onClick={() => router.push(`/app/vitrine/${live.id}`)}
-                className="bg-[#20203A] border border-white/[0.08] rounded-xl p-5 hover:border-white/[0.16] hover:bg-[#252540] transition-colors cursor-pointer"
+                className="bg-white border border-black/[0.08] rounded-xl p-5 hover:border-black/[0.16] hover:bg-[#F6F6FB] transition-colors cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-2">
-                      <h3 className="font-semibold text-white truncate">{live.title}</h3>
+                      <h3 className="font-semibold text-[#16162B] truncate">{live.title}</h3>
                       <StatusBadge status={live.status} />
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-[#B8B4E8] flex-wrap">
+                    <div className="flex items-center gap-4 text-xs text-[#4B4768] flex-wrap">
                       {live.liveDate && (
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3 h-3" />
@@ -164,13 +148,13 @@ export default function VitrinePage() {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
-                        className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#7C75FF] mt-2 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#5851E0] mt-2 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
                         {`/vitrine/${profile.username}/${live.slug}`}
                       </a>
                     )}
-                    <p className="text-[11px] text-[#7E78B8] mt-1">
+                    <p className="text-[11px] text-[#716C8C] mt-1">
                       Atualizada em {new Date(live.updatedAt).toLocaleDateString("pt-BR")}
                     </p>
                   </div>
@@ -180,7 +164,7 @@ export default function VitrinePage() {
                       onClick={() => toggleStatus(live)}
                       className={`h-8 px-3 text-xs font-semibold rounded-lg border transition-colors ${
                         live.status === "published"
-                          ? "border-white/[0.12] text-[#B8B4E8] hover:text-white hover:border-white/[0.20]"
+                          ? "border-black/[0.12] text-[#4B4768] hover:text-[#16162B] hover:border-black/[0.20]"
                           : "border-[#6C63FF]/40 text-[#6C63FF] hover:bg-[#6C63FF] hover:text-white hover:border-[#6C63FF]"
                       }`}
                     >
@@ -188,7 +172,7 @@ export default function VitrinePage() {
                     </button>
                     <button
                       onClick={() => setConfirmId(live.id)}
-                      className="w-8 h-8 flex items-center justify-center rounded-lg text-[#7E78B8] hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-red-600 hover:bg-red-50 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -204,9 +188,9 @@ export default function VitrinePage() {
       {confirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmId(null)} />
-          <div className="relative bg-[#20203A] border border-white/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h3 className="font-semibold text-white mb-2">Excluir vitrine?</h3>
-            <p className="text-sm text-[#B8B4E8] mb-5">
+          <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <h3 className="font-semibold text-[#16162B] mb-2">Excluir vitrine?</h3>
+            <p className="text-sm text-[#4B4768] mb-5">
               Esta ação remove a vitrine e todos os produtos vinculados permanentemente. Não poderá ser desfeito.
             </p>
             <div className="flex gap-3">
@@ -219,7 +203,7 @@ export default function VitrinePage() {
               </button>
               <button
                 onClick={() => setConfirmId(null)}
-                className="flex-1 h-10 bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] text-sm font-medium rounded-lg hover:border-white/[0.20] transition-colors"
+                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-lg hover:border-black/[0.20] transition-colors"
               >
                 Cancelar
               </button>

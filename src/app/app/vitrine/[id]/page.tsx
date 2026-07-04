@@ -37,11 +37,11 @@ interface Live {
 
 function StatusBadge({ status }: { status: "draft" | "published" }) {
   return status === "published" ? (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-900/60 text-emerald-300 border border-emerald-700/40">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
       <CheckCircle2 className="w-3 h-3" /> Publicada
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#29294A] text-[#B8B4E8] border border-white/[0.12]">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F1F0F7] text-[#4B4768] border border-black/[0.12]">
       <FileText className="w-3 h-3" /> Rascunho
     </span>
   );
@@ -363,7 +363,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="h-screen bg-[#111126] flex items-center justify-center">
+      <div className="h-screen bg-[#F6F6FB] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-[#6C63FF] animate-spin" />
       </div>
     );
@@ -371,7 +371,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   if (!live) {
     return (
-      <div className="h-screen bg-[#111126] flex items-center justify-center text-[#B8B4E8]">
+      <div className="h-screen bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
         Vitrine não encontrada.
       </div>
     );
@@ -380,10 +380,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const publicUrl = username ? `${typeof window !== "undefined" ? window.location.origin : ""}/vitrine/${username}/${live.slug}` : null;
 
   return (
-    <div className="h-screen flex flex-col bg-[#111126] text-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="h-14 shrink-0 border-b border-white/[0.08] bg-[#111126] flex items-center justify-between px-5 z-10">
-        <Link href="/app/vitrine" className="flex items-center gap-1.5 text-sm text-[#B8B4E8] hover:text-white transition-colors">
+      <div className="h-14 shrink-0 border-b border-black/[0.08] bg-[#F6F6FB] flex items-center justify-between px-5 z-10">
+        <Link href="/app/vitrine" className="flex items-center gap-1.5 text-sm text-[#4B4768] hover:text-[#16162B] transition-colors">
           <ArrowLeft className="w-4 h-4" /> Suas vitrines
         </Link>
         <div className="flex items-center gap-2">
@@ -392,14 +392,14 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
             <button
               onClick={publishVitrine}
               disabled={togglingStatus}
-              className="h-8 px-4 text-xs font-semibold rounded-lg bg-[#6C63FF] hover:bg-[#7C75FF] text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="h-8 px-4 text-xs font-semibold rounded-lg bg-[#6C63FF] hover:bg-[#5851E0] text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
               {togglingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Publicar"}
             </button>
           )}
           {publicUrl && live.status === "published" && (
             <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] hover:text-white transition-colors">
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] transition-colors">
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           )}
@@ -410,22 +410,22 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       <div className="flex-1 flex overflow-hidden">
 
         {/* LEFT: Edit panel */}
-        <div className="w-[360px] shrink-0 border-r border-white/[0.08] overflow-y-auto bg-[#111126] p-5 space-y-5">
+        <div className="w-[360px] shrink-0 border-r border-black/[0.08] overflow-y-auto bg-[#F6F6FB] p-5 space-y-5">
 
           {/* Vitrine info */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#29294A] overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0">
               {live.imageUrl ? (
                 <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-4 h-4 text-[#7E78B8]" />
+                  <Package className="w-4 h-4 text-[#716C8C]" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-white text-sm truncate">{live.title}</p>
-              <div className="flex items-center gap-2 text-xs text-[#B8B4E8] mt-0.5 flex-wrap">
+              <p className="font-semibold text-[#16162B] text-sm truncate">{live.title}</p>
+              <div className="flex items-center gap-2 text-xs text-[#4B4768] mt-0.5 flex-wrap">
                 {live.liveDate && (
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
@@ -446,7 +446,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           <div className="flex gap-2">
             <button
               onClick={() => setShowEditModal(true)}
-              className="flex-1 h-8 text-xs font-medium text-[#B8B4E8] hover:text-white bg-[#29294A] border border-white/[0.12] hover:border-white/[0.20] rounded-lg transition-colors"
+              className="flex-1 h-8 text-xs font-medium text-[#4B4768] hover:text-[#16162B] bg-[#F1F0F7] border border-black/[0.12] hover:border-black/[0.20] rounded-lg transition-colors"
             >
               Editar dados
             </button>
@@ -455,7 +455,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               className={`flex-1 h-8 text-xs font-medium rounded-lg border transition-colors flex items-center justify-center gap-1 ${
                 showAddProducts
                   ? "bg-[#6C63FF]/20 border-[#6C63FF]/40 text-[#6C63FF]"
-                  : "text-[#B8B4E8] hover:text-white bg-[#29294A] border-white/[0.12] hover:border-white/[0.20]"
+                  : "text-[#4B4768] hover:text-[#16162B] bg-[#F1F0F7] border-black/[0.12] hover:border-black/[0.20]"
               }`}
             >
               <Plus className="w-3 h-3" /> Produtos
@@ -465,27 +465,27 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           {/* Add products section */}
           {(showAddProducts || productCount === 0) && (
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-[#7E78B8] uppercase tracking-wider">Adicionar produtos</p>
+              <p className="text-xs font-semibold text-[#716C8C] uppercase tracking-wider">Adicionar produtos</p>
               <textarea
                 value={urlsText}
                 onChange={e => setUrlsText(e.target.value)}
                 placeholder={"https://www.cea.com.br/produto...\nhttps://www.cea.com.br/produto..."}
                 rows={4}
                 disabled={fetching}
-                className="w-full bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#6C63FF] resize-none transition-all disabled:opacity-50"
+                className="w-full bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#6C63FF] resize-none transition-all disabled:opacity-50"
               />
-              <p className="text-[10px] text-[#7E78B8]">{urls.length} de {slotsLeft} slots disponíveis</p>
+              <p className="text-[10px] text-[#716C8C]">{urls.length} de {slotsLeft} slots disponíveis</p>
               {fetchError && <p className="text-xs text-red-400">{fetchError}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={fetchProducts}
                   disabled={fetching || urls.length === 0 || slotsLeft <= 0}
-                  className="flex-1 h-9 flex items-center justify-center gap-1.5 bg-[#6C63FF] hover:bg-[#7C75FF] disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-colors"
+                  className="flex-1 h-9 flex items-center justify-center gap-1.5 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-colors"
                 >
                   {fetching ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Buscando...</> : "Buscar produtos"}
                 </button>
                 <button onClick={() => setUrlsText("")} disabled={fetching}
-                  className="h-9 px-3 text-xs text-[#B8B4E8] bg-[#29294A] border border-white/[0.12] rounded-xl transition-colors">
+                  className="h-9 px-3 text-xs text-[#4B4768] bg-[#F1F0F7] border border-black/[0.12] rounded-xl transition-colors">
                   Limpar
                 </button>
               </div>
@@ -495,7 +495,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           {/* Product list (mini cards) */}
           {live.products.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] font-semibold text-[#7E78B8] uppercase tracking-wider px-1">
+              <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider px-1">
                 {live.products.length} produto{live.products.length !== 1 ? "s" : ""} · arraste para reordenar
               </p>
               {live.products.map((product, i) => (
@@ -510,19 +510,19 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     overIndex === i && dragIndex !== i
                       ? "border-[#6C63FF] bg-[#6C63FF]/10"
                       : dragIndex === i
-                      ? "border-white/[0.08] bg-[#20203A] opacity-40"
-                      : "border-white/[0.06] bg-[#20203A] hover:border-white/[0.12]"
+                      ? "border-black/[0.08] bg-white opacity-40"
+                      : "border-black/[0.06] bg-white hover:border-black/[0.12]"
                   }`}
                 >
-                  <GripVertical className="w-3.5 h-3.5 text-[#7E78B8] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="w-9 h-9 rounded-lg bg-[#29294A] overflow-hidden shrink-0">
+                  <GripVertical className="w-3.5 h-3.5 text-[#716C8C] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="w-9 h-9 rounded-lg bg-[#F1F0F7] overflow-hidden shrink-0">
                     {product.imageUrl
                       ? <img src={product.imageUrl} alt="" className="w-full h-full object-cover" />
-                      : <div className="w-full h-full flex items-center justify-center"><Package className="w-4 h-4 text-[#7E78B8]" /></div>
+                      : <div className="w-full h-full flex items-center justify-center"><Package className="w-4 h-4 text-[#716C8C]" /></div>
                     }
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-white truncate leading-tight">{product.name ?? "Sem nome"}</p>
+                    <p className="text-xs text-[#16162B] truncate leading-tight">{product.name ?? "Sem nome"}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {product.price && <span className="text-[10px] text-[#6C63FF] font-semibold">{product.price}</span>}
                       {/* Inline size field */}
@@ -534,7 +534,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                           onBlur={() => saveSize(product.id)}
                           onKeyDown={e => { if (e.key === "Enter") saveSize(product.id); if (e.key === "Escape") setEditingSizeId(null); }}
                           placeholder="ex: M, 38"
-                          className="h-4 w-16 bg-transparent border-b border-[#6C63FF] text-[10px] text-white placeholder:text-[#7E78B8] focus:outline-none"
+                          className="h-4 w-16 bg-transparent border-b border-[#6C63FF] text-[10px] text-[#16162B] placeholder:text-[#716C8C] focus:outline-none"
                         />
                       ) : (
                         <button
@@ -542,7 +542,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                           className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
                             product.size
                               ? "border-[#6C63FF]/40 text-[#6C63FF] bg-[#6C63FF]/10 hover:bg-[#6C63FF]/20"
-                              : "border-white/[0.10] text-[#7E78B8] hover:text-[#B8B4E8] hover:border-white/[0.20]"
+                              : "border-black/[0.10] text-[#716C8C] hover:text-[#4B4768] hover:border-black/[0.20]"
                           }`}
                         >
                           {product.size ?? "+ tamanho"}
@@ -552,11 +552,11 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                     <button onClick={() => setEditingProduct(product)}
-                      className="w-6 h-6 rounded-lg bg-[#29294A] flex items-center justify-center text-[#B8B4E8] hover:text-white hover:bg-[#6C63FF] transition-colors">
+                      className="w-6 h-6 rounded-lg bg-[#F1F0F7] flex items-center justify-center text-[#4B4768] hover:text-white hover:bg-[#6C63FF] transition-colors">
                       <Pencil className="w-3 h-3" />
                     </button>
                     <button onClick={() => removeProduct(product.id)} disabled={removingId === product.id}
-                      className="w-6 h-6 rounded-lg bg-[#29294A] flex items-center justify-center text-[#B8B4E8] hover:text-white hover:bg-red-600 transition-colors">
+                      className="w-6 h-6 rounded-lg bg-[#F1F0F7] flex items-center justify-center text-[#4B4768] hover:text-white hover:bg-red-600 transition-colors">
                       {removingId === product.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
                     </button>
                   </div>
@@ -567,19 +567,19 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               {live.products.length > 0 && (
                 <div className="pt-1">
                   {confirmClearAll ? (
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-900/20 border border-red-600/30">
-                      <p className="text-xs text-red-300 flex-1">Remover todos os {live.products.length} produtos?</p>
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-red-50 border border-red-200">
+                      <p className="text-xs text-red-700 flex-1">Remover todos os {live.products.length} produtos?</p>
                       <button onClick={clearAllProducts} disabled={clearingAll}
                         className="h-7 px-3 text-xs bg-red-600 hover:bg-red-500 text-white rounded-lg disabled:opacity-50 flex items-center gap-1">
                         {clearingAll && <Loader2 className="w-3 h-3 animate-spin" />}
                         Confirmar
                       </button>
                       <button onClick={() => setConfirmClearAll(false)}
-                        className="h-7 px-3 text-xs bg-white/10 hover:bg-white/20 text-white rounded-lg">Cancelar</button>
+                        className="h-7 px-3 text-xs bg-black/5 hover:bg-black/10 text-[#4B4768] rounded-lg">Cancelar</button>
                     </div>
                   ) : (
                     <button onClick={() => setConfirmClearAll(true)}
-                      className="w-full h-8 text-xs text-[#7E78B8] hover:text-red-400 border border-dashed border-white/[0.08] hover:border-red-600/30 rounded-xl transition-colors">
+                      className="w-full h-8 text-xs text-[#716C8C] hover:text-red-400 border border-dashed border-black/[0.08] hover:border-red-600/30 rounded-xl transition-colors">
                       Limpar tudo
                     </button>
                   )}
@@ -606,28 +606,28 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       {showPublishSuccess && publicUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowPublishSuccess(false)} />
-          <div className="relative bg-[#20203A] border border-white/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+          <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
             <div className="flex flex-col items-center text-center gap-3 mb-5">
               <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-white text-lg">Vitrine publicada!</h3>
-                <p className="text-sm text-[#B8B4E8] mt-1">Sua vitrine já está disponível para suas seguidoras.</p>
+                <h3 className="font-semibold text-[#16162B] text-lg">Vitrine publicada!</h3>
+                <p className="text-sm text-[#4B4768] mt-1">Sua vitrine já está disponível para suas seguidoras.</p>
               </div>
             </div>
             <div onClick={() => copyPublicLink(publicUrl)}
-              className="flex items-center gap-2 bg-[#29294A] border border-white/[0.12] hover:border-[#6C63FF]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5">
-              <span className="flex-1 text-xs text-[#B8B4E8] truncate">{publicUrl}</span>
-              {copiedLink ? <Check className="w-4 h-4 text-emerald-400 shrink-0" /> : <Copy className="w-4 h-4 text-[#7E78B8] group-hover:text-white shrink-0 transition-colors" />}
+              className="flex items-center gap-2 bg-[#F1F0F7] border border-black/[0.12] hover:border-[#6C63FF]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5">
+              <span className="flex-1 text-xs text-[#4B4768] truncate">{publicUrl}</span>
+              {copiedLink ? <Check className="w-4 h-4 text-emerald-600 shrink-0" /> : <Copy className="w-4 h-4 text-[#716C8C] group-hover:text-[#16162B] shrink-0 transition-colors" />}
             </div>
             <div className="flex gap-3">
               <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
+                className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
                 Minha vitrine
               </a>
               <button onClick={() => setShowPublishSuccess(false)}
-                className="flex-1 h-10 bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] text-sm font-medium rounded-xl hover:border-white/[0.20] transition-colors">
+                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-xl hover:border-black/[0.20] transition-colors">
                 Fechar
               </button>
             </div>
@@ -713,79 +713,79 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-[#20203A] border border-white/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl">
+      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-semibold text-white">Editar dados da vitrine</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#B8B4E8] hover:text-white hover:bg-[#29294A] transition-colors">
+          <h3 className="font-semibold text-[#16162B]">Editar dados da vitrine</h3>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#B8B4E8]">Título</label>
+            <label className="text-sm font-medium text-[#4B4768]">Título</label>
             <input type="text" value={title} onChange={e => setTitle(e.target.value)} required
-              className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
           </div>
           {/* Store + Discount on same row */}
           <div className="grid grid-cols-[1fr_100px] gap-3 items-end">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#B8B4E8]">Loja</label>
+              <label className="text-sm font-medium text-[#4B4768]">Loja</label>
               <StoreSelect value={store} onChange={setStore} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#B8B4E8]">
-                Desconto <span className="text-[#7E78B8] font-normal">(opcional)</span>
+              <label className="text-sm font-medium text-[#4B4768]">
+                Desconto <span className="text-[#716C8C] font-normal">(opcional)</span>
               </label>
               <div className="relative">
                 <input
                   type="number" min="1" max="99" value={discount}
                   onChange={e => setDiscount(e.target.value)}
                   placeholder="Ex: 10"
-                  className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-3 pr-8 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                  className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 pr-8 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#7E78B8]">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">%</span>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#B8B4E8]">Data</label>
+              <label className="text-sm font-medium text-[#4B4768]">Data</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all" />
+                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#B8B4E8]">Horário</label>
+              <label className="text-sm font-medium text-[#4B4768]">Horário</label>
               <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all" />
+                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all" />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#B8B4E8]">Imagem</label>
+            <label className="text-sm font-medium text-[#4B4768]">Imagem</label>
             <label className="block cursor-pointer">
               <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
               {imagePreview ? (
-                <div className="relative w-full h-32 rounded-xl overflow-hidden border border-white/[0.12]">
+                <div className="relative w-full h-32 rounded-xl overflow-hidden border border-black/[0.12]">
                   <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                   {uploading && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Loader2 className="w-5 h-5 text-white animate-spin" /></div>}
                   <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">Clique para trocar</div>
                 </div>
               ) : (
-                <div className="w-full h-24 rounded-xl border-2 border-dashed border-white/[0.12] hover:border-violet-500 flex items-center justify-center gap-2 transition-colors">
-                  <Upload className="w-5 h-5 text-[#7E78B8]" />
-                  <span className="text-sm text-[#7E78B8]">Upload de imagem</span>
+                <div className="w-full h-24 rounded-xl border-2 border-dashed border-black/[0.12] hover:border-violet-500 flex items-center justify-center gap-2 transition-colors">
+                  <Upload className="w-5 h-5 text-[#716C8C]" />
+                  <span className="text-sm text-[#716C8C]">Upload de imagem</span>
                 </div>
               )}
             </label>
           </div>
-          {error && <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-300">{error}</div>}
+          {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving || uploading}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#7C75FF] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar alterações"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] text-sm rounded-xl hover:border-white/[0.20] transition-colors">
+              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>
@@ -835,25 +835,25 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-[#20203A] border border-white/[0.12] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+      <div className="relative bg-white border border-black/[0.12] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.08]">
-          <h3 className="font-semibold text-white">Editar produto</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#B8B4E8] hover:text-white hover:bg-[#29294A] transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-black/[0.08]">
+          <h3 className="font-semibold text-[#16162B]">Editar produto</h3>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Product image + link */}
-        <div className="px-6 py-4 border-b border-white/[0.08] flex items-center gap-3">
-          <div className="w-14 h-14 rounded-xl bg-[#29294A] overflow-hidden shrink-0">
+        <div className="px-6 py-4 border-b border-black/[0.08] flex items-center gap-3">
+          <div className="w-14 h-14 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0">
             {product.imageUrl
               ? <img src={product.imageUrl} alt={product.name ?? ""} className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-[#7E78B8]" /></div>
+              : <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-[#716C8C]" /></div>
             }
           </div>
           <a href={product.url} target="_blank" rel="noopener noreferrer"
-            className="text-xs text-[#6C63FF] hover:text-[#7C75FF] truncate flex items-center gap-1">
+            className="text-xs text-[#6C63FF] hover:text-[#5851E0] truncate flex items-center gap-1">
             <ExternalLink className="w-3 h-3 shrink-0" />
             <span className="truncate">{product.url}</span>
           </a>
@@ -862,38 +862,38 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
         {/* Form */}
         <form onSubmit={handleSave} className="px-6 py-5 space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#B8B4E8]">Nome do produto</label>
+            <label className="text-sm font-medium text-[#4B4768]">Nome do produto</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Vestido Floral Verão"
-              className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#B8B4E8]">Preço</label>
+              <label className="text-sm font-medium text-[#4B4768]">Preço</label>
               <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="R$ 89,90"
-                className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#B8B4E8]">Categoria</label>
+              <label className="text-sm font-medium text-[#4B4768]">Categoria</label>
               <input type="text" value={category} onChange={e => setCategory(e.target.value)} placeholder="Ex: Blusas"
-                className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#B8B4E8]">
+            <label className="text-sm font-medium text-[#4B4768]">
               Tamanho que você usou
-              <span className="ml-1.5 text-xs text-[#7E78B8] font-normal">(ajuda suas seguidoras a escolher)</span>
+              <span className="ml-1.5 text-xs text-[#716C8C] font-normal">(ajuda suas seguidoras a escolher)</span>
             </label>
             <input type="text" value={size} onChange={e => setSize(e.target.value)} placeholder="Ex: M, 38, P/M..."
-              className="w-full h-11 bg-[#29294A] border border-white/[0.12] text-white placeholder:text-[#7E78B8] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
           </div>
-          {error && <div className="p-3 bg-red-900/30 border border-red-700/50 rounded-xl text-sm text-red-300">{error}</div>}
+          {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="flex gap-3 pt-1">
             <button type="submit" disabled={saving}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#7C75FF] disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#29294A] border border-white/[0.12] text-[#B8B4E8] text-sm rounded-xl hover:border-white/[0.20] transition-colors">
+              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>

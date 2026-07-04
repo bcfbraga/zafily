@@ -11,8 +11,8 @@ export default function PerformancePage() {
             <BarChart2 className="w-7 h-7 text-[#6C63FF]" />
           </div>
           <div>
-            <p className="font-heading font-semibold text-white text-lg">Sem dados ainda</p>
-            <p className="text-[#7E78B8] text-sm mt-1 max-w-sm">
+            <p className="font-heading font-semibold text-[#16162B] text-lg">Sem dados ainda</p>
+            <p className="text-[#716C8C] text-sm mt-1 max-w-sm">
               Os dados de cliques e receita aparecerão aqui assim que você começar a compartilhar seus links de afiliado.
             </p>
           </div>

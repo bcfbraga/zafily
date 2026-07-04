@@ -9,11 +9,11 @@ interface BadgeProps {
 }
 
 const variants: Record<BadgeVariant, string> = {
-  success: "bg-[rgba(0,212,170,0.14)] text-[#00D4AA]",
-  warning: "bg-[rgba(255,200,87,0.14)] text-[#FFC857]",
-  error: "bg-[rgba(255,95,126,0.14)] text-[#FF5F7E]",
-  info: "bg-[rgba(108,99,255,0.16)] text-[#8B84FF]",
-  neutral: "bg-[rgba(255,255,255,0.08)] text-[#B8B4E8]",
+  success: "bg-[rgba(0,212,170,0.14)] text-[#00806A]",
+  warning: "bg-[rgba(255,200,87,0.20)] text-[#8A6A1B]",
+  error: "bg-[rgba(225,29,72,0.10)] text-[#E11D48]",
+  info: "bg-[rgba(108,99,255,0.14)] text-[#4338CA]",
+  neutral: "bg-black/[0.05] text-[#4B4768]",
 };
 
 export function ZafilyBadge({ variant = "neutral", children, className }: BadgeProps) {

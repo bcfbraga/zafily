@@ -8,22 +8,18 @@ import { ZafilyLogo } from "./Logo";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
 import {
-  BarChart2,
   ShoppingBag,
   Settings,
   ChevronRight,
-  Zap,
   LogOut,
-  Link2,
+  Receipt,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
 
 const navItems = [
   { label: "Minha Vitrine", href: "/app/vitrine", icon: ShoppingBag },
-  { label: "Minha CEA",     href: "/app/cea",     icon: Link2 },
-  { label: "Performance",   href: "/app/performance", icon: BarChart2 },
-  { label: "Integrações",   href: "/app/integrations", icon: Zap },
+  { label: "Propostas",     href: "/app/orcamentos", icon: Receipt },
 ];
 
 const COLLAPSED_KEY = "zafily_sidebar_collapsed";
@@ -61,12 +57,12 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "shrink-0 h-screen bg-[#1A1A2E] border-r border-white/[0.08] flex flex-col transition-[width] duration-200 overflow-hidden",
+        "shrink-0 h-screen bg-white border-r border-black/[0.08] flex flex-col transition-[width] duration-200 overflow-hidden",
         collapsed ? "w-[60px]" : "w-[260px]"
       )}
     >
       {/* Logo + collapse button */}
-      <div className="h-[72px] flex items-center border-b border-white/[0.06] shrink-0 px-3 gap-2">
+      <div className="h-[72px] flex items-center border-b border-black/[0.06] shrink-0 px-3 gap-2">
         {!collapsed && (
           <Link href="/" className="flex-1 px-3">
             <ZafilyLogo size={28} />
@@ -76,7 +72,7 @@ export function Sidebar() {
           onClick={toggle}
           title={collapsed ? "Expandir menu" : "Recolher menu"}
           className={cn(
-            "w-8 h-8 rounded-lg flex items-center justify-center text-[#7E78B8] hover:text-white hover:bg-white/[0.06] transition-colors shrink-0",
+            "w-8 h-8 rounded-lg flex items-center justify-center text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.05] transition-colors shrink-0",
             collapsed && "mx-auto"
           )}
         >
@@ -100,8 +96,8 @@ export function Sidebar() {
                 "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors duration-150",
                 collapsed ? "justify-center px-0" : "px-3",
                 active
-                  ? "bg-[rgba(108,99,255,0.16)] text-white"
-                  : "text-[#7E78B8] hover:text-[#B8B4E8] hover:bg-white/[0.05]"
+                  ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
+                  : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
               )}
             >
               <Icon className={cn("w-4 h-4 shrink-0", active ? "text-[#6C63FF]" : "")} />
@@ -117,7 +113,7 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom */}
-      <div className="px-2 pb-4 border-t border-white/[0.06] pt-3 space-y-0.5">
+      <div className="px-2 pb-4 border-t border-black/[0.06] pt-3 space-y-0.5">
         <Link
           href="/app/settings"
           title={collapsed ? "Configurações" : undefined}
@@ -125,8 +121,8 @@ export function Sidebar() {
             "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
             collapsed ? "justify-center px-0" : "px-3",
             pathname === "/app/settings"
-              ? "bg-[rgba(108,99,255,0.16)] text-white"
-              : "text-[#7E78B8] hover:text-[#B8B4E8] hover:bg-white/[0.05]"
+              ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
+              : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
           )}
         >
           <Settings className={cn("w-4 h-4 shrink-0", pathname === "/app/settings" ? "text-[#6C63FF]" : "")} />
@@ -137,7 +133,7 @@ export function Sidebar() {
           onClick={handleLogout}
           title={collapsed ? "Sair" : undefined}
           className={cn(
-            "w-full flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium text-[#7E78B8] hover:text-[#FF5F7E] hover:bg-[rgba(255,95,126,0.06)] transition-colors",
+            "w-full flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium text-[#716C8C] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors",
             collapsed ? "justify-center px-0" : "px-3"
           )}
         >
@@ -146,13 +142,13 @@ export function Sidebar() {
         </button>
 
         {!collapsed && (
-          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-white/[0.04]">
+          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-black/[0.03]">
             <div className="w-7 h-7 rounded-full bg-[#6C63FF] flex items-center justify-center text-xs font-semibold text-white shrink-0">
               {initial}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-white truncate">{displayName || "..."}</p>
-              <p className="text-[10px] text-[#7E78B8] truncate">{email}</p>
+              <p className="text-xs font-medium text-[#16162B] truncate">{displayName || "..."}</p>
+              <p className="text-[10px] text-[#716C8C] truncate">{email}</p>
             </div>
           </div>
         )}

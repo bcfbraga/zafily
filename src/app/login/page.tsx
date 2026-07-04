@@ -40,19 +40,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#111126] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[#F6F6FB] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-[400px]">
         <div className="flex justify-center mb-10">
           <Link href="/"><ZafilyLogo size={32} /></Link>
         </div>
 
-        <div className="bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-8 shadow-[0_24px_80px_rgba(0,0,0,0.36)]">
-          <h1 className="font-heading font-bold text-[24px] text-white mb-1">Bem-vinda de volta</h1>
-          <p className="text-sm text-[#7E78B8] mb-8">Entre na sua conta Zafily</p>
+        <div className="bg-white border border-black/[0.08] rounded-[20px] p-8 shadow-[0_24px_80px_rgba(23,23,60,0.10)]">
+          <h1 className="font-heading font-bold text-[24px] text-[#16162B] mb-1">Bem-vinda de volta</h1>
+          <p className="text-sm text-[#716C8C] mb-8">Entre na sua conta Zafily</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-[#B8B4E8]">Email</label>
+              <label className="text-xs font-medium text-[#4B4768]">Email</label>
               <input
                 type="email"
                 value={email}
@@ -60,13 +60,13 @@ export default function LoginPage() {
                 placeholder="voce@email.com"
                 required
                 disabled={loading}
-                className="w-full h-12 bg-[rgba(255,255,255,0.06)] border border-[rgba(184,180,232,0.18)] text-white placeholder:text-[#7E78B8] rounded-[12px] px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:shadow-[0_0_0_4px_rgba(108,99,255,0.18)] transition-all disabled:opacity-50"
+                className="w-full h-12 bg-[#F6F6FB] border border-black/[0.10] text-[#16162B] placeholder:text-[#9B96AF] rounded-[12px] px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:shadow-[0_0_0_4px_rgba(108,99,255,0.18)] transition-all disabled:opacity-50"
               />
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-medium text-[#B8B4E8]">Senha</label>
-                <a href="#" className="text-xs text-[#6C63FF] hover:text-[#7C75FF] transition-colors">
+                <label className="text-xs font-medium text-[#4B4768]">Senha</label>
+                <a href="#" className="text-xs text-[#6C63FF] hover:text-[#5851E0] transition-colors">
                   Esqueci minha senha
                 </a>
               </div>
@@ -77,14 +77,14 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 required
                 disabled={loading}
-                className="w-full h-12 bg-[rgba(255,255,255,0.06)] border border-[rgba(184,180,232,0.18)] text-white placeholder:text-[#7E78B8] rounded-[12px] px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:shadow-[0_0_0_4px_rgba(108,99,255,0.18)] transition-all disabled:opacity-50"
+                className="w-full h-12 bg-[#F6F6FB] border border-black/[0.10] text-[#16162B] placeholder:text-[#9B96AF] rounded-[12px] px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:shadow-[0_0_0_4px_rgba(108,99,255,0.18)] transition-all disabled:opacity-50"
               />
             </div>
 
             {error && (
-              <div className="flex items-center gap-2.5 bg-[rgba(255,95,126,0.10)] border border-[rgba(255,95,126,0.24)] rounded-[12px] p-3.5">
-                <AlertCircle className="w-4 h-4 text-[#FF5F7E] shrink-0" />
-                <p className="text-sm text-[#FF5F7E]">{error}</p>
+              <div className="flex items-center gap-2.5 bg-[rgba(225,29,72,0.06)] border border-[rgba(225,29,72,0.20)] rounded-[12px] p-3.5">
+                <AlertCircle className="w-4 h-4 text-[#E11D48] shrink-0" />
+                <p className="text-sm text-[#BE123C]">{error}</p>
               </div>
             )}
 
@@ -99,16 +99,16 @@ export default function LoginPage() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[rgba(255,255,255,0.08)]" />
+              <div className="w-full border-t border-black/[0.08]" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-3 bg-[#20203A] text-xs text-[#7E78B8]">ou continue com</span>
+              <span className="px-3 bg-white text-xs text-[#716C8C]">ou continue com</span>
             </div>
           </div>
 
           <button
             onClick={handleGoogle}
-            className="w-full h-12 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-[#B8B4E8] font-medium rounded-[12px] hover:bg-[rgba(255,255,255,0.09)] transition-colors flex items-center justify-center gap-2 text-sm"
+            className="w-full h-12 bg-white border border-black/[0.12] text-[#4B4768] font-medium rounded-[12px] hover:bg-black/[0.02] transition-colors flex items-center justify-center gap-2 text-sm"
           >
             <svg viewBox="0 0 24 24" className="w-4 h-4">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -120,9 +120,9 @@ export default function LoginPage() {
           </button>
         </div>
 
-        <p className="text-center text-sm text-[#7E78B8] mt-6">
+        <p className="text-center text-sm text-[#716C8C] mt-6">
           Não tem conta?{" "}
-          <Link href="/signup" className="text-[#6C63FF] hover:text-[#7C75FF] font-medium transition-colors">
+          <Link href="/signup" className="text-[#6C63FF] hover:text-[#5851E0] font-medium transition-colors">
             Criar conta grátis
           </Link>
         </p>

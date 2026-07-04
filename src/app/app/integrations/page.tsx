@@ -15,17 +15,17 @@ export default function IntegrationsPage() {
           {/* Info banner */}
           <div className="flex items-start gap-3 bg-[rgba(108,99,255,0.08)] border border-[rgba(108,99,255,0.20)] rounded-[14px] p-4">
             <Info className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
-            <p className="text-sm text-[#B8B4E8] leading-relaxed">
+            <p className="text-sm text-[#4B4768] leading-relaxed">
               Conecte sua conta de afiliada para que todos os links gerados no Zafily
-              fiquem vinculados ao <span className="text-white font-medium">seu ID</span>, não ao da plataforma.
+              fiquem vinculados ao <span className="text-[#16162B] font-medium">seu ID</span>, não ao da plataforma.
               Cada integração é validada diretamente com a rede.
             </p>
           </div>
 
           {/* Section */}
           <div>
-            <h2 className="font-heading font-semibold text-white mb-1">Redes disponíveis</h2>
-            <p className="text-xs text-[#7E78B8] mb-4">
+            <h2 className="font-heading font-semibold text-[#16162B] mb-1">Redes disponíveis</h2>
+            <p className="text-xs text-[#716C8C] mb-4">
               Mais redes serão adicionadas em breve.
             </p>
             <AwinCard />

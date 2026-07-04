@@ -53,16 +53,13 @@ export function StoreLogo({ value, size }: { value: string; size?: number }) {
 interface StoreSelectProps {
   value: StoreValue | string;
   onChange: (v: string) => void;
-  dark?: boolean; // true = dark card bg (#29294A), false = slightly lighter (#20203A)
 }
 
-export function StoreSelect({ value, onChange, dark = false }: StoreSelectProps) {
+export function StoreSelect({ value, onChange }: StoreSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const selected = STORES.find(s => s.value === value) ?? STORES[0];
-  const bg      = dark ? "bg-[#20203A]" : "bg-[#20203A]";
-  const optionBg = "bg-[#16162A]";
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -78,16 +75,16 @@ export function StoreSelect({ value, onChange, dark = false }: StoreSelectProps)
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className={`w-full h-12 ${bg} border ${open ? "border-[#6C63FF] ring-2 ring-[#6C63FF]/20" : "border-white/[0.12] hover:border-white/[0.20]"} text-white rounded-xl px-4 text-sm transition-all flex items-center gap-3 cursor-pointer`}
+        className={`w-full h-12 bg-white border ${open ? "border-[#6C63FF] ring-2 ring-[#6C63FF]/20" : "border-black/[0.12] hover:border-black/[0.20]"} text-[#16162B] rounded-xl px-4 text-sm transition-all flex items-center gap-3 cursor-pointer`}
       >
         <StoreLogo value={selected.value} size={26} />
         <span className="flex-1 text-left font-medium">{selected.label}</span>
-        <ChevronDown className={`w-4 h-4 text-[#7E78B8] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-4 h-4 text-[#716C8C] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown */}
       {open && (
-        <div className={`absolute z-50 top-[calc(100%+6px)] left-0 right-0 ${optionBg} border border-white/[0.12] rounded-xl shadow-2xl overflow-hidden py-1`}>
+        <div className={`absolute z-50 top-[calc(100%+6px)] left-0 right-0 bg-white border border-black/[0.12] rounded-xl shadow-[0_16px_48px_rgba(23,23,60,0.14)] overflow-hidden py-1`}>
           {STORES.map(store => (
             <button
               key={store.value}
@@ -95,8 +92,8 @@ export function StoreSelect({ value, onChange, dark = false }: StoreSelectProps)
               onClick={() => { onChange(store.value); setOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
                 store.value === selected.value
-                  ? "bg-[#6C63FF]/15 text-white"
-                  : "text-[#B8B4E8] hover:bg-white/[0.06] hover:text-white"
+                  ? "bg-[#6C63FF]/10 text-[#4338CA]"
+                  : "text-[#4B4768] hover:bg-black/[0.04] hover:text-[#16162B]"
               }`}
             >
               <StoreLogo value={store.value} size={28} />

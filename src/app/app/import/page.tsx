@@ -12,14 +12,14 @@ export default function ImportPage() {
             <Link2 className="w-7 h-7 text-[#6C63FF]" />
           </div>
           <div>
-            <p className="font-heading font-semibold text-white text-lg">Em breve</p>
-            <p className="text-[#7E78B8] text-sm mt-1 max-w-sm">
+            <p className="font-heading font-semibold text-[#16162B] text-lg">Em breve</p>
+            <p className="text-[#716C8C] text-sm mt-1 max-w-sm">
               A importação manual de links está sendo desenvolvida. Por enquanto, sincronize os produtos diretamente pela página de Produtos.
             </p>
           </div>
           <Link
             href="/app/products"
-            className="h-10 px-5 bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-[12px] transition-colors"
+            className="h-10 px-5 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-[12px] transition-colors"
           >
             Ir para Produtos
           </Link>
