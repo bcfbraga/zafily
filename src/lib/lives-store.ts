@@ -37,6 +37,17 @@ export interface Profile {
   userId: string;
   username: string;
   displayName: string | null;
+  instagramHandle: string | null;
+  location: string | null;
+  followersLabel: string | null;
+  reachLabel: string | null;
+  viewsLabel: string | null;
+  engagementLabel: string | null;
+  whatsapp: string | null;
+  contactEmail: string | null;
+  linkUrl: string | null;
+  photoUrl: string | null;
+  roleTitle: string | null;
 }
 
 // ─── Slug ─────────────────────────────────────────────────────────────────────
@@ -65,10 +76,29 @@ export async function uniqueSlug(userId: string, base: string): Promise<string> 
 
 // ─── Profile ──────────────────────────────────────────────────────────────────
 
+function rowToProfile(row: Record<string, unknown>): Profile {
+  return {
+    userId: row.user_id as string,
+    username: row.username as string,
+    displayName: (row.display_name as string) ?? null,
+    instagramHandle: (row.instagram_handle as string) ?? null,
+    location: (row.location as string) ?? null,
+    followersLabel: (row.followers_label as string) ?? null,
+    reachLabel: (row.reach_label as string) ?? null,
+    viewsLabel: (row.views_label as string) ?? null,
+    engagementLabel: (row.engagement_label as string) ?? null,
+    whatsapp: (row.whatsapp as string) ?? null,
+    contactEmail: (row.contact_email as string) ?? null,
+    linkUrl: (row.link_url as string) ?? null,
+    photoUrl: (row.photo_url as string) ?? null,
+    roleTitle: (row.role_title as string) ?? null,
+  };
+}
+
 export async function getOrCreateProfile(userId: string, email: string): Promise<Profile> {
   const db: DB = getSupabase();
   const { data } = await db.from("profiles").select("*").eq("user_id", userId).maybeSingle();
-  if (data) return { userId: data.user_id, username: data.username, displayName: data.display_name };
+  if (data) return rowToProfile(data);
 
   const base = email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
   let username = base;
@@ -85,14 +115,53 @@ export async function getOrCreateProfile(userId: string, email: string): Promise
     .select()
     .single();
 
-  return { userId: created.user_id, username: created.username, displayName: created.display_name };
+  return rowToProfile(created);
+}
+
+export async function updateProfile(
+  userId: string,
+  data: {
+    instagramHandle?: string | null;
+    location?: string | null;
+    followersLabel?: string | null;
+    reachLabel?: string | null;
+    viewsLabel?: string | null;
+    engagementLabel?: string | null;
+    whatsapp?: string | null;
+    contactEmail?: string | null;
+    linkUrl?: string | null;
+    photoUrl?: string | null;
+    roleTitle?: string | null;
+  }
+): Promise<Profile> {
+  const db: DB = getSupabase();
+  const { data: row } = await db
+    .from("profiles")
+    .update({
+      ...(data.instagramHandle !== undefined && { instagram_handle: data.instagramHandle }),
+      ...(data.location !== undefined && { location: data.location }),
+      ...(data.followersLabel !== undefined && { followers_label: data.followersLabel }),
+      ...(data.reachLabel !== undefined && { reach_label: data.reachLabel }),
+      ...(data.viewsLabel !== undefined && { views_label: data.viewsLabel }),
+      ...(data.engagementLabel !== undefined && { engagement_label: data.engagementLabel }),
+      ...(data.whatsapp !== undefined && { whatsapp: data.whatsapp }),
+      ...(data.contactEmail !== undefined && { contact_email: data.contactEmail }),
+      ...(data.linkUrl !== undefined && { link_url: data.linkUrl }),
+      ...(data.photoUrl !== undefined && { photo_url: data.photoUrl }),
+      ...(data.roleTitle !== undefined && { role_title: data.roleTitle }),
+    })
+    .eq("user_id", userId)
+    .select()
+    .single();
+
+  return rowToProfile(row);
 }
 
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
   const db: DB = getSupabase();
   const { data } = await db.from("profiles").select("*").eq("username", username).maybeSingle();
   if (!data) return null;
-  return { userId: data.user_id, username: data.username, displayName: data.display_name };
+  return rowToProfile(data);
 }
 
 // ─── Lives ────────────────────────────────────────────────────────────────────
