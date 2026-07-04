@@ -129,14 +129,14 @@ export default function OrcamentosPage() {
                       <p className="font-medium text-[#16162B] truncate">{budget.title}</p>
                       {budget.status === "published" && profile && (
                         <a
-                          href={`${baseUrl}/orcamento/${profile.username}/${budget.slug}`}
+                          href={`${baseUrl}/${profile.username}/proposta/${budget.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={e => e.stopPropagation()}
                           className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#5851E0] mt-0.5 transition-colors"
                         >
                           <ExternalLink className="w-3 h-3" />
-                          {`/orcamento/${profile.username}/${budget.slug}`}
+                          {`/${profile.username}/proposta/${budget.slug}`}
                         </a>
                       )}
                     </td>

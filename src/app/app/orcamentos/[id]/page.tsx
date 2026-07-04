@@ -4,15 +4,10 @@ import { useEffect, useState, useRef, use } from "react";
 import Link from "next/link";
 import {
   ArrowLeft, Loader2, X, Upload, Package, CheckCircle2, FileText,
-  ExternalLink, Copy, Check, Receipt, Download, Pencil, Eye, EyeOff,
-  AtSign, Users, MapPin, Minus, Plus
+  ExternalLink, Copy, Check, Download, Pencil, Eye, EyeOff,
+  Minus, Plus, GripVertical, Trash2, PlusCircle
 } from "lucide-react";
-
-const WINE = "#2A0E1B";
-const WINE_CARD = "#3A1626";
-const GOLD = "#C6A15B";
-
-const HOURS_ITEM = "Cobertura de Eventos";
+import { ProposalView, HOURS_ITEM, type ProposalProfile } from "@/components/zafily/ProposalView";
 
 const SCOPE_PRESETS: { key: string; hint?: string; defaultNotes?: string }[] = [
   { key: "Reels / Feed", defaultNotes: "Vídeo de até 60s publicado no feed e nos stories, com edição, trilha sonora e legenda." },
@@ -24,12 +19,6 @@ const SCOPE_PRESETS: { key: string; hint?: string; defaultNotes?: string }[] = [
   { key: "Direito de Uso de Imagem" },
 ];
 
-function sortByScopeOrder<T extends { description: string }>(items: T[]): T[] {
-  return [...items].sort(
-    (a, b) => SCOPE_PRESETS.findIndex(p => p.key === a.description) - SCOPE_PRESETS.findIndex(p => p.key === b.description)
-  );
-}
-
 interface Item {
   id: string;
   description: string;
@@ -38,14 +27,7 @@ interface Item {
   position: number;
 }
 
-interface CreatorProfile {
-  username: string;
-  displayName: string | null;
-  instagramHandle: string | null;
-  location: string | null;
-  followersLabel: string | null;
-  photoUrl: string | null;
-}
+type CreatorProfile = ProposalProfile;
 
 interface Budget {
   id: string;
@@ -82,11 +64,6 @@ function formatBRL(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function itemLabel(item: Item): string {
-  if (item.description === HOURS_ITEM) return `${HOURS_ITEM} (Até ${item.quantity ?? 0} horas)`;
-  return item.quantity && item.quantity > 1 ? `${item.quantity}x ${item.description}` : item.description;
-}
-
 // ── Quantity stepper ─────────────────────────────────────────────────────────
 function QuantityStepper({ value, onChange }: { value: number; onChange: (next: number) => void }) {
   return (
@@ -113,123 +90,23 @@ function QuantityStepper({ value, onChange }: { value: number; onChange: (next: 
 
 // ── Preview (right panel) ────────────────────────────────────────────────────
 function BudgetPreview({ budget, profile }: { budget: Budget; profile: CreatorProfile | null }) {
-  const creatorName = profile?.displayName || profile?.username || "Você";
-  const metaParts: string[] = [];
-  if (profile?.instagramHandle) metaParts.push(`@${profile.instagramHandle.replace(/^@/, "")}`);
-  if (profile?.followersLabel) metaParts.push(`${profile.followersLabel} seguidores`);
-  if (profile?.location) metaParts.push(profile.location);
+  const fallbackProfile: CreatorProfile = {
+    username: "voce", displayName: "Você", instagramHandle: null, location: null,
+    followersLabel: null, reachLabel: null, viewsLabel: null, engagementLabel: null,
+    whatsapp: null, contactEmail: null, linkUrl: null, photoUrl: null, roleTitle: null,
+  };
 
   return (
-    <div className="min-h-full bg-white text-zinc-900 font-sans">
+    <div className="min-h-full bg-[#efe9e8]">
       <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-zinc-100">
         <div className="max-w-xl mx-auto px-5 h-12 flex items-center justify-between">
           <span className="text-[10px] font-semibold tracking-widest uppercase text-zinc-400">Preview</span>
           <span className="text-[10px] text-zinc-300">{budget.status === "draft" ? "Rascunho" : "Publicado"}</span>
         </div>
       </div>
-
-      {/* Hero */}
-      <div className="relative overflow-hidden" style={{ backgroundColor: WINE, minHeight: 220 }}>
-        {profile?.photoUrl ? (
-          <div className="absolute inset-0">
-            <img src={profile.photoUrl} alt={creatorName} className="w-full h-full object-cover" style={{ objectPosition: "68% center" }} />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(90deg, rgba(43,7,20,.92) 0%, rgba(43,7,20,.55) 32%, rgba(43,7,20,.05) 60%)" }} />
-          </div>
-        ) : (
-          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full opacity-40" style={{ backgroundColor: WINE_CARD }} />
-        )}
-        <div className="relative px-6 pt-8 pb-8 max-w-[80%]">
-          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-2" style={{ color: GOLD }}>
-            Proposta Comercial
-          </p>
-          <h1 className="font-serif italic font-bold text-2xl text-white leading-tight mb-2">{creatorName}</h1>
-          {budget.clientName && (
-            <p className="italic text-white/70 text-xs mb-3">Proposta para {budget.clientName}</p>
-          )}
-          {metaParts.length > 0 && (
-            <div className="flex items-center gap-1.5 flex-wrap text-white/80 text-xs">
-              {profile?.instagramHandle && (
-                <span className="flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center shrink-0" style={{ backgroundColor: "#A6335C" }}>
-                    {profile.photoUrl ? <img src={profile.photoUrl} alt="" className="w-full h-full object-cover" /> : <AtSign className="w-3 h-3" />}
-                  </span>
-                  {profile.instagramHandle.replace(/^@/, "")}
-                </span>
-              )}
-              {profile?.followersLabel && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{profile.followersLabel}</span>}
-              {profile?.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{profile.location}</span>}
-            </div>
-          )}
-          {budget.clientLogoUrl && (
-            <div className="w-12 h-12 rounded-lg overflow-hidden mt-4 bg-white/95 border border-white/20 flex items-center justify-center">
-              <img src={budget.clientLogoUrl} alt={budget.clientName ?? ""} className="max-w-full max-h-full object-contain" />
-            </div>
-          )}
-        </div>
+      <div className="flex justify-center py-8 px-4">
+        <ProposalView budget={budget} profile={profile ?? fallbackProfile} photoSrc={profile?.photoUrl ?? null} />
       </div>
-
-      {/* Deliverables */}
-      <div className="max-w-xl mx-auto px-6 py-8">
-        <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-zinc-400 mb-5">O que será entregue</p>
-        {budget.items.filter(i => (i.quantity ?? 0) > 0).length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 gap-3 text-zinc-300">
-            <Receipt className="w-8 h-8" />
-            <p className="text-sm">Nenhum item ainda</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-3">
-            {sortByScopeOrder(budget.items.filter(i => (i.quantity ?? 0) > 0)).map(item => (
-              <div key={item.id} className="rounded-xl border border-zinc-100 p-3">
-                <p className="text-sm font-bold text-zinc-900">{itemLabel(item)}</p>
-                {item.notes && <p className="text-xs text-zinc-500 mt-1">{item.notes}</p>}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Value points */}
-      {!budget.valueHidden && (budget.valueIntro?.trim() || budget.valuePoints?.some(p => p.title.trim() || p.body.trim())) && (
-        <div className="bg-zinc-50 border-y border-zinc-100 px-6 py-8">
-          <div className="max-w-xl mx-auto">
-            <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-zinc-400 mb-2">Valor Gerado</p>
-            {budget.valueIntro?.trim() && <p className="text-xs text-zinc-500 mb-3">{budget.valueIntro}</p>}
-            <div className="space-y-2">
-              {budget.valuePoints?.filter(p => p.title.trim() || p.body.trim()).map((p, i) => (
-                <div key={i} className="rounded-lg border border-zinc-200 bg-white p-2.5">
-                  {p.title && <p className="text-xs font-bold text-zinc-900">{p.title}</p>}
-                  {p.body && <p className="text-xs text-zinc-500 mt-0.5">{p.body}</p>}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Investment */}
-      {budget.finalValue != null && (
-        <div style={{ backgroundColor: WINE }}>
-          <div className="px-6 py-6">
-            <p className="text-[10px] font-semibold tracking-[0.2em] uppercase mb-1.5" style={{ color: GOLD }}>Investimento</p>
-            <p className="text-2xl font-bold text-white">{formatBRL(budget.finalValue)}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Conditions */}
-      {!budget.conditionsHidden && budget.conditions?.trim() && (
-        <div className="max-w-xl mx-auto px-6 py-8">
-          <p className="text-[10px] font-semibold tracking-[0.2em] uppercase text-zinc-400 mb-2">Condições</p>
-          <ul className="space-y-1">
-            {budget.conditions.split("\n").map(c => c.trim()).filter(Boolean).map((c, i) => (
-              <li key={i} className="text-xs text-zinc-600 flex items-start gap-1.5">
-                <span className="w-1 h-1 rounded-full bg-rose-400 mt-1.5 shrink-0" />
-                {c}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
@@ -247,6 +124,8 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
   const [showPublishSuccess, setShowPublishSuccess] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
+  const [customItemText, setCustomItemText] = useState("");
+  const [dragItemId, setDragItemId] = useState<string | null>(null);
   const creatingRef = useRef<Record<string, boolean>>({});
   const latestQuantityRef = useRef<Record<string, number>>({});
   const pendingDeleteRef = useRef<Record<string, boolean>>({});
@@ -351,6 +230,45 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
     });
   }
 
+  async function deleteScopeItem(itemId: string) {
+    setBudget(prev => prev ? { ...prev, items: prev.items.filter(i => i.id !== itemId) } : prev);
+    await fetch(`/api/budgets/${id}/items/${itemId}`, { method: "DELETE" });
+  }
+
+  function addCustomItem(description: string) {
+    const trimmed = description.trim();
+    if (!trimmed) return;
+    setPresetQuantity(trimmed, 1);
+  }
+
+  async function reorderScopeItems(newOrderIds: string[]) {
+    setBudget(prev => {
+      if (!prev) return prev;
+      const byId = new Map(prev.items.map(i => [i.id, i]));
+      const reordered = newOrderIds.map((itemId, idx) => ({ ...byId.get(itemId)!, position: idx }));
+      const untouched = prev.items.filter(i => !newOrderIds.includes(i.id));
+      return { ...prev, items: [...reordered, ...untouched] };
+    });
+    await fetch(`/api/budgets/${id}/items/reorder`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order: newOrderIds }),
+    });
+  }
+
+  function handleScopeDrop(activeItems: Item[], targetId: string) {
+    if (!dragItemId || dragItemId === targetId) { setDragItemId(null); return; }
+    const ids = activeItems.map(i => i.id);
+    const fromIdx = ids.indexOf(dragItemId);
+    const toIdx = ids.indexOf(targetId);
+    setDragItemId(null);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const reordered = [...ids];
+    reordered.splice(fromIdx, 1);
+    reordered.splice(toIdx, 0, dragItemId);
+    reorderScopeItems(reordered);
+  }
+
   function setFinalValueLocal(raw: string) {
     const value = raw.trim() ? Number(raw.replace(",", ".")) : null;
     setBudget(prev => prev ? { ...prev, finalValue: value === null || isNaN(value) ? null : value } : prev);
@@ -423,7 +341,11 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
     );
   }
 
-  const publicUrl = profile?.username ? `${typeof window !== "undefined" ? window.location.origin : ""}/orcamento/${profile.username}/${budget.slug}` : null;
+  const publicUrl = profile?.username ? `${typeof window !== "undefined" ? window.location.origin : ""}/${profile.username}/proposta/${budget.slug}` : null;
+
+  const activeScopeItems = [...budget.items].filter(i => (i.quantity ?? 0) > 0).sort((a, b) => a.position - b.position);
+  const activeDescriptions = new Set(activeScopeItems.map(i => i.description));
+  const inactivePresets = SCOPE_PRESETS.filter(p => !activeDescriptions.has(p.key));
 
   return (
     <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
@@ -521,36 +443,88 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
             </div>
           </div>
 
-          {/* Scope presets */}
+          {/* Scope items */}
           <div className="space-y-2">
             <p className="text-xs font-semibold text-[#716C8C] uppercase tracking-wider">Escopo</p>
-            <p className="text-[10px] text-[#716C8C] -mt-1">Defina a quantidade de cada item. Zero = não aparece na proposta.</p>
-            <div className="space-y-1">
-              {SCOPE_PRESETS.map(preset => {
-                const existing = budget.items.find(i => i.description === preset.key);
-                const qty = existing?.quantity ?? 0;
-                return (
-                  <div key={preset.key} className="px-2.5 py-1.5 rounded-lg border border-black/[0.06] bg-white">
+            <p className="text-[10px] text-[#716C8C] -mt-1">Arraste para reordenar. A lixeira remove da proposta.</p>
+
+            {activeScopeItems.length > 0 && (
+              <div className="space-y-1">
+                {activeScopeItems.map(item => (
+                  <div
+                    key={item.id}
+                    draggable
+                    onDragStart={() => setDragItemId(item.id)}
+                    onDragOver={e => e.preventDefault()}
+                    onDrop={() => handleScopeDrop(activeScopeItems, item.id)}
+                    className={`px-2.5 py-1.5 rounded-lg border bg-white transition-colors ${dragItemId === item.id ? "border-[#6C63FF]/40 opacity-60" : "border-black/[0.06]"}`}
+                  >
                     <div className="flex items-center gap-2">
+                      <span className="shrink-0 text-[#B7B3C8] cursor-grab active:cursor-grabbing">
+                        <GripVertical className="w-3.5 h-3.5" />
+                      </span>
                       <div className="flex-1 min-w-0 leading-tight">
-                        <p className="text-xs text-[#16162B] truncate">{preset.key}</p>
-                        {preset.hint && <p className="text-[10px] text-[#716C8C] leading-tight">{preset.hint}</p>}
+                        <p className="text-xs text-[#16162B] truncate">{item.description}</p>
+                        {item.description === HOURS_ITEM && <p className="text-[10px] text-[#716C8C] leading-tight">quantidade em horas</p>}
                       </div>
-                      <QuantityStepper value={qty} onChange={next => setPresetQuantity(preset.key, next)} />
+                      <QuantityStepper value={item.quantity ?? 0} onChange={next => setPresetQuantity(item.description, next)} />
+                      <button
+                        onClick={() => deleteScopeItem(item.id)}
+                        title="Remover"
+                        className="w-6 h-6 shrink-0 flex items-center justify-center rounded-md text-[#B7B3C8] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.08)] transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    {existing && (
-                      <input
-                        type="text"
-                        defaultValue={existing.notes ?? ""}
-                        onChange={e => setPresetNotesLocal(existing.id, e.target.value)}
-                        onBlur={e => savePresetNotes(existing.id, e.target.value)}
-                        placeholder="Descrição do que será feito (opcional)"
-                        className="mt-1 w-full h-6 bg-[#F1F0F7] border border-black/[0.08] text-[#16162B] placeholder:text-[#716C8C] rounded-md px-1.5 text-[11px] focus:outline-none focus:border-[#6C63FF] transition-all"
-                      />
-                    )}
+                    <input
+                      type="text"
+                      defaultValue={item.notes ?? ""}
+                      onChange={e => setPresetNotesLocal(item.id, e.target.value)}
+                      onBlur={e => savePresetNotes(item.id, e.target.value)}
+                      placeholder="Descrição do que será feito (opcional)"
+                      className="mt-1 w-full h-6 bg-[#F1F0F7] border border-black/[0.08] text-[#16162B] placeholder:text-[#716C8C] rounded-md px-1.5 text-[11px] focus:outline-none focus:border-[#6C63FF] transition-all"
+                    />
                   </div>
-                );
-              })}
+                ))}
+              </div>
+            )}
+
+            {inactivePresets.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {inactivePresets.map(preset => (
+                  <button
+                    key={preset.key}
+                    onClick={() => setPresetQuantity(preset.key, 1)}
+                    className="h-7 px-2.5 flex items-center gap-1 rounded-full border border-dashed border-black/[0.15] text-[#4B4768] hover:border-[#6C63FF] hover:text-[#6C63FF] text-[11px] transition-colors"
+                  >
+                    <Plus className="w-3 h-3" /> {preset.key}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="flex items-center gap-1.5 pt-1">
+              <input
+                type="text"
+                value={customItemText}
+                onChange={e => setCustomItemText(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addCustomItem(customItemText);
+                    setCustomItemText("");
+                  }
+                }}
+                placeholder="Item personalizado..."
+                className="flex-1 h-8 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-lg px-2.5 text-xs focus:outline-none focus:border-[#6C63FF] transition-all"
+              />
+              <button
+                onClick={() => { addCustomItem(customItemText); setCustomItemText(""); }}
+                disabled={!customItemText.trim()}
+                className="h-8 px-2.5 shrink-0 flex items-center gap-1 rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] disabled:opacity-40 transition-colors text-xs font-medium"
+              >
+                <PlusCircle className="w-3.5 h-3.5" /> Adicionar
+              </button>
             </div>
           </div>
 

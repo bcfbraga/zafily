@@ -40,9 +40,6 @@ function defaultExpiresAt(): string {
   return d.toISOString().slice(0, 10);
 }
 
-const DEFAULT_VALUE_INTRO =
-  "O foco da entrega é unir audiência, formato nativo e clareza comercial em uma publicação que faça sentido dentro do perfil.";
-
 const DEFAULT_VALUE_POINTS: ValuePoint[] = [
   { title: "Exposição Qualificada", body: "A marca aparece para uma audiência que já acompanha e confia na criadora." },
   { title: "Conteúdo Nativo", body: "A entrega é pensada para parecer conteúdo de rotina, não anúncio deslocado." },
@@ -51,11 +48,9 @@ const DEFAULT_VALUE_POINTS: ValuePoint[] = [
 
 const DEFAULT_CONDITIONS = [
   "Prazo de produção: definido após aprovação do briefing",
-  "Validade da proposta: conforme data informada acima",
   "Alterações: 1 rodada de ajustes inclusa",
   "Impulsionamento pago: não incluso",
   "Exclusividade de segmento: sob consulta",
-  "Deslocamento: pode ser incluído conforme local da gravação",
 ].join("\n");
 
 export interface BudgetItem {
@@ -170,7 +165,6 @@ export async function createBudget(
       final_value: data.finalValue ?? null,
       status: "draft",
       expires_at: defaultExpiresAt(),
-      value_intro: DEFAULT_VALUE_INTRO,
       value_points: DEFAULT_VALUE_POINTS,
       conditions: DEFAULT_CONDITIONS,
     })
