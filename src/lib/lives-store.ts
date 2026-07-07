@@ -316,6 +316,47 @@ export async function updateLive(
   return rowToLive(row);
 }
 
+export async function updateLiveSlug(
+  id: string,
+  userId: string,
+  rawSlug: string
+): Promise<{ ok: true; live: Live } | { ok: false; error: string }> {
+  const slug = generateSlug(rawSlug);
+  if (slug.length < 3) {
+    return { ok: false, error: "Link precisa ter ao menos 3 caracteres" };
+  }
+
+  const db: DB = getSupabase();
+  const { data: existing } = await db.from("lives").select("id").eq("user_id", userId).eq("slug", slug).maybeSingle();
+  if (existing && existing.id !== id) {
+    return { ok: false, error: "Já existe uma vitrine sua com esse link" };
+  }
+
+  const { data: current } = await db.from("lives").select("slug").eq("id", id).eq("user_id", userId).maybeSingle();
+  const oldSlug = current?.slug as string | undefined;
+
+  if (oldSlug && oldSlug !== slug) {
+    await db.from("live_slug_history").delete().eq("live_id", id).eq("old_slug", slug);
+    await db.from("live_slug_history").upsert({ live_id: id, old_slug: oldSlug, changed_at: new Date().toISOString() });
+  }
+
+  const { data: row } = await db.from("lives").update({ slug }).eq("id", id).eq("user_id", userId).select().single();
+  return { ok: true, live: rowToLive(row) };
+}
+
+export async function resolveCurrentSlug(userId: string, oldSlug: string): Promise<string | null> {
+  const db: DB = getSupabase();
+  const { data } = await db
+    .from("live_slug_history")
+    .select("live_id, lives!inner(user_id, slug)")
+    .eq("old_slug", oldSlug)
+    .eq("lives.user_id", userId)
+    .maybeSingle();
+  if (!data) return null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data.lives as any)?.slug ?? null;
+}
+
 export async function deleteLive(id: string, userId: string): Promise<void> {
   const db: DB = getSupabase();
   await db.from("lives").delete().eq("id", id).eq("user_id", userId);

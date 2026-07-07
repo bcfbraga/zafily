@@ -61,7 +61,7 @@ export function ProductGrid({ products, discount }: Props) {
     <div>
       {/* Category tabs */}
       {categories.length > 1 && (
-        <div className="flex gap-2 flex-wrap mb-8">
+        <div className="hidden sm:flex gap-2 flex-wrap mb-8">
           {categories.map(cat => (
             <button
               key={cat}

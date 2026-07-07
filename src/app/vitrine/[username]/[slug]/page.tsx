@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getPublicLive, getProfileByUsername, resolveCurrentUsername } from "@/lib/lives-store";
+import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug } from "@/lib/lives-store";
 import { ShareButtons } from "./ShareButtons";
 import { ProductGrid } from "./ProductGrid";
 import { Calendar, Clock } from "lucide-react";
@@ -19,8 +19,13 @@ export default async function VitrinePage({ params }: Props) {
   ]);
 
   if (!live || !profile) {
-    const currentUsername = await resolveCurrentUsername(username);
-    if (currentUsername) redirect(`/vitrine/${currentUsername}/${slug}`);
+    if (!profile) {
+      const currentUsername = await resolveCurrentUsername(username);
+      if (currentUsername) redirect(`/vitrine/${currentUsername}/${slug}`);
+      notFound();
+    }
+    const currentSlug = await resolveCurrentSlug(profile.userId, slug);
+    if (currentSlug) redirect(`/vitrine/${username}/${currentSlug}`);
     notFound();
   }
 

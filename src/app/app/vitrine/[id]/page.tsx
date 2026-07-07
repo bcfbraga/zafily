@@ -661,7 +661,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
       {/* ── Edit vitrine modal ─────────────────────────────────────────────── */}
       {showEditModal && (
-        <EditModal live={live} liveId={id}
+        <EditModal live={live} liveId={id} username={username}
           onClose={() => setShowEditModal(false)}
           onSave={(updated) => { setLive(prev => prev ? { ...prev, ...updated } : prev); setShowEditModal(false); }}
         />
@@ -686,12 +686,14 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 interface EditModalProps {
   live: Live;
   liveId: string;
+  username: string | null;
   onClose: () => void;
   onSave: (data: Partial<Live>) => void;
 }
 
-function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
+function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) {
   const [title, setTitle] = useState(live.title);
+  const [slug, setSlug] = useState(live.slug);
   const [date, setDate] = useState(live.liveDate ?? "");
   const [time, setTime] = useState(live.liveTime?.slice(0, 5) ?? "");
   const [imageUrl, setImageUrl] = useState<string | null>(live.imageUrl);
@@ -724,14 +726,14 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title, liveDate: date || null, liveTime: time || null, imageUrl, store,
+        title, slug, liveDate: date || null, liveTime: time || null, imageUrl, store,
         discount: discount.trim() ? Math.min(99, Math.max(1, parseInt(discount))) : null,
       }),
     });
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setError(data.error ?? "Erro ao salvar"); return; }
-    onSave({ title: data.title, liveDate: data.liveDate, liveTime: data.liveTime, imageUrl: data.imageUrl, store: data.store ?? null, discount: data.discount ?? null });
+    onSave({ title: data.title, slug: data.slug, liveDate: data.liveDate, liveTime: data.liveTime, imageUrl: data.imageUrl, store: data.store ?? null, discount: data.discount ?? null });
   }
 
   return (
@@ -749,6 +751,20 @@ function EditModal({ live, liveId, onClose, onSave }: EditModalProps) {
             <label className="text-sm font-medium text-[#4B4768]">Título</label>
             <input type="text" value={title} onChange={e => setTitle(e.target.value)} required
               className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[#4B4768]">Link da vitrine</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">/vitrine/{username ?? "..."}/</span>
+              <input
+                type="text"
+                value={slug}
+                onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
+                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                style={{ paddingLeft: `calc(1rem + ${10 + (username?.length ?? 3)}ch)` }}
+              />
+            </div>
+            <p className="text-[11px] text-[#716C8C]">Mudar o link não quebra o link antigo — ele redireciona para o novo.</p>
           </div>
           {/* Store + Discount on same row */}
           <div className="grid grid-cols-[1fr_100px] gap-3 items-end">

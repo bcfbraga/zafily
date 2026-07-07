@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { getLive, updateLive, deleteLive, listProducts } from "@/lib/lives-store";
+import { getLive, updateLive, updateLiveSlug, deleteLive, listProducts } from "@/lib/lives-store";
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   let userId: string;
@@ -21,6 +21,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
   const { id } = await params;
   const body = await req.json();
+
+  if (body.slug !== undefined) {
+    const result = await updateLiveSlug(id, userId, body.slug);
+    if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
+  }
+
   const live = await updateLive(id, userId, {
     title: body.title,
     liveDate: body.liveDate,
