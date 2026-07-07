@@ -114,12 +114,11 @@ async function fetchVtexProduct(origin: string, slug: string): Promise<UrlMetada
       }
     }
 
-    // Category from categoryTree (last leaf)
+    // Category from categoryTree (last leaf), falling back to keyword inference from the name
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const categoryTree: any[] = product.categoryTree ?? [];
-    const category: string | null = categoryTree.length > 0
-      ? categoryTree[categoryTree.length - 1].name ?? null
-      : null;
+    const category: string | null = (categoryTree.length > 0 ? categoryTree[categoryTree.length - 1].name : null)
+      ?? inferCategoryFromName(name);
 
     return { name, imageUrl, price, category, productUrl: `${origin}/${slug}/p` };
   } catch { return null; }
@@ -173,6 +172,34 @@ function findProductLd(blocks: Record<string, unknown>[]): Record<string, unknow
   return null;
 }
 
+const CATEGORY_KEYWORDS: [RegExp, string][] = [
+  [/\bcal[çc]a\b/i, "Calças"],
+  [/\bvestido\b/i, "Vestidos"],
+  [/\bsaia\b/i, "Saias"],
+  [/\bblusa\b/i, "Blusas"],
+  [/\bcamiseta\b/i, "Camisetas"],
+  [/\bpolo\b/i, "Polos"],
+  [/\bjaqueta\b/i, "Jaquetas"],
+  [/\bcasaco\b/i, "Casacos"],
+  [/\bcardigan\b/i, "Cardigans"],
+  [/\bsu[eé]ter\b/i, "Suéteres"],
+  [/\bblazer\b/i, "Blazers"],
+  [/\bcinto\b/i, "Acessórios"],
+  [/\bbata\b/i, "Batas"],
+  [/\bshort\b/i, "Shorts"],
+  [/\bregata\b/i, "Regatas"],
+  [/\bmacac[ãa]o\b/i, "Macacões"],
+  [/\bbermuda\b/i, "Bermudas"],
+];
+
+function inferCategoryFromName(name: string | null): string | null {
+  if (!name) return null;
+  for (const [re, label] of CATEGORY_KEYWORDS) {
+    if (re.test(name)) return label;
+  }
+  return null;
+}
+
 function extractFromHtml(html: string): Omit<UrlMetadata, "productUrl"> {
   const ldBlocks = extractLdJson(html);
   const product = findProductLd(ldBlocks);
@@ -206,9 +233,11 @@ function extractFromHtml(html: string): Omit<UrlMetadata, "productUrl"> {
   // Price
   let price: string | null = null;
   if (product) {
-    const offers = product.offers;
+    const offers = product.offers as Record<string, unknown> | Record<string, unknown>[] | undefined;
     const offer = Array.isArray(offers) ? offers[0] : offers;
-    const p = (offer as Record<string, unknown>)?.price ?? product.price;
+    const nestedOffers = offer?.offers;
+    const nestedOffer = Array.isArray(nestedOffers) ? (nestedOffers as Record<string, unknown>[])[0] : undefined;
+    const p = offer?.price ?? nestedOffer?.price ?? offer?.lowPrice ?? product.price;
     if (p != null) {
       const num = parseFloat(String(p));
       price = !isNaN(num) ? `R$ ${num.toFixed(2).replace(".", ",")}` : String(p);
@@ -226,6 +255,7 @@ function extractFromHtml(html: string): Omit<UrlMetadata, "productUrl"> {
     }
   }
   if (!category) category = extractMeta(html, "og:category") || extractMeta(html, "product:category") || null;
+  if (!category) category = inferCategoryFromName(name);
 
   return { name, imageUrl, price, category };
 }
