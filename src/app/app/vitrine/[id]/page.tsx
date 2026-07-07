@@ -9,6 +9,7 @@ import {
   Copy, Check, GripVertical, Plus, ShoppingBag, Smartphone, Monitor
 } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
+import { titleCase } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -228,9 +229,12 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                           {p.category && (
                             <p className="text-[9px] font-semibold text-zinc-400 uppercase tracking-wide mb-1">{p.category}</p>
                           )}
-                          <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1.5">
-                            {p.name ?? "Produto"}
+                          <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1">
+                            {p.name ? titleCase(p.name) : "Produto"}
                           </p>
+                          {p.size && (
+                            <p className="text-[10px] text-zinc-400 mb-1">Tam. {p.size}</p>
+                          )}
                           {disc ? (
                             <div>
                               <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
@@ -546,7 +550,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     }
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-[#16162B] truncate leading-tight">{product.name ?? "Sem nome"}</p>
+                    <p className="text-xs text-[#16162B] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {product.price && <span className="text-[10px] text-[#6C63FF] font-semibold">{product.price}</span>}
                       {/* Inline size field */}
