@@ -61,17 +61,9 @@ export default async function VitrinePage({ params }: Props) {
       <div className="max-w-3xl mx-auto px-5 pt-6 sm:pt-10 pb-8">
         {/* Title block */}
         <div className="mb-2">
-          <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
-            <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight">
-              {live.title}
-            </h1>
-            {live.discount && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F7E9EC] border border-[#E3BEC7]">
-                <span className="text-[#8C2F45] text-xs font-bold">{live.discount}% OFF</span>
-                <span className="text-[#B37A87] text-xs">· cupom exclusivo desta live</span>
-              </span>
-            )}
-          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight mb-4">
+            {live.title}
+          </h1>
 
           {/* Meta pills */}
           <div className="flex items-center gap-3 flex-wrap text-xs text-zinc-400">

@@ -156,16 +156,7 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
 
             <div className={isMobile ? "px-4 pt-4" : ""}>
               {/* Title */}
-              <h1 className="text-2xl font-bold text-zinc-900 mb-2">{live.title || "Sua vitrine"}</h1>
-
-              {/* Discount banner */}
-              {live.discount && (
-                <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-[#F7E9EC] border border-[#E3BEC7]">
-                  <span className="text-[#8C2F45] text-xs font-bold">{live.discount}% OFF</span>
-                  <span className="text-[#B37A87] text-xs">· cupom exclusivo desta live</span>
-                </div>
-              )}
-              {!live.discount && <div className="mb-5" />}
+              <h1 className="text-2xl font-bold text-zinc-900 mb-5">{live.title || "Sua vitrine"}</h1>
 
               {/* Category tabs */}
               {categories.length > 1 && (
