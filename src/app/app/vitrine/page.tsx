@@ -144,14 +144,14 @@ export default function VitrinePage() {
                     </div>
                     {live.status === "published" && profile && (
                       <a
-                        href={`${baseUrl}/vitrine/${profile.username}/${live.slug}`}
+                        href={`${baseUrl}/${profile.username}/${live.slug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={e => e.stopPropagation()}
                         className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#5851E0] mt-2 transition-colors"
                       >
                         <ExternalLink className="w-3 h-3" />
-                        {`/vitrine/${profile.username}/${live.slug}`}
+                        {`/${profile.username}/${live.slug}`}
                       </a>
                     )}
                     <p className="text-[11px] text-[#716C8C] mt-1">

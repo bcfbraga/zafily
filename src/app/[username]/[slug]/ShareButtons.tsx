@@ -13,8 +13,8 @@ export function ShareButtons({ title, username, slug }: Props) {
   const [copied, setCopied] = useState(false);
 
   const url = typeof window !== "undefined"
-    ? `${window.location.origin}/vitrine/${username}/${slug}`
-    : `https://zafily.com.br/vitrine/${username}/${slug}`;
+    ? `${window.location.origin}/${username}/${slug}`
+    : `https://zafily.com.br/${username}/${slug}`;
 
   const text = `Vitrine "${title}" — produtos escolhidos pra você 🛍️`;
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`;

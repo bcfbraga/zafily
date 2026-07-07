@@ -129,7 +129,7 @@ export function ProductGrid({ products, discount }: Props) {
                   {product.name ? titleCase(product.name) : "Produto"}
                 </p>
                 {product.size && (
-                  <p className="text-[10px] text-zinc-400 mb-1">Tam. {product.size}</p>
+                  <p className="text-[10px] text-zinc-400 mb-1">Tamanho Pam: {product.size}</p>
                 )}
                 {(() => {
                   const disc = discountedPrice(product.price, discount);

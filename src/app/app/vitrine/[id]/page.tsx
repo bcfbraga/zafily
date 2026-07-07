@@ -224,7 +224,7 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                             {p.name ? titleCase(p.name) : "Produto"}
                           </p>
                           {p.size && (
-                            <p className="text-[10px] text-zinc-400 mb-1">Tam. {p.size}</p>
+                            <p className="text-[10px] text-zinc-400 mb-1">Tamanho Pam: {p.size}</p>
                           )}
                           {disc ? (
                             <div>
@@ -396,7 +396,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     );
   }
 
-  const publicUrl = username ? `${typeof window !== "undefined" ? window.location.origin : ""}/vitrine/${username}/${live.slug}` : null;
+  const publicUrl = username ? `${typeof window !== "undefined" ? window.location.origin : ""}/${username}/${live.slug}` : null;
 
   return (
     <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
@@ -750,13 +750,13 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Link da vitrine</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">/vitrine/{username ?? "..."}/</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">/{username ?? "..."}/</span>
               <input
                 type="text"
                 value={slug}
                 onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
                 className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
-                style={{ paddingLeft: `calc(1rem + ${10 + (username?.length ?? 3)}ch)` }}
+                style={{ paddingLeft: `calc(1rem + ${2 + (username?.length ?? 3)}ch)` }}
               />
             </div>
             <p className="text-[11px] text-[#716C8C]">Mudar o link não quebra o link antigo — ele redireciona para o novo.</p>
