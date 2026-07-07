@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Loader2, Check } from "lucide-react";
+import { CurrencyInput } from "@/components/zafily/CurrencyInput";
 
 const SCOPE_OPTIONS = [
   "Reels / Feed",
@@ -20,7 +21,7 @@ export default function NovoOrcamentoPage() {
 
   const [clientName, setClientName] = useState("");
   const [scopeItems, setScopeItems] = useState<string[]>([]);
-  const [finalValue, setFinalValue] = useState("");
+  const [finalValue, setFinalValue] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,7 +41,7 @@ export default function NovoOrcamentoPage() {
         title: clientName.trim(),
         clientName: clientName.trim(),
         scopeItems,
-        finalValue: finalValue.trim() ? Number(finalValue.replace(",", ".")) : undefined,
+        finalValue: finalValue ?? undefined,
       }),
     });
     const data = await res.json();
@@ -109,10 +110,9 @@ export default function NovoOrcamentoPage() {
             <label className="text-sm font-medium text-[#4B4768]">Valor</label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">R$</span>
-              <input
-                type="text" inputMode="decimal" value={finalValue}
-                onChange={e => setFinalValue(e.target.value.replace(/[^\d.,]/g, ""))}
-                placeholder="0,00"
+              <CurrencyInput
+                defaultValue={null}
+                onChange={setFinalValue}
                 className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl pl-10 pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
               />
             </div>

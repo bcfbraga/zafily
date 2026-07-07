@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { ProposalView, HOURS_ITEM, formatDateBR, type ProposalProfile } from "@/components/zafily/ProposalView";
 import { SCOPE_DEFAULT_NOTES } from "@/lib/scope-defaults";
+import { CurrencyInput } from "@/components/zafily/CurrencyInput";
 
 const SCOPE_PRESETS: { key: string; hint?: string; defaultNotes?: string }[] = [
   { key: "Reels / Feed", defaultNotes: SCOPE_DEFAULT_NOTES["Reels / Feed"] },
@@ -345,7 +346,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
           )}
           {publicUrl && budget.status === "published" && (
             <>
-              <a href={`${publicUrl}?print=1`} target="_blank" rel="noopener noreferrer"
+              <a href={`/api/budgets/${id}/pdf`} download
                 title="Baixar PDF"
                 className="h-8 px-3 flex items-center gap-1.5 rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] transition-colors text-xs font-medium">
                 <Download className="w-3.5 h-3.5" /> PDF
@@ -549,16 +550,20 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
               <span className="flex-1 text-xs text-[#4B4768] truncate">{publicUrl}</span>
               {copiedLink ? <Check className="w-4 h-4 text-emerald-600 shrink-0" /> : <Copy className="w-4 h-4 text-[#716C8C] group-hover:text-[#16162B] shrink-0 transition-colors" />}
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-3">
               <a href={publicUrl} target="_blank" rel="noopener noreferrer"
                 className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
                 Ver proposta
               </a>
-              <button onClick={() => setShowPublishSuccess(false)}
-                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-xl hover:border-black/[0.20] transition-colors">
-                Fechar
-              </button>
+              <a href={`/api/budgets/${id}/pdf`} download
+                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+                <Download className="w-3.5 h-3.5" /> Baixar PDF
+              </a>
             </div>
+            <button onClick={() => setShowPublishSuccess(false)}
+              className="w-full h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-xl hover:border-black/[0.20] transition-colors">
+              Fechar
+            </button>
           </div>
         </div>
       )}
@@ -606,7 +611,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
   const [clientPhone, setClientPhone] = useState(budget.clientPhone ?? "");
   const [clientLogoUrl, setClientLogoUrl] = useState<string | null>(budget.clientLogoUrl);
   const [logoPreview, setLogoPreview] = useState<string | null>(budget.clientLogoUrl);
-  const [finalValue, setFinalValue] = useState(budget.finalValue != null ? String(budget.finalValue) : "");
+  const [finalValue, setFinalValue] = useState<number | null>(budget.finalValue);
   const [expiresAt, setExpiresAt] = useState(budget.expiresAt ?? "");
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -630,7 +635,6 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
     e.preventDefault();
     if (!title.trim()) { setError("Título obrigatório"); return; }
     setSaving(true);
-    const parsedValue = finalValue.trim() ? Number(finalValue.replace(",", ".")) : null;
     const res = await fetch(`/api/budgets/${budgetId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -639,7 +643,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
         clientName: clientName || null,
         clientPhone: clientPhone || null,
         clientLogoUrl,
-        finalValue: parsedValue === null || isNaN(parsedValue) ? null : parsedValue,
+        finalValue,
         expiresAt: expiresAt || null,
       }),
     });
@@ -691,10 +695,9 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
               <label className="text-sm font-medium text-[#4B4768]">Valor do investimento</label>
               <div className="relative">
                 <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">R$</span>
-                <input
-                  type="text" inputMode="decimal" value={finalValue}
-                  onChange={e => setFinalValue(e.target.value.replace(/[^\d.,]/g, ""))}
-                  placeholder="0,00"
+                <CurrencyInput
+                  defaultValue={budget.finalValue}
+                  onChange={setFinalValue}
                   className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl pl-9 pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
               </div>
             </div>
