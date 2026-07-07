@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   ArrowLeft, Loader2, X, Upload, Calendar, Clock,
   Package, CheckCircle2, FileText, ExternalLink, Pencil,
-  Copy, Check, GripVertical, Plus, ShoppingBag
+  Copy, Check, GripVertical, Plus, ShoppingBag, Smartphone, Monitor
 } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
 
@@ -92,6 +92,8 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
   const [activeCategory, setActiveCategory] = useState("Tudo");
   const [dragIdx, setDragIdx] = useState<number | null>(null);
   const [overIdx, setOverIdx] = useState<number | null>(null);
+  const [previewMode, setPreviewMode] = useState<"mobile" | "web">("mobile");
+  const isMobile = previewMode === "mobile";
 
   const products = live.products.map(p => ({ ...p, category: shortCat(p.category) }));
   const categories = ["Tudo", ...Array.from(new Set(products.map(p => p.category).filter(Boolean) as string[]))];
@@ -114,120 +116,142 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
   }
 
   return (
-    <div className="min-h-full bg-white text-zinc-900 font-sans">
+    <div className="min-h-full bg-[#EFEFF4] text-zinc-900 font-sans">
       {/* Sticky mini header */}
       <div className="sticky top-0 z-10 bg-white/90 backdrop-blur border-b border-zinc-100">
         <div className="max-w-2xl mx-auto px-5 h-12 flex items-center justify-between">
           <span className="text-[10px] font-semibold tracking-widest uppercase text-zinc-400">Preview</span>
-          <span className="text-[10px] text-zinc-300">{live.status === "draft" ? "Rascunho" : "Publicada"}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0.5 bg-zinc-100 rounded-full p-0.5">
+              <button
+                onClick={() => setPreviewMode("mobile")}
+                title="Visualizar como mobile"
+                className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors ${isMobile ? "bg-white shadow-sm text-zinc-900" : "text-zinc-400 hover:text-zinc-600"}`}
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setPreviewMode("web")}
+                title="Visualizar como web"
+                className={`w-7 h-7 flex items-center justify-center rounded-full transition-colors ${!isMobile ? "bg-white shadow-sm text-zinc-900" : "text-zinc-400 hover:text-zinc-600"}`}
+              >
+                <Monitor className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <span className="text-[10px] text-zinc-300">{live.status === "draft" ? "Rascunho" : "Publicada"}</span>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-5 pt-8 pb-16">
-        {/* Cover image */}
-        {live.imageUrl && (
-          <div className="w-full h-44 rounded-2xl overflow-hidden mb-7 bg-zinc-100">
-            <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
-          </div>
-        )}
+      <div className={isMobile ? "flex justify-center py-6 px-4" : "px-5 pt-8 pb-16"}>
+        <div className={isMobile ? "w-[390px] max-w-full rounded-[32px] border border-zinc-200 shadow-lg overflow-hidden bg-white" : "max-w-2xl mx-auto"}>
+          <div className={isMobile ? "pb-10" : ""}>
+            {/* Cover image */}
+            {live.imageUrl && (
+              <div className={isMobile ? "w-full h-auto bg-zinc-100 overflow-hidden" : "w-full h-44 rounded-2xl overflow-hidden mb-7 bg-zinc-100"}>
+                <img src={live.imageUrl} alt={live.title} className={isMobile ? "w-full h-auto object-contain" : "w-full h-full object-cover"} />
+              </div>
+            )}
 
-        {/* Title */}
-        <h1 className="text-2xl font-bold text-zinc-900 mb-2">{live.title || "Sua vitrine"}</h1>
+            <div className={isMobile ? "px-4 pt-4" : ""}>
+              {/* Title */}
+              <h1 className="text-2xl font-bold text-zinc-900 mb-2">{live.title || "Sua vitrine"}</h1>
 
-        {/* Discount banner */}
-        {live.discount && (
-          <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200">
-            <span className="text-violet-700 text-xs font-bold">{live.discount}% OFF</span>
-            <span className="text-violet-500 text-xs">· cupom exclusivo desta live</span>
-          </div>
-        )}
-        {!live.discount && <div className="mb-5" />}
-
-        {/* Category tabs */}
-        {categories.length > 1 && (
-          <div className="flex gap-2 flex-wrap mb-6">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`h-8 px-4 rounded-full text-xs font-semibold border transition-colors ${
-                  activeCategory === cat
-                    ? "bg-zinc-900 text-white border-zinc-900"
-                    : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Products grid */}
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 gap-3 text-zinc-300">
-            <ShoppingBag className="w-10 h-10" />
-            <p className="text-sm">Nenhum produto ainda</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-3 gap-3">
-            {filtered.map((p, i) => {
-              const disc = discountedPrice(p.price, live.discount);
-              return (
-                <div
-                  key={p.id}
-                  draggable
-                  onDragStart={() => setDragIdx(i)}
-                  onDragOver={e => { e.preventDefault(); setOverIdx(i); }}
-                  onDrop={handleDrop}
-                  onDragEnd={() => { setDragIdx(null); setOverIdx(null); }}
-                  className={`rounded-2xl overflow-hidden border bg-white shadow-sm cursor-grab active:cursor-grabbing transition-all ${
-                    overIdx === i && dragIdx !== i ? "border-violet-400 scale-[1.02]" : dragIdx === i ? "border-zinc-200 opacity-40" : "border-zinc-100"
-                  }`}
-                >
-                  <div className="relative aspect-[3/4] bg-zinc-50 overflow-hidden">
-                    {p.imageUrl ? (
-                      <img src={p.imageUrl} alt={p.name ?? ""} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-zinc-300">
-                        <Package className="w-8 h-8" />
-                      </div>
-                    )}
-                    <span className="absolute top-2 left-2 w-6 h-6 rounded-full bg-zinc-900 text-white text-[10px] font-bold flex items-center justify-center">
-                      {i + 1}
-                    </span>
-                    {disc && (
-                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-violet-600 text-white text-[10px] font-bold shadow">
-                        -{live.discount}%
-                      </span>
-                    )}
-                    {!disc && p.category && (
-                      <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/90 text-zinc-600 text-[10px] font-medium border border-zinc-200">
-                        {p.category}
-                      </span>
-                    )}
-                  </div>
-                  <div className="p-3">
-                    <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1.5">
-                      {p.name ?? "Produto"}
-                    </p>
-                    {disc ? (
-                      <div>
-                        <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
-                        <p className="text-sm font-bold text-violet-700 leading-tight">{disc.discounted}</p>
-                        <p className="text-[9px] text-violet-400 font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
-                      </div>
-                    ) : (
-                      p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
-                    )}
-                    <div className="mt-2 w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-[10px] font-semibold tracking-wide">
-                      VER PRODUTO →
-                    </div>
-                  </div>
+              {/* Discount banner */}
+              {live.discount && (
+                <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-[#FBF3E3] border border-[#E8D4A8]">
+                  <span className="text-[#8A6A1F] text-xs font-bold">{live.discount}% OFF</span>
+                  <span className="text-[#B8935B] text-xs">· cupom exclusivo desta live</span>
                 </div>
-              );
-            })}
+              )}
+              {!live.discount && <div className="mb-5" />}
+
+              {/* Category tabs */}
+              {categories.length > 1 && (
+                <div className="flex gap-2 flex-wrap mb-6">
+                  {categories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`h-8 px-4 rounded-full text-xs font-semibold border transition-colors ${
+                        activeCategory === cat
+                          ? "bg-zinc-900 text-white border-zinc-900"
+                          : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Products grid */}
+              {filtered.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 gap-3 text-zinc-300">
+                  <ShoppingBag className="w-10 h-10" />
+                  <p className="text-sm">Nenhum produto ainda</p>
+                </div>
+              ) : (
+                <div className={`grid gap-3 ${isMobile ? "grid-cols-2" : "grid-cols-3"}`}>
+                  {filtered.map((p, i) => {
+                    const disc = discountedPrice(p.price, live.discount);
+                    return (
+                      <div
+                        key={p.id}
+                        draggable
+                        onDragStart={() => setDragIdx(i)}
+                        onDragOver={e => { e.preventDefault(); setOverIdx(i); }}
+                        onDrop={handleDrop}
+                        onDragEnd={() => { setDragIdx(null); setOverIdx(null); }}
+                        className={`rounded-2xl overflow-hidden border bg-white shadow-sm cursor-grab active:cursor-grabbing transition-all ${
+                          overIdx === i && dragIdx !== i ? "border-violet-400 scale-[1.02]" : dragIdx === i ? "border-zinc-200 opacity-40" : "border-zinc-100"
+                        }`}
+                      >
+                        <div className="relative aspect-[3/4] bg-zinc-50 overflow-hidden">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.name ?? ""} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-zinc-300">
+                              <Package className="w-8 h-8" />
+                            </div>
+                          )}
+                          <span className="absolute top-2 left-2 w-6 h-6 rounded-full bg-zinc-900 text-white text-[10px] font-bold flex items-center justify-center">
+                            {i + 1}
+                          </span>
+                          {disc && (
+                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#C7A15A] text-[#2B1A08] text-[10px] font-bold shadow">
+                              -{live.discount}%
+                            </span>
+                          )}
+                        </div>
+                        <div className="p-3">
+                          {p.category && (
+                            <p className="text-[9px] font-semibold text-zinc-400 uppercase tracking-wide mb-1">{p.category}</p>
+                          )}
+                          <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1.5">
+                            {p.name ?? "Produto"}
+                          </p>
+                          {disc ? (
+                            <div>
+                              <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
+                              <p className="text-sm font-bold text-[#8A6A1F] leading-tight">{disc.discounted}</p>
+                              <p className="text-[9px] text-[#B8935B] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
+                            </div>
+                          ) : (
+                            p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
+                          )}
+                          <div className="mt-2 w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-[10px] font-semibold tracking-wide">
+                            VER PRODUTO →
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
