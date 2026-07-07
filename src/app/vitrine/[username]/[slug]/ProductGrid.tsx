@@ -116,7 +116,7 @@ export function ProductGrid({ products, discount }: Props) {
                 </div>
                 {/* Discount badge */}
                 {discount && (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-violet-600 text-[10px] font-bold text-white shadow">
+                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#C7A15A] text-[10px] font-bold text-[#2B1A08] shadow">
                     -{discount}%
                   </div>
                 )}
@@ -138,8 +138,8 @@ export function ProductGrid({ products, discount }: Props) {
                   if (disc) return (
                     <div className="mb-2">
                       <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
-                      <p className="text-sm font-bold text-violet-700 leading-tight">{disc.discounted}</p>
-                      <p className="text-[9px] text-violet-400 font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
+                      <p className="text-sm font-bold text-[#8A6A1F] leading-tight">{disc.discounted}</p>
+                      <p className="text-[9px] text-[#B8935B] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
                     </div>
                   );
                   if (product.price) return (

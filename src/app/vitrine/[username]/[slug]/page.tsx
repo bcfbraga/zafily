@@ -59,9 +59,9 @@ export default async function VitrinePage({ params }: Props) {
               {live.title}
             </h1>
             {live.discount && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200">
-                <span className="text-violet-700 text-xs font-bold">{live.discount}% OFF</span>
-                <span className="text-violet-500 text-xs">· cupom exclusivo desta live</span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#FBF3E3] border border-[#E8D4A8]">
+                <span className="text-[#8A6A1F] text-xs font-bold">{live.discount}% OFF</span>
+                <span className="text-[#B8935B] text-xs">· cupom exclusivo desta live</span>
               </span>
             )}
           </div>
