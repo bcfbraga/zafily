@@ -79,9 +79,6 @@ export function ProductGrid({ products, discount }: Props) {
         </div>
       )}
 
-      {/* Counter */}
-      <p className="text-xs text-zinc-400 mb-5">{filtered.length} de {products.length} produtos</p>
-
       {/* Grid */}
       {filtered.length === 0 ? (
         <div className="text-center py-16">
