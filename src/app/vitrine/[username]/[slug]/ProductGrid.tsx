@@ -98,7 +98,7 @@ export function ProductGrid({ products, discount }: Props) {
               className="group flex flex-col bg-white border border-zinc-100 hover:border-zinc-300 rounded-2xl overflow-hidden transition-all hover:shadow-md"
             >
               {/* Image */}
-              <div className="aspect-square bg-zinc-50 overflow-hidden relative">
+              <div className="aspect-[3/4] bg-zinc-50 overflow-hidden relative">
                 {product.imageUrl ? (
                   <img
                     src={product.imageUrl}
