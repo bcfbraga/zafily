@@ -54,9 +54,17 @@ export default async function VitrinePage({ params }: Props) {
 
         {/* Title block */}
         <div className="mb-2">
-          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight mb-4">
-            {live.title}
-          </h1>
+          <div className="flex items-center gap-3 flex-wrap mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight">
+              {live.title}
+            </h1>
+            {live.discount && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200">
+                <span className="text-violet-700 text-xs font-bold">{live.discount}% OFF</span>
+                <span className="text-violet-500 text-xs">· cupom exclusivo desta live</span>
+              </span>
+            )}
+          </div>
 
           {/* Meta pills */}
           <div className="flex items-center gap-3 flex-wrap text-xs text-zinc-400">
@@ -75,14 +83,6 @@ export default async function VitrinePage({ params }: Props) {
             <span>{live.products.length} produto{live.products.length !== 1 ? "s" : ""}</span>
           </div>
         </div>
-
-        {/* Discount banner */}
-        {live.discount && (
-          <div className="inline-flex items-center gap-1.5 mt-4 px-3 py-1.5 rounded-full bg-violet-50 border border-violet-200">
-            <span className="text-violet-700 text-xs font-bold">{live.discount}% OFF</span>
-            <span className="text-violet-500 text-xs">· cupom exclusivo desta live</span>
-          </div>
-        )}
 
         <div className="border-t border-zinc-100 mt-6 mb-8" />
 
