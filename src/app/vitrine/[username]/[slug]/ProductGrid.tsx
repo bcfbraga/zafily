@@ -114,20 +114,19 @@ export function ProductGrid({ products, discount }: Props) {
                 <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[10px] font-bold text-zinc-500 shadow-sm">
                   {i + 1}
                 </div>
-                {/* Badge: discount or category */}
-                {discount ? (
+                {/* Discount badge */}
+                {discount && (
                   <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-violet-600 text-[10px] font-bold text-white shadow">
                     -{discount}%
                   </div>
-                ) : product.category ? (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-semibold text-zinc-600 shadow-sm uppercase tracking-wide">
-                    {product.category}
-                  </div>
-                ) : null}
+                )}
               </div>
 
               {/* Info */}
               <div className="p-3 flex flex-col flex-1">
+                {product.category && (
+                  <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1">{product.category}</p>
+                )}
                 <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1 flex-1">
                   {product.name ?? "Produto"}
                 </p>
