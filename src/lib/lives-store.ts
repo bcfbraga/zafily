@@ -157,6 +157,25 @@ export async function updateProfile(
   return rowToProfile(row);
 }
 
+export async function updateUsername(
+  userId: string,
+  rawUsername: string
+): Promise<{ ok: true; profile: Profile } | { ok: false; error: string }> {
+  const username = rawUsername.toLowerCase().trim().replace(/[^a-z0-9_]/g, "");
+  if (username.length < 3) {
+    return { ok: false, error: "Nome de usuário precisa ter ao menos 3 caracteres" };
+  }
+
+  const db: DB = getSupabase();
+  const { data: existing } = await db.from("profiles").select("user_id").eq("username", username).maybeSingle();
+  if (existing && existing.user_id !== userId) {
+    return { ok: false, error: "Este nome de usuário já está em uso" };
+  }
+
+  const { data: row } = await db.from("profiles").update({ username }).eq("user_id", userId).select().single();
+  return { ok: true, profile: rowToProfile(row) };
+}
+
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
   const db: DB = getSupabase();
   const { data } = await db.from("profiles").select("*").eq("username", username).maybeSingle();

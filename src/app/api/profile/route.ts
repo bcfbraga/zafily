@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { getOrCreateProfile, updateProfile } from "@/lib/lives-store";
+import { getOrCreateProfile, updateProfile, updateUsername } from "@/lib/lives-store";
 import { createClient } from "@/lib/supabase-server";
 
 export async function GET(req: NextRequest) {
@@ -24,6 +24,12 @@ export async function PUT(req: NextRequest) {
   }
 
   const body = await req.json();
+
+  if (body.username !== undefined) {
+    const result = await updateUsername(userId, body.username);
+    if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
+  }
+
   const profile = await updateProfile(userId, {
     instagramHandle: body.instagramHandle !== undefined ? (body.instagramHandle || null) : undefined,
     location: body.location !== undefined ? (body.location || null) : undefined,

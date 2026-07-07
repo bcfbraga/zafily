@@ -4,9 +4,10 @@ import { Topbar } from "@/components/zafily/Topbar";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 interface Profile {
+  username: string;
   instagramHandle: string | null;
   location: string | null;
   followersLabel: string | null;
@@ -21,7 +22,7 @@ interface Profile {
 }
 
 const emptyProfile: Profile = {
-  instagramHandle: "", location: "", followersLabel: "", reachLabel: "",
+  username: "", instagramHandle: "", location: "", followersLabel: "", reachLabel: "",
   viewsLabel: "", engagementLabel: "", whatsapp: "", contactEmail: "", linkUrl: "", photoUrl: null, roleTitle: "",
 };
 
@@ -31,6 +32,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function SettingsPage() {
     supabase.auth.getUser().then(({ data }) => setUser(data.user));
     fetch("/api/profile").then(r => r.json()).then(data => {
       setProfile({
+        username: data.username ?? "",
         instagramHandle: data.instagramHandle ?? "",
         location: data.location ?? "",
         followersLabel: data.followersLabel ?? "",
@@ -57,6 +60,7 @@ export default function SettingsPage() {
   function setField(key: keyof Profile, value: string) {
     setProfile(prev => ({ ...prev, [key]: value }));
     setSaved(false);
+    setSaveError(null);
   }
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -74,12 +78,16 @@ export default function SettingsPage() {
 
   async function handleSave() {
     setSaving(true);
-    await fetch("/api/profile", {
+    setSaveError(null);
+    const res = await fetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(profile),
     });
+    const data = await res.json();
     setSaving(false);
+    if (!res.ok) { setSaveError(data.error ?? "Erro ao salvar"); return; }
+    setProfile(prev => ({ ...prev, username: data.username ?? prev.username }));
     setSaved(true);
   }
 
@@ -101,12 +109,21 @@ export default function SettingsPage() {
           <section className="bg-white border border-black/[0.08] rounded-[20px] p-6 shadow-[0_16px_48px_rgba(23,23,60,0.10)]">
             <h2 className="font-heading font-semibold text-[#16162B] mb-5">Perfil</h2>
             <div className="flex items-center gap-5 mb-6">
-              <div className="w-16 h-16 rounded-full bg-[#6C63FF] flex items-center justify-center text-xl font-bold text-white shrink-0">
-                {initial}
-              </div>
+              <label className="cursor-pointer">
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="hidden" />
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#6C63FF] flex items-center justify-center text-xl font-bold text-white shrink-0 relative">
+                  {profile.photoUrl ? (
+                    <img src={profile.photoUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    initial
+                  )}
+                  {uploadingPhoto && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Loader2 className="w-4 h-4 text-white animate-spin" /></div>}
+                </div>
+              </label>
               <div>
                 {displayName && <p className="font-medium text-[#16162B]">{displayName}</p>}
                 <p className="text-sm text-[#716C8C]">{email}</p>
+                <p className="text-xs text-[#716C8C] mt-0.5">Clique na foto para {profile.photoUrl ? "trocar" : "enviar"}. Aparece na vitrine e nas propostas públicas.</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -125,6 +142,32 @@ export default function SettingsPage() {
                   />
                 </div>
               ))}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-[#4B4768]">Nome de usuário</label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">zafily.com.br/</span>
+                  <input
+                    type="text"
+                    value={profile.username}
+                    onChange={e => setField("username", e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                    className="w-full h-11 bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.10)] text-[#16162B] rounded-[12px] pl-[104px] pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+            <p className="text-xs text-[#716C8C] mt-2">
+              Usado no link da sua vitrine e das suas propostas comerciais. Mudar o nome de usuário quebra links já compartilhados.
+            </p>
+            <div className="flex items-center gap-3 pt-4">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="h-10 px-5 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white text-sm font-semibold rounded-[12px] transition-colors flex items-center gap-2"
+              >
+                {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
+              </button>
+              {saved && !saving && <span className="text-xs text-emerald-600">Salvo.</span>}
+              {saveError && <span className="text-xs text-[#E11D48]">{saveError}</span>}
             </div>
           </section>
 
@@ -137,22 +180,6 @@ export default function SettingsPage() {
               <div className="h-32 bg-[rgba(0,0,0,0.03)] rounded-[12px] animate-pulse" />
             ) : (
               <div className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-[#4B4768]">Foto</label>
-                  <label className="flex items-center gap-4 cursor-pointer">
-                    <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handlePhotoChange} className="hidden" />
-                    <div className="w-16 h-16 rounded-full overflow-hidden bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.10)] flex items-center justify-center shrink-0 relative">
-                      {profile.photoUrl ? (
-                        <img src={profile.photoUrl} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <Upload className="w-5 h-5 text-[#716C8C]" />
-                      )}
-                      {uploadingPhoto && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Loader2 className="w-4 h-4 text-white animate-spin" /></div>}
-                    </div>
-                    <span className="text-xs text-[#716C8C]">Aparece na proposta pública. Clique para {profile.photoUrl ? "trocar" : "enviar"}.</span>
-                  </label>
-                </div>
-
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-[#4B4768]">Cargo / título</label>
                   <input type="text" value={profile.roleTitle ?? ""} onChange={e => setField("roleTitle", e.target.value)}
