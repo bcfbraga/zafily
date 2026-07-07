@@ -160,9 +160,9 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
 
               {/* Discount banner */}
               {live.discount && (
-                <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-[#FBF3E3] border border-[#E8D4A8]">
-                  <span className="text-[#8A6A1F] text-xs font-bold">{live.discount}% OFF</span>
-                  <span className="text-[#B8935B] text-xs">· cupom exclusivo desta live</span>
+                <div className="inline-flex items-center gap-1.5 mb-5 px-3 py-1.5 rounded-full bg-[#F7E9EC] border border-[#E3BEC7]">
+                  <span className="text-[#8C2F45] text-xs font-bold">{live.discount}% OFF</span>
+                  <span className="text-[#B37A87] text-xs">· cupom exclusivo desta live</span>
                 </div>
               )}
               {!live.discount && <div className="mb-5" />}
@@ -220,7 +220,7 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                             {i + 1}
                           </span>
                           {disc && (
-                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#C7A15A] text-[#2B1A08] text-[10px] font-bold shadow">
+                            <span className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#8C2F45] text-white text-[10px] font-bold shadow">
                               -{live.discount}%
                             </span>
                           )}
@@ -238,8 +238,8 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                           {disc ? (
                             <div>
                               <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
-                              <p className="text-sm font-bold text-[#8A6A1F] leading-tight">{disc.discounted}</p>
-                              <p className="text-[9px] text-[#B8935B] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
+                              <p className="text-sm font-bold text-[#8C2F45] leading-tight">{disc.discounted}</p>
+                              <p className="text-[9px] text-[#B37A87] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
                             </div>
                           ) : (
                             p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
