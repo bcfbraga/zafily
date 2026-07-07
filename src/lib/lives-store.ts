@@ -172,6 +172,16 @@ export async function updateUsername(
     return { ok: false, error: "Este nome de usuário já está em uso" };
   }
 
+  const { data: current } = await db.from("profiles").select("username").eq("user_id", userId).maybeSingle();
+  const oldUsername = current?.username as string | undefined;
+
+  if (oldUsername && oldUsername !== username) {
+    // The new username may have belonged to someone else historically — that
+    // record should no longer redirect here now that it's actively claimed.
+    await db.from("username_history").delete().eq("old_username", username);
+    await db.from("username_history").upsert({ old_username: oldUsername, user_id: userId, changed_at: new Date().toISOString() });
+  }
+
   const { data: row } = await db.from("profiles").update({ username }).eq("user_id", userId).select().single();
   return { ok: true, profile: rowToProfile(row) };
 }
@@ -181,6 +191,14 @@ export async function getProfileByUsername(username: string): Promise<Profile | 
   const { data } = await db.from("profiles").select("*").eq("username", username).maybeSingle();
   if (!data) return null;
   return rowToProfile(data);
+}
+
+export async function resolveCurrentUsername(oldUsername: string): Promise<string | null> {
+  const db: DB = getSupabase();
+  const { data } = await db.from("username_history").select("user_id").eq("old_username", oldUsername).maybeSingle();
+  if (!data) return null;
+  const { data: profile } = await db.from("profiles").select("username").eq("user_id", data.user_id).maybeSingle();
+  return (profile?.username as string) ?? null;
 }
 
 // ─── Lives ────────────────────────────────────────────────────────────────────

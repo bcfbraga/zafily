@@ -1,5 +1,5 @@
-import { notFound } from "next/navigation";
-import { getPublicBudget, getProfileByUsername } from "@/lib/budgets-store";
+import { notFound, redirect } from "next/navigation";
+import { getPublicBudget, getProfileByUsername, resolveCurrentUsername } from "@/lib/budgets-store";
 import { Clock } from "lucide-react";
 import { AutoPrint } from "./AutoPrint";
 import { ProposalView } from "@/components/zafily/ProposalView";
@@ -33,7 +33,11 @@ export default async function ProposalPage({ params, searchParams }: Props) {
     getProfileByUsername(username),
   ]);
 
-  if (!budget || !profile) notFound();
+  if (!budget || !profile) {
+    const currentUsername = await resolveCurrentUsername(username);
+    if (currentUsername) redirect(`/${currentUsername}/proposta/${slug}`);
+    notFound();
+  }
 
   const creatorName = profile.displayName || profile.username;
   const expired = budget.expiresAt ? new Date(budget.expiresAt + "T23:59:59") < new Date() : false;

@@ -1,10 +1,10 @@
 import { getSupabase } from "./supabase";
-import { generateSlug, getOrCreateProfile, getProfileByUsername } from "./lives-store";
+import { generateSlug, getOrCreateProfile, getProfileByUsername, resolveCurrentUsername } from "./lives-store";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DB = any;
 
-export { getOrCreateProfile, getProfileByUsername };
+export { getOrCreateProfile, getProfileByUsername, resolveCurrentUsername };
 export { SCOPE_DEFAULT_NOTES } from "./scope-defaults";
 
 export interface ValuePoint {
