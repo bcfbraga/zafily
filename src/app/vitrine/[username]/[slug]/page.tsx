@@ -30,7 +30,7 @@ export default async function VitrinePage({ params }: Props) {
     <div className="min-h-screen bg-white text-zinc-900">
 
       {/* ── Header ──────────────────────────────────────────────── */}
-      <header className="border-b border-zinc-100 bg-white sticky top-0 z-10">
+      <header className="hidden sm:block border-b border-zinc-100 bg-white sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
           <span className="text-xs font-semibold tracking-widest uppercase text-zinc-400">
             Vitrine
@@ -39,19 +39,21 @@ export default async function VitrinePage({ params }: Props) {
         </div>
       </header>
 
-      {/* ── Hero ────────────────────────────────────────────────── */}
-      <div className="max-w-3xl mx-auto px-5 pt-10 pb-8">
-        {/* Cover image */}
-        {live.imageUrl && (
-          <div className="w-full h-56 sm:h-72 rounded-2xl overflow-hidden mb-8 bg-zinc-100">
+      {/* Cover image — full-bleed edge-to-edge on mobile, contained on desktop */}
+      {live.imageUrl && (
+        <div className="w-full sm:max-w-3xl sm:mx-auto sm:px-5 sm:pt-10">
+          <div className="w-full h-auto sm:h-72 sm:rounded-2xl overflow-hidden sm:mb-8 bg-zinc-100">
             <img
               src={live.imageUrl}
               alt={live.title}
-              className="w-full h-full object-cover"
+              className="w-full h-auto sm:h-full object-contain sm:object-cover"
             />
           </div>
-        )}
+        </div>
+      )}
 
+      {/* ── Hero ────────────────────────────────────────────────── */}
+      <div className="max-w-3xl mx-auto px-5 pt-6 sm:pt-10 pb-8">
         {/* Title block */}
         <div className="mb-2">
           <div className="flex items-center gap-3 flex-wrap mb-4">
