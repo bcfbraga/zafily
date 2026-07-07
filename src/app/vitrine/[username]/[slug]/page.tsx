@@ -47,7 +47,7 @@ export default async function VitrinePage({ params }: Props) {
       {/* Cover image — full-bleed edge-to-edge on mobile, contained on desktop */}
       {live.imageUrl && (
         <div className="w-full sm:max-w-3xl sm:mx-auto sm:px-5 sm:pt-10">
-          <div className="w-full h-auto sm:h-72 sm:rounded-2xl overflow-hidden sm:mb-8 bg-zinc-100">
+          <div className="w-full h-auto sm:h-72 sm:rounded-2xl overflow-hidden sm:mb-4 bg-zinc-100">
             <img
               src={live.imageUrl}
               alt={live.title}
