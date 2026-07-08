@@ -221,6 +221,26 @@ function rowToLive(row: Record<string, unknown>, count?: number): Live {
   };
 }
 
+export async function listPublishedLivesByUsername(username: string): Promise<{ profile: Profile; lives: Live[] } | null> {
+  const profile = await getProfileByUsername(username);
+  if (!profile) return null;
+
+  const db: DB = getSupabase();
+  const { data } = await db
+    .from("lives")
+    .select("*, live_products(count)")
+    .eq("user_id", profile.userId)
+    .eq("status", "published")
+    .order("created_at", { ascending: false });
+
+  const lives = (data ?? []).map((row: Record<string, unknown>) => {
+    const products = row.live_products as Array<{ count: number }>;
+    return rowToLive(row, products?.[0]?.count ?? 0);
+  });
+
+  return { profile, lives };
+}
+
 export async function listLives(userId: string): Promise<Live[]> {
   const db: DB = getSupabase();
   const { data } = await db
