@@ -55,23 +55,23 @@ export default async function CreatorProfilePage({ params }: Props) {
             <p className="text-zinc-400 text-sm">Nenhuma vitrine publicada ainda.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             {lives.map(live => (
               <a
                 key={live.id}
                 href={`/${profile.username}/${live.slug}`}
                 className="group flex flex-col bg-white border border-zinc-100 hover:border-zinc-300 rounded-2xl overflow-hidden transition-all hover:shadow-md"
               >
-                <div className="aspect-square bg-zinc-50 overflow-hidden relative">
+                <div className="w-full h-auto bg-zinc-50 overflow-hidden relative">
                   {live.imageUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={live.imageUrl}
                       alt={live.title}
-                      className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+                      className="w-full h-auto object-contain"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
+                    <div className="w-full aspect-[3/1] flex items-center justify-center">
                       <Package className="w-8 h-8 text-zinc-300" />
                     </div>
                   )}
