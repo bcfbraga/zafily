@@ -14,18 +14,18 @@ export function VitrineTabs() {
   if (TABS.length <= 1) return null;
 
   return (
-    <div className="flex items-center gap-1 px-8 pt-4 border-b border-black/[0.08] bg-white">
+    <div className="flex items-center gap-1 px-8 pt-4 bg-white" style={{ borderBottom: "1px solid var(--cr-border)" }}>
       {TABS.map(tab => {
         const active = tab.href === "/app/vitrine" ? pathname === "/app/vitrine" : pathname.startsWith(tab.href);
         return (
           <Link
             key={tab.href}
             href={tab.href}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
-              active
-                ? "border-[#6C63FF] text-[#16162B]"
-                : "border-transparent text-[#716C8C] hover:text-[#16162B]"
-            }`}
+            className="px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors"
+            style={{
+              borderColor: active ? "var(--cr-brand-600)" : "transparent",
+              color: active ? "var(--cr-text-primary)" : "var(--cr-text-tertiary)",
+            }}
           >
             {tab.label}
           </Link>
