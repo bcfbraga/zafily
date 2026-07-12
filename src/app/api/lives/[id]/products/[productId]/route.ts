@@ -39,6 +39,7 @@ export async function PATCH(
   if ("price"    in body) patch.price    = body.price    ?? null;
   if ("category" in body) patch.category = body.category ?? null;
   if ("size"     in body) patch.size     = body.size     ?? null;
+  if ("imageUrl" in body) patch.image_url = body.imageUrl ?? null;
   if (Object.keys(patch).length === 0) return NextResponse.json({ error: "Nenhum campo" }, { status: 400 });
   const supabase = getSupabase();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

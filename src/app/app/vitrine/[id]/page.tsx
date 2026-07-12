@@ -865,7 +865,7 @@ interface EditProductModalProps {
   product: Product;
   liveId: string;
   onClose: () => void;
-  onSave: (data: Pick<Product, "id" | "name" | "price" | "category" | "size">) => void;
+  onSave: (data: Pick<Product, "id" | "name" | "price" | "category" | "size" | "imageUrl">) => void;
 }
 
 function EditProductModal({ product, liveId, onClose, onSave }: EditProductModalProps) {
@@ -873,8 +873,23 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
   const [price, setPrice] = useState(product.price ?? "");
   const [category, setCategory] = useState(shortCat(product.category) ?? "");
   const [size, setSize] = useState(product.size ?? "");
+  const [imageUrl, setImageUrl] = useState(product.imageUrl);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingImage(true);
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/lives/upload", { method: "POST", body: form });
+    const data = await res.json();
+    setUploadingImage(false);
+    if (!res.ok) { setError(data.error ?? "Erro ao enviar imagem"); return; }
+    setImageUrl(data.url);
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -888,12 +903,13 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
         price: price.trim() || null,
         category: category.trim() || null,
         size: size.trim() || null,
+        imageUrl,
       }),
     });
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setError(data.error ?? "Erro ao salvar"); return; }
-    onSave({ id: product.id, name: data.name, price: data.price, category: data.category ?? null, size: data.size ?? null });
+    onSave({ id: product.id, name: data.name, price: data.price, category: data.category ?? null, size: data.size ?? null, imageUrl: data.image_url ?? null });
   }
 
   return (
@@ -910,12 +926,19 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
 
         {/* Product image + link */}
         <div className="px-6 py-4 border-b border-black/[0.08] flex items-center gap-3">
-          <div className="w-14 h-14 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0">
-            {product.imageUrl
-              ? <img src={product.imageUrl} alt={product.name ?? ""} className="w-full h-full object-cover" />
+          <label className="relative w-14 h-14 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0 cursor-pointer group">
+            <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
+            {imageUrl
+              ? <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
               : <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-[#716C8C]" /></div>
             }
-          </div>
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
+              {uploadingImage
+                ? <Loader2 className="w-4 h-4 text-white animate-spin" />
+                : <Upload className="w-4 h-4 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+              }
+            </div>
+          </label>
           <a href={product.url} target="_blank" rel="noopener noreferrer"
             className="text-xs text-[#6C63FF] hover:text-[#5851E0] truncate flex items-center gap-1">
             <ExternalLink className="w-3 h-3 shrink-0" />
