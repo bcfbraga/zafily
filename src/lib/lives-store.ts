@@ -48,6 +48,29 @@ export interface LiveProduct {
   clicks?: number;
 }
 
+export interface SocialLink {
+  platform: "instagram" | "pinterest" | "youtube" | "tiktok" | "twitter";
+  url: string;
+}
+
+export interface DesignSettings {
+  theme: string;
+  header: string;
+  wallpaper: string;
+  buttons: string;
+  text: string;
+  colors: string;
+}
+
+export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
+  theme: "Custom",
+  header: "Classic",
+  wallpaper: "Gradient",
+  buttons: "Glass",
+  text: "Poppins, Link Sans",
+  colors: "Marsala",
+};
+
 export interface Profile {
   userId: string;
   username: string;
@@ -63,6 +86,9 @@ export interface Profile {
   linkUrl: string | null;
   photoUrl: string | null;
   roleTitle: string | null;
+  bio: string | null;
+  socialLinks: SocialLink[];
+  designSettings: DesignSettings;
 }
 
 // ─── Slug ─────────────────────────────────────────────────────────────────────
@@ -107,6 +133,9 @@ function rowToProfile(row: Record<string, unknown>): Profile {
     linkUrl: (row.link_url as string) ?? null,
     photoUrl: (row.photo_url as string) ?? null,
     roleTitle: (row.role_title as string) ?? null,
+    bio: (row.bio as string) ?? null,
+    socialLinks: (row.social_links as SocialLink[]) ?? [],
+    designSettings: { ...DEFAULT_DESIGN_SETTINGS, ...((row.design_settings as Partial<DesignSettings>) ?? {}) },
   };
 }
 
@@ -147,6 +176,9 @@ export async function updateProfile(
     linkUrl?: string | null;
     photoUrl?: string | null;
     roleTitle?: string | null;
+    bio?: string | null;
+    socialLinks?: SocialLink[];
+    designSettings?: DesignSettings;
   }
 ): Promise<Profile> {
   const db: DB = getSupabase();
@@ -164,6 +196,9 @@ export async function updateProfile(
       ...(data.linkUrl !== undefined && { link_url: data.linkUrl }),
       ...(data.photoUrl !== undefined && { photo_url: data.photoUrl }),
       ...(data.roleTitle !== undefined && { role_title: data.roleTitle }),
+      ...(data.bio !== undefined && { bio: data.bio }),
+      ...(data.socialLinks !== undefined && { social_links: data.socialLinks }),
+      ...(data.designSettings !== undefined && { design_settings: data.designSettings }),
     })
     .eq("user_id", userId)
     .select()

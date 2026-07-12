@@ -6,9 +6,11 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Globe, Calendar,
   CheckCircle2, FileText, Radio, Layers,
-  X, Settings2, GripVertical, Copy, Check, Package
+  X, Settings2, GripVertical, Share2, Check, Package
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
+import { VitrineTabs } from "@/components/zafily/VitrineTabs";
+import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
 
 interface Live {
   id: string;
@@ -34,9 +36,22 @@ interface Section {
   position: number;
 }
 
+interface SocialLink {
+  platform: "instagram" | "pinterest" | "youtube" | "tiktok" | "twitter";
+  url: string;
+}
+
 interface Profile {
   username: string;
   displayName: string | null;
+  photoUrl: string | null;
+  bio: string | null;
+  socialLinks: SocialLink[];
+}
+
+function formatCount(n: number): string {
+  if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
+  return String(n);
 }
 
 function StatusBadge({ status }: { status: "draft" | "published" }) {
@@ -64,20 +79,20 @@ function GroupSection({ title, icon, count, children }: { title: string; icon?: 
   );
 }
 
-function ThumbCollage({ thumbnails }: { thumbnails?: string[] }) {
+function ThumbRow({ thumbnails }: { thumbnails?: string[] }) {
   const imgs = (thumbnails ?? []).slice(0, 4);
   if (imgs.length === 0) {
     return (
-      <div className="w-14 h-14 rounded-lg bg-[#F1F0F7] flex items-center justify-center shrink-0">
-        <Package className="w-5 h-5 text-[#B7B4C7]" />
+      <div className="w-20 h-20 rounded-xl bg-[#F1F0F7] flex items-center justify-center shrink-0">
+        <Package className="w-6 h-6 text-[#B7B4C7]" />
       </div>
     );
   }
   return (
-    <div className="w-14 h-14 rounded-lg overflow-hidden shrink-0 bg-[#F1F0F7] grid grid-cols-2 grid-rows-2 gap-px">
+    <div className="flex items-center gap-2">
       {imgs.map((url, i) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={i} src={url} alt="" className={`w-full h-full object-cover ${imgs.length === 1 ? "col-span-2 row-span-2" : ""}`} />
+        <img key={i} src={url} alt="" className="w-20 h-20 rounded-xl object-cover bg-[#F1F0F7] shrink-0" />
       ))}
     </div>
   );
@@ -92,6 +107,7 @@ export default function VitrinePage() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [managingSections, setManagingSections] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [dragLiveId, setDragLiveId] = useState<string | null>(null);
   const [overLiveId, setOverLiveId] = useState<string | null>(null);
@@ -174,6 +190,7 @@ export default function VitrinePage() {
   const uncategorized = lives.filter(l => !l.liveDate && !l.sectionId);
 
   function renderCard(live: Live) {
+    const ctr = (live.clicks ?? 0) > 0 && (live.views ?? 0) > 0 ? ((live.clicks! / live.views!) * 100).toFixed(1) : null;
     return (
       <div
         key={live.id}
@@ -183,7 +200,7 @@ export default function VitrinePage() {
         onDrop={handleDropLive}
         onDragEnd={() => { setDragLiveId(null); setOverLiveId(null); }}
         onClick={() => router.push(`/app/vitrine/${live.id}`)}
-        className={`group flex items-center gap-3 bg-white border rounded-xl p-3 transition-colors cursor-pointer ${
+        className={`group flex items-start gap-3 bg-white border rounded-2xl p-4 transition-colors cursor-pointer ${
           overLiveId === live.id && dragLiveId !== live.id
             ? "border-[#6C63FF]"
             : dragLiveId === live.id
@@ -191,55 +208,62 @@ export default function VitrinePage() {
               : "border-black/[0.08] hover:border-black/[0.16] hover:bg-[#F6F6FB]"
         }`}
       >
-        <GripVertical className="w-4 h-4 text-[#B7B4C7] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
-
-        <ThumbCollage thumbnails={live.thumbnails} />
+        <GripVertical className="w-4 h-4 mt-1 text-[#B7B4C7] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
+          <ThumbRow thumbnails={live.thumbnails} />
+
+          <div className="flex items-center gap-2 flex-wrap mt-3 mb-2">
             <h3 className="font-semibold text-[#16162B] text-sm truncate">{live.title}</h3>
             <StatusBadge status={live.status} />
-          </div>
-          <div className="flex items-center gap-3 text-xs text-[#4B4768] flex-wrap">
             {live.liveDate && (
-              <span className="flex items-center gap-1">
+              <span className="flex items-center gap-1 text-xs text-[#4B4768]">
                 <Calendar className="w-3 h-3" />
                 {new Date(live.liveDate + "T00:00:00").toLocaleDateString("pt-BR")}
               </span>
             )}
-            <span>{live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}</span>
-            {(live.clicks ?? 0) > 0 && (
-              <span>
-                {live.clicks} clique{live.clicks !== 1 ? "s" : ""}
-                {(live.views ?? 0) > 0 && ` · ${((live.clicks! / live.views!) * 100).toFixed(1)}% CTR`}
-              </span>
-            )}
           </div>
-        </div>
 
-        <div className="flex items-center gap-1.5 shrink-0" onClick={e => e.stopPropagation()}>
-          {live.status === "published" && (
-            <button
-              onClick={() => copyLink(live)}
-              title="Copiar link"
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
-            >
-              {copiedId === live.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-            </button>
-          )}
-          <button
-            onClick={() => toggleStatus(live)}
-            title={live.status === "published" ? "Despublicar" : "Publicar"}
-            className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${live.status === "published" ? "bg-[#6C63FF]" : "bg-black/[0.15]"}`}
-          >
-            <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${live.status === "published" ? "translate-x-4" : "translate-x-0"}`} />
-          </button>
-          <button
-            onClick={() => setConfirmId(live.id)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-red-600 hover:bg-red-50 transition-colors"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-[#4B4768]">{live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}</span>
+              {(live.clicks ?? 0) > 0 && (
+                <span className="px-2.5 py-1 rounded-full bg-[#F1F0F7] text-[#4B4768] text-xs font-medium">
+                  {formatCount(live.clicks!)} clique{live.clicks !== 1 ? "s" : ""}
+                </span>
+              )}
+              {ctr && (
+                <span className="px-2.5 py-1 rounded-full bg-[#F1F0F7] text-[#4B4768] text-xs font-medium">
+                  {ctr}% CTR
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0" onClick={e => e.stopPropagation()}>
+              {live.status === "published" && (
+                <button
+                  onClick={() => copyLink(live)}
+                  title="Copiar link"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+                >
+                  {copiedId === live.id ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
+                </button>
+              )}
+              <button
+                onClick={() => toggleStatus(live)}
+                title={live.status === "published" ? "Despublicar" : "Publicar"}
+                className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${live.status === "published" ? "bg-emerald-500" : "bg-black/[0.15]"}`}
+              >
+                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${live.status === "published" ? "translate-x-4" : "translate-x-0"}`} />
+              </button>
+              <button
+                onClick={() => setConfirmId(live.id)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-red-600 hover:bg-red-50 transition-colors"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -248,24 +272,27 @@ export default function VitrinePage() {
   return (
     <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
       <Topbar title="Minha Vitrine" action={
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setManagingSections(true)}
-            className="flex items-center gap-1.5 h-8 px-4 bg-white border border-black/[0.12] hover:border-black/[0.20] text-[#4B4768] text-xs font-semibold rounded-lg transition-colors"
-          >
-            <Settings2 className="w-3.5 h-3.5" /> Seções
-          </button>
-          <Link
-            href="/app/vitrine/nova"
-            className="flex items-center gap-1.5 h-8 px-4 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-xs font-semibold rounded-lg transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" /> Nova vitrine
-          </Link>
-        </div>
+        <button
+          onClick={() => setManagingSections(true)}
+          className="flex items-center gap-1.5 h-8 px-4 bg-white border border-black/[0.12] hover:border-black/[0.20] text-[#4B4768] text-xs font-semibold rounded-lg transition-colors"
+        >
+          <Settings2 className="w-3.5 h-3.5" /> Seções
+        </button>
       } />
+
+      <VitrineTabs />
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto px-8 py-8">
+          <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
+
+          <Link
+            href="/app/vitrine/nova"
+            className="flex items-center justify-center gap-2 w-full h-12 mb-8 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-full transition-colors"
+          >
+            <Plus className="w-4 h-4" /> Adicionar vitrine
+          </Link>
+
           {loading ? (
             <div className="space-y-3">
               {[1, 2].map(i => (
@@ -281,12 +308,6 @@ export default function VitrinePage() {
                 <p className="text-[#16162B] font-semibold text-lg">Nenhuma vitrine ainda</p>
                 <p className="text-[#4B4768] text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
               </div>
-              <Link
-                href="/app/vitrine/nova"
-                className="flex items-center gap-1.5 h-10 px-5 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-lg transition-colors"
-              >
-                <Plus className="w-4 h-4" /> Criar primeira vitrine
-              </Link>
             </div>
           ) : (
             <div className="space-y-8">
@@ -349,6 +370,164 @@ export default function VitrinePage() {
           onChange={setSections}
         />
       )}
+
+      {editingProfile && profile && (
+        <ProfileEditModal
+          profile={profile}
+          onClose={() => setEditingProfile(false)}
+          onSaved={setProfile}
+        />
+      )}
+    </div>
+  );
+}
+
+// ── Profile header ────────────────────────────────────────────────────────────
+
+function ProfileHeader({ profile, onEdit }: { profile: Profile | null; onEdit: () => void }) {
+  const displayName = profile?.displayName || profile?.username || "";
+  return (
+    <div className="flex items-start gap-4 mb-6">
+      <div className="w-16 h-16 rounded-full overflow-hidden bg-[#F1F0F7] flex items-center justify-center shrink-0">
+        {profile?.photoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={profile.photoUrl} alt={displayName} className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-xl font-bold text-[#B7B4C7]">{displayName[0]?.toUpperCase() ?? "?"}</span>
+        )}
+      </div>
+      <div className="flex-1 min-w-0 pt-1">
+        <h2 className="text-lg font-bold text-[#16162B] truncate">{displayName}</h2>
+        <button
+          onClick={onEdit}
+          className="text-sm text-[#B7B4C7] hover:text-[#4B4768] transition-colors text-left"
+        >
+          {profile?.bio || "Adicionar bio"}
+        </button>
+        <div className="flex items-center gap-2 mt-2">
+          {(profile?.socialLinks ?? []).map((s, i) => (
+            <a
+              key={i}
+              href={s.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-[#F1F0F7] text-[#4B4768] hover:bg-[#E4E2F0] transition-colors"
+            >
+              <SocialIcon platform={s.platform} className="w-4 h-4" />
+            </a>
+          ))}
+          <button
+            onClick={onEdit}
+            title="Adicionar rede social"
+            className="w-8 h-8 flex items-center justify-center rounded-full border border-dashed border-black/[0.15] text-[#B7B4C7] hover:text-[#4B4768] hover:border-black/[0.25] transition-colors"
+          >
+            <Plus className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProfileEditModal({ profile, onClose, onSaved }: {
+  profile: Profile;
+  onClose: () => void;
+  onSaved: (p: Profile) => void;
+}) {
+  const [bio, setBio] = useState(profile.bio ?? "");
+  const [links, setLinks] = useState<SocialLink[]>(profile.socialLinks ?? []);
+  const [newPlatform, setNewPlatform] = useState<SocialLink["platform"]>("instagram");
+  const [newUrl, setNewUrl] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  function addLink() {
+    const url = newUrl.trim();
+    if (!url) return;
+    setLinks(prev => [...prev, { platform: newPlatform, url }]);
+    setNewUrl("");
+  }
+
+  function removeLink(i: number) {
+    setLinks(prev => prev.filter((_, idx) => idx !== i));
+  }
+
+  async function save() {
+    setSaving(true);
+    const res = await fetch("/api/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ bio: bio.trim() || null, socialLinks: links }),
+    });
+    if (res.ok) {
+      const updated = await res.json();
+      onSaved({ username: updated.username, displayName: updated.displayName, photoUrl: updated.photoUrl, bio: updated.bio, socialLinks: updated.socialLinks });
+      onClose();
+    }
+    setSaving(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-md shadow-2xl">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-semibold text-[#16162B]">Editar perfil</h3>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        <label className="block text-xs font-semibold text-[#4B4768] mb-1.5">Bio</label>
+        <textarea
+          value={bio}
+          onChange={e => setBio(e.target.value)}
+          rows={2}
+          placeholder="Conte um pouco sobre você"
+          className="w-full bg-[#F1F0F7] border border-black/[0.12] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#6C63FF] mb-4 resize-none"
+        />
+
+        <label className="block text-xs font-semibold text-[#4B4768] mb-1.5">Redes sociais</label>
+        <div className="space-y-2 mb-3">
+          {links.map((link, i) => (
+            <div key={i} className="flex items-center gap-2 border border-black/[0.06] bg-[#F6F6FB] rounded-xl px-3 py-2">
+              <SocialIcon platform={link.platform} className="w-4 h-4 text-[#4B4768] shrink-0" />
+              <span className="flex-1 text-sm text-[#16162B] truncate">{link.url}</span>
+              <button onClick={() => removeLink(i)} className="text-[#716C8C] hover:text-red-600 shrink-0">
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 mb-5">
+          <select
+            value={newPlatform}
+            onChange={e => setNewPlatform(e.target.value as SocialLink["platform"])}
+            className="h-10 bg-[#F1F0F7] border border-black/[0.12] rounded-xl px-2 text-sm focus:outline-none focus:border-[#6C63FF]"
+          >
+            {SOCIAL_PLATFORMS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </select>
+          <input
+            type="url"
+            value={newUrl}
+            onChange={e => setNewUrl(e.target.value)}
+            onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addLink(); } }}
+            placeholder="https://..."
+            className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] rounded-xl px-3 text-sm focus:outline-none focus:border-[#6C63FF]"
+          />
+          <button type="button" onClick={addLink} className="h-10 px-3 bg-white border border-black/[0.12] hover:border-black/[0.20] text-[#4B4768] text-sm font-semibold rounded-xl transition-colors shrink-0">
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
+
+        <button
+          onClick={save}
+          disabled={saving}
+          className="w-full h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors"
+        >
+          {saving ? "Salvando..." : "Salvar"}
+        </button>
+      </div>
     </div>
   );
 }

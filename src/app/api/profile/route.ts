@@ -42,6 +42,9 @@ export async function PUT(req: NextRequest) {
     linkUrl: body.linkUrl !== undefined ? (body.linkUrl || null) : undefined,
     photoUrl: body.photoUrl !== undefined ? (body.photoUrl || null) : undefined,
     roleTitle: body.roleTitle !== undefined ? (body.roleTitle || null) : undefined,
+    bio: body.bio !== undefined ? (body.bio || null) : undefined,
+    socialLinks: body.socialLinks !== undefined ? body.socialLinks : undefined,
+    designSettings: body.designSettings !== undefined ? body.designSettings : undefined,
   });
   return NextResponse.json(profile);
 }
