@@ -83,14 +83,14 @@ export default async function CreatorProfilePage({ params }: Props) {
       </div>
 
       {/* ── Vitrines gallery ────────────────────────────────────── */}
-      <div className="max-w-2xl mx-auto px-5 pb-20">
+      <div className="max-w-6xl mx-auto px-5 pb-20">
         {groups.length === 0 ? (
           <div className="cr-empty-state">
             <Package className="w-7 h-7 mb-3" style={{ color: "var(--cr-text-tertiary)" }} />
             <p className="cr-body-text">Nenhuma vitrine publicada ainda.</p>
           </div>
         ) : groups.length === 1 ? (
-          <div className="flex flex-col gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
             {groups[0].lives.map(live => (
               <VitrineSection key={live.id} live={live} username={profile.username} />
             ))}
@@ -102,7 +102,7 @@ export default async function CreatorProfilePage({ params }: Props) {
                 {group.icon}
                 <h2 className="cr-card-title">{group.title}</h2>
               </div>
-              <div className="flex flex-col gap-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
                 {group.lives.map(live => (
                   <VitrineSection key={live.id} live={live} username={profile.username} />
                 ))}
