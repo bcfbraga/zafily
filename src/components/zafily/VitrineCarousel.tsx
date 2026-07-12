@@ -57,14 +57,14 @@ function ProductMiniCard({ name, imageUrl, price, discount, showPrices, href }: 
   );
 }
 
-function BannerMiniCard({ imageUrl, href }: { imageUrl: string; href?: string }) {
+function FullBanner({ imageUrl, href }: { imageUrl: string; href?: string }) {
   const Tag = href ? "a" : "div";
   return (
     <Tag
       {...(href ? { href, target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="w-[280px] shrink-0 block"
+      className="block"
     >
-      <div className="aspect-[4/3] overflow-hidden rounded-[var(--cr-radius-lg)]" style={{ background: "var(--cr-surface-soft)" }}>
+      <div className="aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-[var(--cr-radius-lg)]" style={{ background: "var(--cr-surface-soft)" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt="" className="w-full h-full object-cover" />
       </div>
@@ -90,7 +90,7 @@ export function VitrineCarousel({ title, products, discount, showPrices, viewMor
     el.scrollBy({ left: direction * el.clientWidth * 0.85, behavior: "smooth" });
   }
 
-  const showArrows = interactive && (products.length + (bannerImageUrl ? 1 : 0)) > 2;
+  const showArrows = interactive && products.length > 2;
 
   return (
     <div>
@@ -106,7 +106,9 @@ export function VitrineCarousel({ title, products, discount, showPrices, viewMor
           </a>
         )}
       </div>
-      {products.length === 0 && !bannerImageUrl ? (
+      {bannerImageUrl ? (
+        <FullBanner imageUrl={bannerImageUrl} href={interactive ? viewMoreHref : undefined} />
+      ) : products.length === 0 ? (
         <div className="cr-showcase-card flex items-center justify-center py-10">
           <Package className="w-6 h-6" style={{ color: "var(--cr-text-tertiary)" }} />
         </div>
@@ -135,9 +137,6 @@ export function VitrineCarousel({ title, products, discount, showPrices, viewMor
             </>
           )}
           <div ref={scrollerRef} className="flex gap-4 overflow-x-auto pb-1 scroll-smooth" style={{ scrollbarWidth: "none" }}>
-            {bannerImageUrl && (
-              <BannerMiniCard imageUrl={bannerImageUrl} href={interactive ? viewMoreHref : undefined} />
-            )}
             {products.map(p => (
               <ProductMiniCard
                 key={p.id}
