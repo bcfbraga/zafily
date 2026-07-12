@@ -118,7 +118,8 @@ export default async function CreatorProfilePage({ params }: Props) {
 
   const { profile, sections, lives } = result;
   const displayName = profile.displayName || profile.username;
-  const design = resolveDesign(profile.designSettings, profile.photoUrl);
+  // Design tab is temporarily disabled — pass profile.designSettings here to reactivate.
+  const design = resolveDesign(null, profile.photoUrl);
 
   const liveShopping = lives.filter(l => l.liveDate);
   const sectionGroups = sections

@@ -8,12 +8,12 @@ export interface DesignSettings {
 }
 
 export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
-  theme: "Marsala",
+  theme: "Custom",
   header: "Classic",
-  wallpaper: "Gradient",
-  buttons: "Glass",
-  text: "Playfair, Inter",
-  colors: "Marsala",
+  wallpaper: "Solid",
+  buttons: "Outline",
+  text: "Inter, System",
+  colors: "Preto & Branco",
 };
 
 interface ColorPalette {

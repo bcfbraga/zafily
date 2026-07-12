@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+// Design tab is temporarily disabled — re-add { href: "/app/vitrine/design", label: "Design" } to reactivate.
 const TABS = [
   { href: "/app/vitrine", label: "Links" },
-  { href: "/app/vitrine/design", label: "Design" },
 ];
 
 export function VitrineTabs() {
   const pathname = usePathname();
+
+  if (TABS.length <= 1) return null;
 
   return (
     <div className="flex items-center gap-1 px-8 pt-4 border-b border-black/[0.08] bg-white">

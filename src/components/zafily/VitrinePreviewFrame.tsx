@@ -36,7 +36,8 @@ export function VitrinePreviewFrame({ profile, sections, lives }: {
   sections: PreviewSection[];
   lives: PreviewLive[];
 }) {
-  const design = resolveDesign(profile?.designSettings, profile?.photoUrl ?? null);
+  // Design tab is temporarily disabled — pass profile?.designSettings here to reactivate.
+  const design = resolveDesign(null, profile?.photoUrl ?? null);
   const published = lives.filter(l => l.status === "published");
   const showLives = published.length > 0 ? published : PLACEHOLDER_LIVES;
 
