@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronRight, Zap, X, Check } from "lucide-react";
+import { ChevronRight, X, Check } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 
@@ -97,9 +97,6 @@ function computeThemeName(s: Omit<DesignSettings, "theme">): string {
 function ValueTag({ value }: { value: string }) {
   return (
     <span className="flex items-center gap-1.5 text-sm text-[#716C8C]">
-      <span className="w-5 h-5 rounded-full bg-[#4B4768] text-white flex items-center justify-center shrink-0">
-        <Zap className="w-2.5 h-2.5" fill="currentColor" />
-      </span>
       {value}
     </span>
   );

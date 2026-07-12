@@ -79,7 +79,7 @@ function GroupSection({ title, icon, count, children }: { title: string; icon?: 
   );
 }
 
-function ThumbRow({ thumbnails }: { thumbnails?: string[] }) {
+function ThumbRow({ thumbnails, productCount }: { thumbnails?: string[]; productCount?: number }) {
   const imgs = (thumbnails ?? []).slice(0, 4);
   if (imgs.length === 0) {
     return (
@@ -88,12 +88,18 @@ function ThumbRow({ thumbnails }: { thumbnails?: string[] }) {
       </div>
     );
   }
+  const remaining = (productCount ?? imgs.length) - imgs.length;
   return (
     <div className="flex items-center gap-2">
       {imgs.map((url, i) => (
         // eslint-disable-next-line @next/next/no-img-element
         <img key={i} src={url} alt="" className="w-20 h-20 rounded-xl object-cover bg-[#F1F0F7] shrink-0" />
       ))}
+      {remaining > 0 && (
+        <div className="w-20 h-20 rounded-xl bg-[#F1F0F7] flex items-center justify-center text-sm font-semibold text-[#4B4768] shrink-0">
+          +{remaining}
+        </div>
+      )}
     </div>
   );
 }
@@ -211,7 +217,7 @@ export default function VitrinePage() {
         <GripVertical className="w-4 h-4 mt-1 text-[#B7B4C7] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
 
         <div className="flex-1 min-w-0">
-          <ThumbRow thumbnails={live.thumbnails} />
+          <ThumbRow thumbnails={live.thumbnails} productCount={live.productCount} />
 
           <div className="flex items-center gap-2 flex-wrap mt-3 mb-2">
             <h3 className="font-semibold text-[#16162B] text-sm truncate">{live.title}</h3>
