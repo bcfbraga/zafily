@@ -382,6 +382,27 @@ export async function getPublicGallery(
     return rowToLive(row, products?.[0]?.count ?? 0);
   });
 
+  const liveIds = lives.map(l => l.id);
+  if (liveIds.length > 0) {
+    const db: DB = getSupabase();
+    const { data: productRows } = await db
+      .from("live_products")
+      .select("live_id, image_url, position")
+      .in("live_id", liveIds)
+      .order("position", { ascending: true });
+
+    const thumbsByLive = new Map<string, string[]>();
+    for (const row of (productRows ?? []) as Array<{ live_id: string; image_url: string | null }>) {
+      if (!row.image_url) continue;
+      const list = thumbsByLive.get(row.live_id) ?? [];
+      if (list.length < 5) {
+        list.push(row.image_url);
+        thumbsByLive.set(row.live_id, list);
+      }
+    }
+    for (const l of lives) l.thumbnails = thumbsByLive.get(l.id) ?? [];
+  }
+
   return { profile, sections, lives };
 }
 

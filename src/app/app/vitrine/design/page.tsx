@@ -4,17 +4,12 @@ import { useEffect, useState } from "react";
 import { ChevronRight, X, Check } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
-
-interface DesignSettings {
-  theme: string;
-  header: string;
-  wallpaper: string;
-  buttons: string;
-  text: string;
-  colors: string;
-}
+import { VitrinePreviewFrame, type PreviewLive, type PreviewSection } from "@/components/zafily/VitrinePreviewFrame";
+import type { DesignSettings } from "@/lib/design-presets";
 
 interface Profile {
+  username: string;
+  displayName: string | null;
   photoUrl: string | null;
   designSettings: DesignSettings;
 }
@@ -176,11 +171,21 @@ function ColorsSwatch() {
 
 export default function DesignPage() {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [lives, setLives] = useState<PreviewLive[]>([]);
+  const [sections, setSections] = useState<PreviewSection[]>([]);
   const [saving, setSaving] = useState(false);
   const [picker, setPicker] = useState<"theme" | Field | null>(null);
 
   useEffect(() => {
-    fetch("/api/profile").then(r => r.json()).then(setProfile);
+    Promise.all([
+      fetch("/api/profile").then(r => r.json()),
+      fetch("/api/lives").then(r => r.json()),
+      fetch("/api/vitrine-sections").then(r => r.json()),
+    ]).then(([profileData, livesData, sectionsData]) => {
+      setProfile(profileData);
+      setLives(Array.isArray(livesData) ? livesData : []);
+      setSections(Array.isArray(sectionsData) ? sectionsData : []);
+    });
   }, []);
 
   async function save(next: DesignSettings) {
@@ -224,25 +229,31 @@ export default function DesignPage() {
       <Topbar title="Design" />
       <VitrineTabs />
 
-      <div className="flex-1 overflow-y-auto px-8 py-8">
-        <div className="max-w-xl mx-auto space-y-6">
-          <Row
-            icon={<ThemeSwatch background={THEME_PRESETS[s.theme]?.background ?? "linear-gradient(160deg, #6C63FF 0%, #8C2F45 100%)"} />}
-            label="Theme"
-            value={s.theme}
-            onClick={() => setPicker("theme")}
-          />
+      <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 overflow-y-auto px-8 py-8">
+          <div className="max-w-xl mx-auto space-y-6">
+            <Row
+              icon={<ThemeSwatch background={THEME_PRESETS[s.theme]?.background ?? "linear-gradient(160deg, #6C63FF 0%, #8C2F45 100%)"} />}
+              label="Theme"
+              value={s.theme}
+              onClick={() => setPicker("theme")}
+            />
 
-          <div>
-            <h2 className="text-sm font-semibold text-[#4B4768] mb-3">Customize</h2>
-            <div className="space-y-2">
-              <Row icon={<HeaderSwatch photoUrl={profile.photoUrl} />} label="Header" value={s.header} onClick={() => setPicker("header")} />
-              <Row icon={<WallpaperSwatch />} label="Wallpaper" value={s.wallpaper} onClick={() => setPicker("wallpaper")} />
-              <Row icon={<ButtonsSwatch />} label="Buttons" value={s.buttons} onClick={() => setPicker("buttons")} />
-              <Row icon={<TextSwatch />} label="Text" value={s.text} onClick={() => setPicker("text")} />
-              <Row icon={<ColorsSwatch />} label="Colors" onClick={() => setPicker("colors")} />
+            <div>
+              <h2 className="text-sm font-semibold text-[#4B4768] mb-3">Customize</h2>
+              <div className="space-y-2">
+                <Row icon={<HeaderSwatch photoUrl={profile.photoUrl} />} label="Header" value={s.header} onClick={() => setPicker("header")} />
+                <Row icon={<WallpaperSwatch />} label="Wallpaper" value={s.wallpaper} onClick={() => setPicker("wallpaper")} />
+                <Row icon={<ButtonsSwatch />} label="Buttons" value={s.buttons} onClick={() => setPicker("buttons")} />
+                <Row icon={<TextSwatch />} label="Text" value={s.text} onClick={() => setPicker("text")} />
+                <Row icon={<ColorsSwatch />} label="Colors" onClick={() => setPicker("colors")} />
+              </div>
             </div>
           </div>
+        </div>
+
+        <div className="hidden lg:flex w-[360px] shrink-0 border-l border-black/[0.08] items-center justify-center p-6 bg-[#F6F6FB] overflow-y-auto">
+          <VitrinePreviewFrame profile={profile} sections={sections} lives={lives} />
         </div>
       </div>
 

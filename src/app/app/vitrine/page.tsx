@@ -11,6 +11,8 @@ import {
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
+import { VitrinePreviewFrame } from "@/components/zafily/VitrinePreviewFrame";
+import type { DesignSettings } from "@/lib/design-presets";
 
 interface Live {
   id: string;
@@ -47,6 +49,7 @@ interface Profile {
   photoUrl: string | null;
   bio: string | null;
   socialLinks: SocialLink[];
+  designSettings: DesignSettings;
 }
 
 function formatCount(n: number): string {
@@ -348,7 +351,7 @@ export default function VitrinePage() {
         </div>
 
         <div className="hidden lg:flex w-[360px] shrink-0 border-l border-black/[0.08] items-center justify-center p-6 bg-[#F6F6FB] overflow-y-auto">
-          <GalleryPreview profile={profile} sections={sections} lives={lives} />
+          <VitrinePreviewFrame profile={profile} sections={sections} lives={lives} />
         </div>
       </div>
 
@@ -478,7 +481,7 @@ function ProfileEditModal({ profile, onClose, onSaved }: {
     });
     if (res.ok) {
       const updated = await res.json();
-      onSaved({ username: updated.username, displayName: updated.displayName, photoUrl: updated.photoUrl, bio: updated.bio, socialLinks: updated.socialLinks });
+      onSaved({ username: updated.username, displayName: updated.displayName, photoUrl: updated.photoUrl, bio: updated.bio, socialLinks: updated.socialLinks, designSettings: updated.designSettings });
       onClose();
     }
     setSaving(false);
@@ -544,91 +547,6 @@ function ProfileEditModal({ profile, onClose, onSaved }: {
         >
           {saving ? "Salvando..." : "Salvar"}
         </button>
-      </div>
-    </div>
-  );
-}
-
-// ── Live phone-frame preview ─────────────────────────────────────────────────
-
-function GalleryPreview({ profile, sections, lives }: { profile: Profile | null; sections: Section[]; lives: Live[] }) {
-  const published = lives.filter(l => l.status === "published");
-  const liveShopping = published.filter(l => l.liveDate);
-  const sectionGroups = sections
-    .slice()
-    .sort((a, b) => a.position - b.position)
-    .map(section => ({
-      title: section.name,
-      lives: published.filter(l => !l.liveDate && l.sectionId === section.id),
-    }));
-  const uncategorized = published.filter(l => !l.liveDate && !l.sectionId);
-
-  const groups = [
-    { title: "Vitrines de Live", lives: liveShopping },
-    ...sectionGroups,
-    { title: "Outras vitrines", lives: uncategorized },
-  ].filter(g => g.lives.length > 0);
-
-  const displayName = profile?.displayName || profile?.username || "";
-
-  return (
-    <div className="w-[300px] h-[620px] rounded-[32px] border border-zinc-200 shadow-lg overflow-hidden bg-white flex flex-col">
-      <div className="flex-1 overflow-y-auto">
-        <div className="px-5 pt-8 pb-5 text-center">
-          <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-100 mx-auto mb-2 flex items-center justify-center">
-            <span className="text-lg font-bold text-zinc-400">{displayName[0]?.toUpperCase() ?? "?"}</span>
-          </div>
-          <p className="text-sm font-bold text-zinc-900">{displayName || "Sua vitrine"}</p>
-          <p className="text-[11px] text-zinc-400">@{profile?.username ?? "..."}</p>
-        </div>
-        <div className="border-t border-zinc-100" />
-        <div className="px-4 py-5">
-          {groups.length === 0 ? (
-            <div className="text-center py-10">
-              <Package className="w-6 h-6 text-zinc-300 mx-auto mb-2" />
-              <p className="text-zinc-400 text-xs">Nenhuma vitrine publicada ainda.</p>
-            </div>
-          ) : groups.length === 1 ? (
-            <div className="flex flex-col gap-3">
-              {groups[0].lives.map(live => <PreviewCard key={live.id} live={live} />)}
-            </div>
-          ) : (
-            groups.map(group => (
-              <section key={group.title} className="mb-6 last:mb-0">
-                <h2 className="text-[11px] font-semibold text-zinc-900 mb-2">{group.title}</h2>
-                <div className="flex flex-col gap-3">
-                  {group.lives.map(live => <PreviewCard key={live.id} live={live} />)}
-                </div>
-              </section>
-            ))
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PreviewCard({ live }: { live: Live }) {
-  return (
-    <div className="flex flex-col bg-white border border-zinc-100 rounded-2xl overflow-hidden">
-      <div className="w-full aspect-[3/1] bg-zinc-50 overflow-hidden relative">
-        {live.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <Package className="w-6 h-6 text-zinc-300" />
-          </div>
-        )}
-        {live.discount && (
-          <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded-full bg-[#8C2F45] text-[9px] font-bold text-white shadow">
-            -{live.discount}%
-          </div>
-        )}
-      </div>
-      <div className="p-2.5">
-        <p className="text-[11px] font-medium text-zinc-800 line-clamp-2 leading-snug mb-0.5">{live.title}</p>
-        <p className="text-[9px] text-zinc-400">{live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}</p>
       </div>
     </div>
   );
