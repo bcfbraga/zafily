@@ -37,9 +37,10 @@ export function ShareButtons({ title, username, slug }: Props) {
       </a>
       <button
         onClick={handleCopy}
-        className="flex items-center gap-2 h-11 px-6 border border-zinc-200 hover:border-zinc-400 text-zinc-700 hover:text-zinc-900 font-semibold text-sm rounded-full transition-colors"
+        className="flex items-center gap-2 h-11 px-6 font-semibold text-sm rounded-full transition-colors"
+        style={{ border: "1px solid var(--cr-border-strong)", color: "var(--cr-text-primary)", background: "var(--cr-surface)" }}
       >
-        {copied ? <><Check className="w-4 h-4 text-green-600" /> Copiado!</> : <><Copy className="w-4 h-4" /> Copiar link</>}
+        {copied ? <><Check className="w-4 h-4" style={{ color: "var(--cr-success)" }} /> Copiado!</> : <><Copy className="w-4 h-4" /> Copiar link</>}
       </button>
     </div>
   );

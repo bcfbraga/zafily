@@ -37,16 +37,13 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
     <div>
       {/* Category tabs */}
       {categories.length > 1 && (
-        <div className="hidden sm:flex gap-2 flex-wrap mb-8">
+        <div className="cr-category-filter hidden sm:inline-flex flex-wrap mb-8">
           {categories.map(cat => (
             <button
               key={cat}
               onClick={() => setActive(cat)}
-              className={`h-9 px-4 rounded-full text-sm font-medium border transition-colors ${
-                active === cat
-                  ? "bg-zinc-900 text-white border-zinc-900"
-                  : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400 hover:text-zinc-900"
-              }`}
+              data-active={active === cat}
+              className="cr-category-filter__item"
             >
               {cat}
             </button>
@@ -56,9 +53,9 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16">
-          <Package className="w-8 h-8 text-zinc-300 mx-auto mb-3" />
-          <p className="text-zinc-400 text-sm">Nenhum produto nesta categoria.</p>
+        <div className="cr-empty-state">
+          <Package className="w-7 h-7 mb-3" style={{ color: "var(--cr-text-tertiary)" }} />
+          <p className="cr-body-text">Nenhum produto nesta categoria.</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
@@ -68,10 +65,10 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
               href={`/api/click/${product.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex flex-col bg-white border border-zinc-100 hover:border-zinc-300 rounded-2xl overflow-hidden transition-all hover:shadow-md"
+              className="cr-showcase-card group flex flex-col"
             >
               {/* Image */}
-              <div className="aspect-[3/4] bg-zinc-50 overflow-hidden relative">
+              <div className="aspect-[3/4] overflow-hidden relative" style={{ background: "var(--cr-surface-soft)" }}>
                 {product.imageUrl ? (
                   <img
                     src={product.imageUrl}
@@ -80,16 +77,19 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
-                    <Package className="w-8 h-8 text-zinc-300" />
+                    <Package className="w-8 h-8" style={{ color: "var(--cr-text-tertiary)" }} />
                   </div>
                 )}
                 {/* Number badge */}
-                <div className="absolute top-2 left-2 w-5 h-5 rounded-full bg-white/90 flex items-center justify-center text-[10px] font-bold text-zinc-500 shadow-sm">
+                <div
+                  className="absolute top-2 left-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm"
+                  style={{ background: "rgba(255,255,255,0.9)", color: "var(--cr-text-secondary)" }}
+                >
                   {i + 1}
                 </div>
                 {/* Discount badge */}
                 {showPrices && discount && (
-                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#8C2F45] text-[10px] font-bold text-white shadow">
+                  <div className="cr-badge cr-badge--pink absolute top-2 right-2 shadow">
                     -{discount}%
                   </div>
                 )}
@@ -98,29 +98,32 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
               {/* Info */}
               <div className="p-3 flex flex-col flex-1">
                 {product.category && (
-                  <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wide mb-1">{product.category}</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--cr-text-tertiary)" }}>{product.category}</p>
                 )}
-                <p className="text-xs font-medium text-zinc-800 line-clamp-2 leading-snug mb-1 flex-1">
+                <p className="text-xs font-medium leading-snug mb-1 flex-1" style={{ color: "var(--cr-text-primary)" }}>
                   {product.name ? titleCase(product.name) : "Produto"}
                 </p>
                 {product.size && (
-                  <p className="text-[10px] text-zinc-400 mb-1">Tamanho Pam: {product.size}</p>
+                  <p className="text-[10px] mb-1" style={{ color: "var(--cr-text-tertiary)" }}>Tamanho Pam: {product.size}</p>
                 )}
                 {showPrices && (() => {
                   const disc = discountedPrice(product.price, discount);
                   if (disc) return (
                     <div className="mb-2">
-                      <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
-                      <p className="text-sm font-bold text-[#8C2F45] leading-tight">{disc.discounted}</p>
-                      <p className="text-[9px] text-[#B37A87] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
+                      <p className="text-[10px] line-through leading-none" style={{ color: "var(--cr-text-tertiary)" }}>{disc.original}</p>
+                      <p className="text-sm font-bold leading-tight" style={{ color: "var(--cr-brand-700)" }}>{disc.discounted}</p>
+                      <p className="text-[9px] font-medium mt-0.5" style={{ color: "var(--cr-brand-500)" }}>Desconto aplicado direto no carrinho</p>
                     </div>
                   );
                   if (product.price) return (
-                    <p className="text-sm font-bold text-zinc-900 mb-2">{product.price}</p>
+                    <p className="text-sm font-bold mb-2" style={{ color: "var(--cr-text-primary)" }}>{product.price}</p>
                   );
                   return null;
                 })()}
-                <div className="w-full h-8 border border-zinc-900 group-hover:bg-zinc-900 group-hover:text-white rounded-lg flex items-center justify-center text-zinc-900 text-xs font-semibold tracking-wide transition-colors">
+                <div
+                  className="w-full h-9 rounded-[var(--cr-radius-md)] flex items-center justify-center text-xs font-semibold tracking-wide transition-colors group-hover:bg-[var(--cr-brand-600)] group-hover:text-white group-hover:border-[var(--cr-brand-600)]"
+                  style={{ border: "1px solid var(--cr-border-strong)", color: "var(--cr-text-primary)" }}
+                >
                   VER PRODUTO →
                 </div>
               </div>

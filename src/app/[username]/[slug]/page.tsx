@@ -31,25 +31,23 @@ export default async function VitrinePage({ params }: Props) {
 
   await recordLiveView(live.id);
 
-  const displayName = profile.displayName ?? profile.username;
-
   return (
-    <div className="min-h-screen bg-white text-zinc-900">
+    <div className="min-h-screen" style={{ background: "var(--cr-background)", color: "var(--cr-text-primary)", fontFamily: "var(--cr-font)" }}>
 
       {/* ── Header ──────────────────────────────────────────────── */}
-      <header className="hidden sm:block border-b border-zinc-100 bg-white sticky top-0 z-10">
+      <header className="hidden sm:block sticky top-0 z-10" style={{ background: "var(--cr-background)", borderBottom: "1px solid var(--cr-border)" }}>
         <div className="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
-          <span className="text-xs font-semibold tracking-widest uppercase text-zinc-400">
+          <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: "var(--cr-text-tertiary)" }}>
             Vitrine
           </span>
-          <span className="text-xs font-medium text-zinc-500">@{profile.username}</span>
+          <span className="text-xs font-medium" style={{ color: "var(--cr-text-secondary)" }}>@{profile.username}</span>
         </div>
       </header>
 
       {/* Cover image — full-bleed edge-to-edge on mobile, contained on desktop */}
       {live.imageUrl && (
         <div className="w-full sm:max-w-3xl sm:mx-auto sm:px-5 sm:pt-10">
-          <div className="w-full h-auto sm:h-72 sm:rounded-2xl overflow-hidden sm:mb-4 bg-zinc-100">
+          <div className="w-full h-auto sm:h-72 sm:rounded-[var(--cr-radius-xl)] overflow-hidden sm:mb-4" style={{ background: "var(--cr-surface-soft)" }}>
             <img
               src={live.imageUrl}
               alt={live.title}
@@ -63,12 +61,12 @@ export default async function VitrinePage({ params }: Props) {
       <div className="max-w-3xl mx-auto px-5 pt-6 sm:pt-10 pb-8">
         {/* Title block */}
         <div className="mb-2">
-          <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight mb-4">
+          <h1 className="cr-page-title mb-4" style={{ fontSize: "clamp(28px, 4.5vw, 40px)" }}>
             {live.title}
           </h1>
 
           {/* Meta pills */}
-          <div className="flex items-center gap-3 flex-wrap text-xs text-zinc-400">
+          <div className="flex items-center gap-3 flex-wrap text-xs" style={{ color: "var(--cr-text-tertiary)" }}>
             {live.liveDate && (
               <span className="flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5" />
@@ -85,12 +83,12 @@ export default async function VitrinePage({ params }: Props) {
           </div>
         </div>
 
-        <div className="border-t border-zinc-100 mt-6 mb-8" />
+        <div className="mt-6 mb-8" style={{ borderTop: "1px solid var(--cr-border)" }} />
 
         {/* ── Products ──────────────────────────────────────────── */}
         {live.products.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-zinc-400 text-sm">
+          <div className="cr-empty-state">
+            <p className="cr-body-text">
               Os produtos serão adicionados em breve. Volte mais tarde.
             </p>
           </div>
@@ -100,15 +98,15 @@ export default async function VitrinePage({ params }: Props) {
       </div>
 
       {/* ── Share section ───────────────────────────────────────── */}
-      <div className="border-t border-zinc-100 mt-8">
+      <div className="mt-8" style={{ borderTop: "1px solid var(--cr-border)" }}>
         <div className="max-w-3xl mx-auto px-5 py-12 text-center">
-          <p className="text-xs font-semibold tracking-widest uppercase text-zinc-400 mb-2">
+          <p className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: "var(--cr-text-tertiary)" }}>
             Gostou das escolhas?
           </p>
-          <h2 className="text-xl font-bold text-zinc-900 mb-1">
+          <h2 className="cr-section-title mb-1" style={{ fontSize: "clamp(20px, 3vw, 24px)" }}>
             Compartilhe com uma amiga
           </h2>
-          <p className="text-sm text-zinc-500 mb-8">
+          <p className="cr-body-text mb-8">
             Mande o link para ela conferir os produtos também.
           </p>
           <ShareButtons title={live.title} username={profile.username} slug={live.slug} />
@@ -116,9 +114,9 @@ export default async function VitrinePage({ params }: Props) {
       </div>
 
       {/* ── Footer ──────────────────────────────────────────────── */}
-      <div className="border-t border-zinc-100 py-6 text-center">
-        <p className="text-xs text-zinc-300">
-          Criado com <span className="text-zinc-400 font-medium">Zafily</span>
+      <div className="py-6 text-center" style={{ borderTop: "1px solid var(--cr-border)" }}>
+        <p className="text-xs" style={{ color: "var(--cr-text-tertiary)" }}>
+          Criado com <span className="font-medium" style={{ color: "var(--cr-text-secondary)" }}>Zafily</span>
         </p>
       </div>
     </div>
