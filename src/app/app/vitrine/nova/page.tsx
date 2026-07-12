@@ -12,6 +12,7 @@ export default function NovaLivePage() {
   const today = new Date().toISOString().split("T")[0];
 
   const [title, setTitle] = useState("");
+  const [type, setType] = useState<"vitrine" | "live">("vitrine");
   const [sectionId, setSectionId] = useState<string | null>(null);
   const [date, setDate] = useState(today);
   const [time, setTime] = useState("");
@@ -47,7 +48,10 @@ export default function NovaLivePage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title, liveDate: date || undefined, liveTime: time || undefined, imageUrl, store,
+        title,
+        liveDate: type === "live" ? (date || undefined) : undefined,
+        liveTime: type === "live" ? (time || undefined) : undefined,
+        imageUrl, store,
         sectionId,
         discount: discount.trim() ? Math.min(99, Math.max(1, parseInt(discount))) : null,
         showPrices,
@@ -87,11 +91,36 @@ export default function NovaLivePage() {
             />
           </div>
 
+          {/* Type */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[#4B4768]">Tipo de vitrine</label>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setType("vitrine")}
+                className={`h-12 rounded-xl border text-sm font-semibold transition-colors ${
+                  type === "vitrine" ? "bg-[#6C63FF] border-[#6C63FF] text-white" : "bg-white border-black/[0.12] text-[#4B4768] hover:border-black/[0.20]"
+                }`}
+              >
+                Vitrine
+              </button>
+              <button
+                type="button"
+                onClick={() => setType("live")}
+                className={`h-12 rounded-xl border text-sm font-semibold transition-colors ${
+                  type === "live" ? "bg-[#6C63FF] border-[#6C63FF] text-white" : "bg-white border-black/[0.12] text-[#4B4768] hover:border-black/[0.20]"
+                }`}
+              >
+                Live
+              </button>
+            </div>
+          </div>
+
           {/* Section */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Seção</label>
             <SectionSelect value={sectionId} onChange={setSectionId} />
-            <p className="text-xs text-[#716C8C]">Agrupa essa vitrine na galeria pública. Se marcar data/horário de live, ela entra automaticamente na seção &ldquo;Lives&rdquo;.</p>
+            <p className="text-xs text-[#716C8C]">Agrupa essa vitrine na galeria pública. Se o tipo for &ldquo;Live&rdquo;, ela entra automaticamente na seção &ldquo;Lives&rdquo;.</p>
           </div>
 
           {/* Store + Discount */}
@@ -132,27 +161,29 @@ export default function NovaLivePage() {
             </button>
           </div>
 
-          {/* Date + Time */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Data da vitrine</label>
-              <input
-                type="date"
-                value={date}
-                onChange={e => setDate(e.target.value)}
-                className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
-              />
+          {/* Date + Time (live only) */}
+          {type === "live" && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#4B4768]">Data da vitrine</label>
+                <input
+                  type="date"
+                  value={date}
+                  onChange={e => setDate(e.target.value)}
+                  className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-[#4B4768]">Horário</label>
+                <input
+                  type="time"
+                  value={time}
+                  onChange={e => setTime(e.target.value)}
+                  className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Horário</label>
-              <input
-                type="time"
-                value={time}
-                onChange={e => setTime(e.target.value)}
-                className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
-              />
-            </div>
-          </div>
+          )}
 
           {/* Image upload */}
           <div className="space-y-1.5">
