@@ -232,7 +232,7 @@ export default function VitrinePage() {
             title={live.status === "published" ? "Despublicar" : "Publicar"}
             className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${live.status === "published" ? "bg-[#6C63FF]" : "bg-black/[0.15]"}`}
           >
-            <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${live.status === "published" ? "translate-x-4" : "translate-x-0.5"}`} />
+            <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${live.status === "published" ? "translate-x-4" : "translate-x-0"}`} />
           </button>
           <button
             onClick={() => setConfirmId(live.id)}
