@@ -3,17 +3,21 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Upload, Loader2, Eye, EyeOff } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
+import { SectionSelect } from "@/components/zafily/SectionSelect";
 
 export default function NovaLivePage() {
   const router = useRouter();
   const today = new Date().toISOString().split("T")[0];
 
   const [title, setTitle] = useState("");
+  const [sectionId, setSectionId] = useState<string | null>(null);
   const [date, setDate] = useState(today);
   const [time, setTime] = useState("");
   const [store, setStore] = useState("cea");
+  const [discount, setDiscount] = useState<string>("");
+  const [showPrices, setShowPrices] = useState(true);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -42,7 +46,12 @@ export default function NovaLivePage() {
     const res = await fetch("/api/lives", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, liveDate: date || undefined, liveTime: time || undefined, imageUrl, store }),
+      body: JSON.stringify({
+        title, liveDate: date || undefined, liveTime: time || undefined, imageUrl, store,
+        sectionId,
+        discount: discount.trim() ? Math.min(99, Math.max(1, parseInt(discount))) : null,
+        showPrices,
+      }),
     });
     const data = await res.json();
     setSaving(false);
@@ -78,10 +87,49 @@ export default function NovaLivePage() {
             />
           </div>
 
-          {/* Store */}
+          {/* Section */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Loja</label>
-            <StoreSelect value={store} onChange={setStore} />
+            <label className="text-sm font-medium text-[#4B4768]">Seção</label>
+            <SectionSelect value={sectionId} onChange={setSectionId} />
+            <p className="text-xs text-[#716C8C]">Agrupa essa vitrine na galeria pública. Se marcar data/horário de live, ela entra automaticamente na seção &ldquo;Lives&rdquo;.</p>
+          </div>
+
+          {/* Store + Discount */}
+          <div className="grid grid-cols-[1fr_120px] gap-4">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#4B4768]">Loja</label>
+              <StoreSelect value={store} onChange={setStore} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#4B4768]">
+                Desconto <span className="text-[#716C8C] font-normal">(opcional)</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="number" min="1" max="99" value={discount}
+                  onChange={e => setDiscount(e.target.value)}
+                  placeholder="Ex: 10"
+                  className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 pr-8 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Show prices toggle */}
+          <div className={`w-full flex items-center justify-between px-4 h-12 rounded-xl border bg-white transition-colors ${showPrices ? "border-black/[0.12]" : "border-black/[0.12] opacity-60"}`}>
+            <div>
+              <p className="text-sm font-medium text-[#16162B]">Mostrar preços</p>
+              <p className="text-xs text-[#716C8C]">Exibe o preço dos produtos na vitrine pública.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowPrices(v => !v)}
+              title={showPrices ? "Ocultar preços" : "Mostrar preços"}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+            >
+              {showPrices ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+            </button>
           </div>
 
           {/* Date + Time */}

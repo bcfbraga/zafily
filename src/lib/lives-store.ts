@@ -14,9 +14,23 @@ export interface Live {
   status: "draft" | "published";
   store: string | null;
   discount: number | null;
+  sectionId: string | null;
+  showPrices: boolean;
+  position: number;
   createdAt: string;
   updatedAt: string;
   productCount?: number;
+  thumbnails?: string[];
+  views?: number;
+  clicks?: number;
+}
+
+export interface VitrineSection {
+  id: string;
+  userId: string;
+  name: string;
+  position: number;
+  createdAt: string;
 }
 
 export interface LiveProduct {
@@ -31,6 +45,7 @@ export interface LiveProduct {
   productUrl: string | null;
   position: number;
   createdAt: string;
+  clicks?: number;
 }
 
 export interface Profile {
@@ -201,6 +216,63 @@ export async function resolveCurrentUsername(oldUsername: string): Promise<strin
   return (profile?.username as string) ?? null;
 }
 
+// ─── Vitrine sections ───────────────────────────────────────────────────────
+
+export async function listSections(userId: string): Promise<VitrineSection[]> {
+  const db: DB = getSupabase();
+  const { data } = await db
+    .from("vitrine_sections")
+    .select("*")
+    .eq("user_id", userId)
+    .order("position", { ascending: true });
+  return (data ?? []).map(rowToSection);
+}
+
+export async function createSection(userId: string, name: string): Promise<VitrineSection> {
+  const db: DB = getSupabase();
+  const { data: existing } = await db
+    .from("vitrine_sections")
+    .select("position")
+    .eq("user_id", userId)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const position = existing ? (existing.position as number) + 1 : 0;
+
+  const { data: row } = await db
+    .from("vitrine_sections")
+    .insert({ user_id: userId, name, position })
+    .select()
+    .single();
+  return rowToSection(row);
+}
+
+export async function renameSection(id: string, userId: string, name: string): Promise<VitrineSection> {
+  const db: DB = getSupabase();
+  const { data: row } = await db
+    .from("vitrine_sections")
+    .update({ name })
+    .eq("id", id)
+    .eq("user_id", userId)
+    .select()
+    .single();
+  return rowToSection(row);
+}
+
+export async function deleteSection(id: string, userId: string): Promise<void> {
+  const db: DB = getSupabase();
+  await db.from("vitrine_sections").delete().eq("id", id).eq("user_id", userId);
+}
+
+export async function reorderSections(userId: string, order: string[]): Promise<void> {
+  const db: DB = getSupabase();
+  await Promise.all(
+    order.map((id, position) =>
+      db.from("vitrine_sections").update({ position }).eq("id", id).eq("user_id", userId)
+    )
+  );
+}
+
 // ─── Lives ────────────────────────────────────────────────────────────────────
 
 function rowToLive(row: Record<string, unknown>, count?: number): Live {
@@ -215,9 +287,22 @@ function rowToLive(row: Record<string, unknown>, count?: number): Live {
     status: row.status as "draft" | "published",
     store: (row.store as string) ?? null,
     discount: (row.discount as number) ?? null,
+    sectionId: (row.section_id as string) ?? null,
+    showPrices: (row.show_prices as boolean) ?? true,
+    position: (row.position as number) ?? 0,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
     productCount: count,
+  };
+}
+
+function rowToSection(row: Record<string, unknown>): VitrineSection {
+  return {
+    id: row.id as string,
+    userId: row.user_id as string,
+    name: row.name as string,
+    position: row.position as number,
+    createdAt: row.created_at as string,
   };
 }
 
@@ -241,18 +326,99 @@ export async function listPublishedLivesByUsername(username: string): Promise<{ 
   return { profile, lives };
 }
 
+export async function getPublicGallery(
+  username: string
+): Promise<{ profile: Profile; sections: VitrineSection[]; lives: Live[] } | null> {
+  const profile = await getProfileByUsername(username);
+  if (!profile) return null;
+
+  const [{ data }, sections] = await Promise.all([
+    getSupabase()
+      .from("lives")
+      .select("*, live_products(count)")
+      .eq("user_id", profile.userId)
+      .eq("status", "published")
+      .order("created_at", { ascending: false }),
+    listSections(profile.userId),
+  ]);
+
+  const lives = (data ?? []).map((row: Record<string, unknown>) => {
+    const products = row.live_products as Array<{ count: number }>;
+    return rowToLive(row, products?.[0]?.count ?? 0);
+  });
+
+  return { profile, sections, lives };
+}
+
 export async function listLives(userId: string): Promise<Live[]> {
   const db: DB = getSupabase();
   const { data } = await db
     .from("lives")
     .select("*, live_products(count)")
     .eq("user_id", userId)
-    .order("created_at", { ascending: false });
+    .order("position", { ascending: true });
 
-  return (data ?? []).map((row: Record<string, unknown>) => {
+  const lives: Live[] = (data ?? []).map((row: Record<string, unknown>) => {
     const products = row.live_products as Array<{ count: number }>;
     return rowToLive(row, products?.[0]?.count ?? 0);
   });
+
+  const liveIds = lives.map(l => l.id);
+  if (liveIds.length === 0) return lives;
+
+  const { data: productRows } = await db
+    .from("live_products")
+    .select("id, live_id, image_url, position")
+    .in("live_id", liveIds)
+    .order("position", { ascending: true });
+
+  const thumbsByLive = new Map<string, string[]>();
+  const liveIdByProductId = new Map<string, string>();
+  for (const row of (productRows ?? []) as Array<{ id: string; live_id: string; image_url: string | null }>) {
+    liveIdByProductId.set(row.id, row.live_id);
+    if (!row.image_url) continue;
+    const list = thumbsByLive.get(row.live_id) ?? [];
+    if (list.length < 4) {
+      list.push(row.image_url);
+      thumbsByLive.set(row.live_id, list);
+    }
+  }
+
+  const productIds = [...liveIdByProductId.keys()];
+  const [{ data: clickRows }, { data: viewRows }] = await Promise.all([
+    productIds.length > 0
+      ? db.from("product_clicks").select("product_id").in("product_id", productIds)
+      : Promise.resolve({ data: [] }),
+    db.from("live_views").select("live_id").in("live_id", liveIds),
+  ]);
+
+  const clicksByLive = new Map<string, number>();
+  for (const row of (clickRows ?? []) as Array<{ product_id: string }>) {
+    const liveId = liveIdByProductId.get(row.product_id);
+    if (!liveId) continue;
+    clicksByLive.set(liveId, (clicksByLive.get(liveId) ?? 0) + 1);
+  }
+
+  const viewsByLive = new Map<string, number>();
+  for (const row of (viewRows ?? []) as Array<{ live_id: string }>) {
+    viewsByLive.set(row.live_id, (viewsByLive.get(row.live_id) ?? 0) + 1);
+  }
+
+  return lives.map(l => ({
+    ...l,
+    thumbnails: thumbsByLive.get(l.id) ?? [],
+    clicks: clicksByLive.get(l.id) ?? 0,
+    views: viewsByLive.get(l.id) ?? 0,
+  }));
+}
+
+export async function reorderLives(userId: string, order: string[]): Promise<void> {
+  const db: DB = getSupabase();
+  await Promise.all(
+    order.map((id, position) =>
+      db.from("lives").update({ position }).eq("id", id).eq("user_id", userId)
+    )
+  );
 }
 
 export async function getLive(id: string, userId: string): Promise<Live | null> {
@@ -287,11 +453,20 @@ export async function getPublicLive(username: string, slug: string): Promise<(Li
 
 export async function createLive(
   userId: string,
-  data: { title: string; liveDate?: string; liveTime?: string; imageUrl?: string; store?: string }
+  data: { title: string; liveDate?: string; liveTime?: string; imageUrl?: string; store?: string; sectionId?: string | null; discount?: number | null; showPrices?: boolean }
 ): Promise<Live> {
   const db: DB = getSupabase();
   const base = generateSlug(data.title);
   const slug = await uniqueSlug(userId, base);
+
+  const { data: existing } = await db
+    .from("lives")
+    .select("position")
+    .eq("user_id", userId)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const position = existing ? (existing.position as number) + 1 : 0;
 
   const { data: row } = await db
     .from("lives")
@@ -303,6 +478,10 @@ export async function createLive(
       live_time: data.liveTime ?? null,
       image_url: data.imageUrl ?? null,
       store: data.store ?? null,
+      section_id: data.sectionId ?? null,
+      discount: data.discount ?? null,
+      show_prices: data.showPrices ?? true,
+      position,
       status: "draft",
     })
     .select()
@@ -314,7 +493,7 @@ export async function createLive(
 export async function updateLive(
   id: string,
   userId: string,
-  data: { title?: string; liveDate?: string | null; liveTime?: string | null; imageUrl?: string | null; status?: "draft" | "published"; store?: string | null; discount?: number | null }
+  data: { title?: string; liveDate?: string | null; liveTime?: string | null; imageUrl?: string | null; status?: "draft" | "published"; store?: string | null; discount?: number | null; sectionId?: string | null; showPrices?: boolean }
 ): Promise<Live> {
   const db: DB = getSupabase();
   const { data: row } = await db
@@ -327,6 +506,8 @@ export async function updateLive(
       ...(data.status !== undefined && { status: data.status }),
       ...(data.store !== undefined && { store: data.store }),
       ...(data.discount !== undefined && { discount: data.discount }),
+      ...(data.sectionId !== undefined && { section_id: data.sectionId }),
+      ...(data.showPrices !== undefined && { show_prices: data.showPrices }),
     })
     .eq("id", id)
     .eq("user_id", userId)
@@ -407,7 +588,18 @@ export async function listProducts(liveId: string): Promise<LiveProduct[]> {
     .select("*")
     .eq("live_id", liveId)
     .order("position", { ascending: true });
-  return (data ?? []).map(rowToProduct);
+  const products = (data ?? []).map(rowToProduct);
+
+  const productIds = products.map((p: LiveProduct) => p.id);
+  if (productIds.length === 0) return products;
+
+  const { data: clickRows } = await db.from("product_clicks").select("product_id").in("product_id", productIds);
+  const clicksByProduct = new Map<string, number>();
+  for (const row of (clickRows ?? []) as Array<{ product_id: string }>) {
+    clicksByProduct.set(row.product_id, (clicksByProduct.get(row.product_id) ?? 0) + 1);
+  }
+
+  return products.map((p: LiveProduct) => ({ ...p, clicks: clicksByProduct.get(p.id) ?? 0 }));
 }
 
 export async function countProducts(liveId: string): Promise<number> {
@@ -441,4 +633,22 @@ export async function addProduct(
 export async function deleteProduct(id: string, liveId: string): Promise<void> {
   const db: DB = getSupabase();
   await db.from("live_products").delete().eq("id", id).eq("live_id", liveId);
+}
+
+// ─── Click / view tracking ──────────────────────────────────────────────────
+
+export async function getProductUrl(productId: string): Promise<string | null> {
+  const db: DB = getSupabase();
+  const { data } = await db.from("live_products").select("url").eq("id", productId).maybeSingle();
+  return (data?.url as string) ?? null;
+}
+
+export async function recordProductClick(productId: string): Promise<void> {
+  const db: DB = getSupabase();
+  await db.from("product_clicks").insert({ product_id: productId });
+}
+
+export async function recordLiveView(liveId: string): Promise<void> {
+  const db: DB = getSupabase();
+  await db.from("live_views").insert({ live_id: liveId });
 }

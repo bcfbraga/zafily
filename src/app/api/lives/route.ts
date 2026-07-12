@@ -26,6 +26,9 @@ export async function POST(req: NextRequest) {
     liveTime: body.liveTime ?? undefined,
     imageUrl: body.imageUrl ?? undefined,
     store: body.store ?? undefined,
+    sectionId: body.sectionId ?? undefined,
+    discount: body.discount !== undefined && body.discount !== null ? Number(body.discount) : undefined,
+    showPrices: body.showPrices ?? undefined,
   });
   return NextResponse.json(live, { status: 201 });
 }

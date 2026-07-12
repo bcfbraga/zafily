@@ -6,9 +6,11 @@ import Link from "next/link";
 import {
   ArrowLeft, Loader2, X, Upload, Calendar, Clock,
   Package, CheckCircle2, FileText, ExternalLink, Pencil,
-  Copy, Check, GripVertical, Plus, ShoppingBag, Smartphone, Monitor
+  Copy, Check, GripVertical, Plus, ShoppingBag, Smartphone, Monitor,
+  Eye, EyeOff
 } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
+import { SectionSelect } from "@/components/zafily/SectionSelect";
 import { titleCase } from "@/lib/utils";
 
 interface Product {
@@ -20,6 +22,7 @@ interface Product {
   category: string | null;
   size: string | null;
   position: number;
+  clicks?: number;
 }
 
 interface Live {
@@ -32,6 +35,8 @@ interface Live {
   status: "draft" | "published";
   store: string | null;
   discount: number | null;
+  sectionId: string | null;
+  showPrices: boolean;
   updatedAt: string;
   products: Product[];
 }
@@ -186,7 +191,7 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
               ) : (
                 <div className={`grid gap-3 ${isMobile ? "grid-cols-2" : "grid-cols-3"}`}>
                   {filtered.map((p, i) => {
-                    const disc = discountedPrice(p.price, live.discount);
+                    const disc = live.showPrices ? discountedPrice(p.price, live.discount) : null;
                     return (
                       <div
                         key={p.id}
@@ -233,7 +238,7 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                               <p className="text-[9px] text-[#B37A87] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
                             </div>
                           ) : (
-                            p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
+                            live.showPrices && p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
                           )}
                           <div className="mt-2 w-full h-7 rounded-lg bg-zinc-900 flex items-center justify-center text-white text-[10px] font-semibold tracking-wide">
                             VER PRODUTO →
@@ -544,6 +549,9 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     <p className="text-xs text-[#16162B] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {product.price && <span className="text-[10px] text-[#6C63FF] font-semibold">{product.price}</span>}
+                      {(product.clicks ?? 0) > 0 && (
+                        <span className="text-[10px] text-[#716C8C]">{product.clicks} clique{product.clicks !== 1 ? "s" : ""}</span>
+                      )}
                       {/* Inline size field */}
                       {editingSizeId === product.id ? (
                         <input
@@ -695,6 +703,8 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
   const [imagePreview, setImagePreview] = useState<string | null>(live.imageUrl);
   const [store, setStore] = useState(live.store ?? "cea");
   const [discount, setDiscount] = useState<string>(live.discount != null ? String(live.discount) : "");
+  const [sectionId, setSectionId] = useState<string | null>(live.sectionId);
+  const [showPrices, setShowPrices] = useState(live.showPrices);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -723,12 +733,14 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
       body: JSON.stringify({
         title, slug, liveDate: date || null, liveTime: time || null, imageUrl, store,
         discount: discount.trim() ? Math.min(99, Math.max(1, parseInt(discount))) : null,
+        sectionId,
+        showPrices,
       }),
     });
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setError(data.error ?? "Erro ao salvar"); return; }
-    onSave({ title: data.title, slug: data.slug, liveDate: data.liveDate, liveTime: data.liveTime, imageUrl: data.imageUrl, store: data.store ?? null, discount: data.discount ?? null });
+    onSave({ title: data.title, slug: data.slug, liveDate: data.liveDate, liveTime: data.liveTime, imageUrl: data.imageUrl, store: data.store ?? null, discount: data.discount ?? null, sectionId: data.sectionId ?? null, showPrices: data.showPrices ?? true });
   }
 
   return (
@@ -746,6 +758,11 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
             <label className="text-sm font-medium text-[#4B4768]">Título</label>
             <input type="text" value={title} onChange={e => setTitle(e.target.value)} required
               className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-[#4B4768]">Seção</label>
+            <SectionSelect value={sectionId} onChange={setSectionId} />
+            <p className="text-[11px] text-[#716C8C]">Agrupa essa vitrine na galeria pública. Vitrines com data de live entram automaticamente na seção &ldquo;Lives&rdquo;.</p>
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Link da vitrine</label>
@@ -781,6 +798,18 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">%</span>
               </div>
             </div>
+          </div>
+
+          <div className={`w-full flex items-center justify-between px-4 h-11 rounded-xl border bg-white transition-colors ${showPrices ? "border-black/[0.12]" : "border-black/[0.12] opacity-60"}`}>
+            <span className="text-sm font-medium text-[#4B4768]">Mostrar preços</span>
+            <button
+              type="button"
+              onClick={() => setShowPrices(v => !v)}
+              title={showPrices ? "Ocultar preços" : "Mostrar preços"}
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+            >
+              {showPrices ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+            </button>
           </div>
 
           <div className="grid grid-cols-2 gap-3">

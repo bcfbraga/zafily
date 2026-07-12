@@ -17,6 +17,7 @@ interface Product {
 interface Props {
   products: Product[];
   discount?: number | null;
+  showPrices?: boolean;
 }
 
 function parsePrice(raw: string | null): number | null {
@@ -51,7 +52,7 @@ function shortCategory(cat: string | null): string | null {
   return parts[parts.length - 1] ?? null;
 }
 
-export function ProductGrid({ products, discount }: Props) {
+export function ProductGrid({ products, discount, showPrices = true }: Props) {
   const productsWithShortCat = products.map(p => ({ ...p, category: shortCategory(p.category) }));
   const categories = ["Tudo", ...Array.from(new Set(productsWithShortCat.map(p => p.category).filter(Boolean) as string[]))];
   const [active, setActive] = useState("Tudo");
@@ -90,7 +91,7 @@ export function ProductGrid({ products, discount }: Props) {
           {filtered.map((product, i) => (
             <a
               key={product.id}
-              href={product.url}
+              href={`/api/click/${product.id}`}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex flex-col bg-white border border-zinc-100 hover:border-zinc-300 rounded-2xl overflow-hidden transition-all hover:shadow-md"
@@ -113,7 +114,7 @@ export function ProductGrid({ products, discount }: Props) {
                   {i + 1}
                 </div>
                 {/* Discount badge */}
-                {discount && (
+                {showPrices && discount && (
                   <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-[#8C2F45] text-[10px] font-bold text-white shadow">
                     -{discount}%
                   </div>
@@ -131,7 +132,7 @@ export function ProductGrid({ products, discount }: Props) {
                 {product.size && (
                   <p className="text-[10px] text-zinc-400 mb-1">Tamanho Pam: {product.size}</p>
                 )}
-                {(() => {
+                {showPrices && (() => {
                   const disc = discountedPrice(product.price, discount);
                   if (disc) return (
                     <div className="mb-2">
