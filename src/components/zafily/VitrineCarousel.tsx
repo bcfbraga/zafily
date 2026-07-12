@@ -1,4 +1,7 @@
-import { Package, ChevronRight } from "lucide-react";
+"use client";
+
+import { useRef } from "react";
+import { Package, ChevronRight, ChevronLeft } from "lucide-react";
 import { titleCase, discountedPrice } from "@/lib/utils";
 
 export interface CarouselProduct {
@@ -9,7 +12,6 @@ export interface CarouselProduct {
 }
 
 interface ProductMiniCardProps {
-  id: string;
   name: string | null;
   imageUrl: string | null;
   price: string | null;
@@ -24,30 +26,30 @@ function ProductMiniCard({ name, imageUrl, price, discount, showPrices, href }: 
   return (
     <Tag
       {...(href ? { href, target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="cr-showcase-card w-[130px] shrink-0 block"
+      className="group w-[210px] shrink-0 block"
     >
-      <div className="aspect-[3/4] overflow-hidden" style={{ background: "var(--cr-surface-soft)" }}>
+      <div className="aspect-[3/4] overflow-hidden rounded-[var(--cr-radius-lg)]" style={{ background: "var(--cr-surface-soft)" }}>
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={imageUrl} alt={name ?? ""} className="w-full h-full object-cover" />
+          <img src={imageUrl} alt={name ?? ""} className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Package className="w-5 h-5" style={{ color: "var(--cr-text-tertiary)" }} />
+            <Package className="w-6 h-6" style={{ color: "var(--cr-text-tertiary)" }} />
           </div>
         )}
       </div>
-      <div className="p-2.5">
-        <p className="text-[11px] font-medium leading-snug line-clamp-2 mb-1" style={{ color: "var(--cr-text-primary)" }}>
+      <div className="pt-2.5">
+        <p className="text-[13px] font-medium leading-snug line-clamp-1 mb-1" style={{ color: "var(--cr-text-primary)" }}>
           {name ? titleCase(name) : "Produto"}
         </p>
         {showPrices && (
           disc ? (
             <div>
-              <p className="text-[9px] line-through" style={{ color: "var(--cr-text-tertiary)" }}>{disc.original}</p>
-              <p className="text-xs font-bold" style={{ color: "var(--cr-brand-700)" }}>{disc.discounted}</p>
+              <p className="text-[11px] line-through" style={{ color: "var(--cr-text-tertiary)" }}>{disc.original}</p>
+              <p className="text-sm font-bold" style={{ color: "var(--cr-brand-700)" }}>{disc.discounted}</p>
             </div>
           ) : price ? (
-            <p className="text-xs font-bold" style={{ color: "var(--cr-text-primary)" }}>{price}</p>
+            <p className="text-sm font-bold" style={{ color: "var(--cr-text-primary)" }}>{price}</p>
           ) : null
         )}
       </div>
@@ -60,9 +62,9 @@ function BannerMiniCard({ imageUrl, href }: { imageUrl: string; href?: string })
   return (
     <Tag
       {...(href ? { href, target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="cr-showcase-card w-[200px] shrink-0 block"
+      className="w-[280px] shrink-0 block"
     >
-      <div className="aspect-[4/3] overflow-hidden" style={{ background: "var(--cr-surface-soft)" }}>
+      <div className="aspect-[4/3] overflow-hidden rounded-[var(--cr-radius-lg)]" style={{ background: "var(--cr-surface-soft)" }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={imageUrl} alt="" className="w-full h-full object-cover" />
       </div>
@@ -80,9 +82,19 @@ export function VitrineCarousel({ title, products, discount, showPrices, viewMor
   productHref?: (productId: string) => string;
   interactive?: boolean;
 }) {
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
+  function scrollBy(direction: 1 | -1) {
+    const el = scrollerRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * el.clientWidth * 0.85, behavior: "smooth" });
+  }
+
+  const showArrows = interactive && (products.length + (bannerImageUrl ? 1 : 0)) > 2;
+
   return (
     <div>
-      <div className="flex items-center justify-between gap-3 mb-2.5">
+      <div className="flex items-center justify-between gap-3 mb-3">
         <h3 className="cr-card-title truncate">{title}</h3>
         {interactive && viewMoreHref && (
           <a
@@ -99,22 +111,45 @@ export function VitrineCarousel({ title, products, discount, showPrices, viewMor
           <Package className="w-6 h-6" style={{ color: "var(--cr-text-tertiary)" }} />
         </div>
       ) : (
-        <div className="flex gap-2.5 overflow-x-auto pb-1">
-          {bannerImageUrl && (
-            <BannerMiniCard imageUrl={bannerImageUrl} href={interactive ? viewMoreHref : undefined} />
+        <div className="relative">
+          {showArrows && (
+            <>
+              <button
+                type="button"
+                onClick={() => scrollBy(-1)}
+                aria-label="Anterior"
+                className="hidden sm:flex absolute left-1 top-[38%] -translate-y-1/2 z-10 w-9 h-9 rounded-full items-center justify-center transition-opacity"
+                style={{ background: "rgba(36,27,53,0.55)", backdropFilter: "blur(4px)" }}
+              >
+                <ChevronLeft className="w-5 h-5 text-white" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollBy(1)}
+                aria-label="Próximo"
+                className="hidden sm:flex absolute right-1 top-[38%] -translate-y-1/2 z-10 w-9 h-9 rounded-full items-center justify-center transition-opacity"
+                style={{ background: "rgba(36,27,53,0.55)", backdropFilter: "blur(4px)" }}
+              >
+                <ChevronRight className="w-5 h-5 text-white" />
+              </button>
+            </>
           )}
-          {products.map(p => (
-            <ProductMiniCard
-              key={p.id}
-              id={p.id}
-              name={p.name}
-              imageUrl={p.imageUrl}
-              price={p.price}
-              discount={discount}
-              showPrices={showPrices}
-              href={interactive ? productHref?.(p.id) : undefined}
-            />
-          ))}
+          <div ref={scrollerRef} className="flex gap-4 overflow-x-auto pb-1 scroll-smooth" style={{ scrollbarWidth: "none" }}>
+            {bannerImageUrl && (
+              <BannerMiniCard imageUrl={bannerImageUrl} href={interactive ? viewMoreHref : undefined} />
+            )}
+            {products.map(p => (
+              <ProductMiniCard
+                key={p.id}
+                name={p.name}
+                imageUrl={p.imageUrl}
+                price={p.price}
+                discount={discount}
+                showPrices={showPrices}
+                href={interactive ? productHref?.(p.id) : undefined}
+              />
+            ))}
+          </div>
         </div>
       )}
     </div>
