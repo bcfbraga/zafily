@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { getPublicGallery, resolveCurrentUsername, type Live } from "@/lib/lives-store";
 import { resolveDesign } from "@/lib/design-presets";
+import { titleCase, discountedPrice } from "@/lib/utils";
 import { Package, MapPin, Radio, Layers, ChevronRight } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -16,38 +17,91 @@ interface CardStyle {
   muted: string;
 }
 
-function VitrineCard({ live, username, style }: { live: Live; username: string; style: CardStyle }) {
-  const thumbs = (live.thumbnails ?? []).slice(0, 5);
+function ProductMiniCard({ id, name, imageUrl, price, discount, showPrices, style }: {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+  price: string | null;
+  discount: number | null;
+  showPrices: boolean;
+  style: CardStyle;
+}) {
+  const disc = showPrices ? discountedPrice(price, discount) : null;
   return (
     <a
-      href={`/${username}/${live.slug}`}
-      className="group block rounded-2xl overflow-hidden transition-all hover:shadow-md"
+      href={`/api/click/${id}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="w-[130px] shrink-0 rounded-2xl overflow-hidden transition-transform hover:scale-[1.02]"
       style={{ background: style.bg, border: `1px solid ${style.border}` }}
     >
-      <div className="flex gap-2 overflow-x-auto p-3 pb-0">
-        {thumbs.length > 0 ? (
-          thumbs.map((url, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={i} src={url} alt="" className="w-20 h-20 rounded-xl object-cover bg-black/5 shrink-0" />
-          ))
+      <div className="aspect-[3/4] bg-black/5 overflow-hidden">
+        {imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageUrl} alt={name ?? ""} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-20 h-20 rounded-xl bg-black/5 flex items-center justify-center shrink-0">
-            <Package className="w-6 h-6 opacity-40" style={{ color: style.muted }} />
+          <div className="w-full h-full flex items-center justify-center">
+            <Package className="w-5 h-5 opacity-30" />
           </div>
         )}
       </div>
-      <div className="p-3 flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold truncate" style={{ color: style.text }}>{live.title}</p>
-          <p className="text-xs mt-0.5" style={{ color: style.muted }}>
-            {live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <span className="flex items-center gap-0.5 text-xs font-semibold shrink-0" style={{ color: style.text }}>
-          Ver mais <ChevronRight className="w-3.5 h-3.5" />
-        </span>
+      <div className="p-2">
+        <p className="text-[11px] font-medium leading-snug line-clamp-2 mb-1" style={{ color: style.text }}>
+          {name ? titleCase(name) : "Produto"}
+        </p>
+        {showPrices && (
+          disc ? (
+            <div>
+              <p className="text-[9px] line-through opacity-60" style={{ color: style.muted }}>{disc.original}</p>
+              <p className="text-xs font-bold" style={{ color: style.text }}>{disc.discounted}</p>
+            </div>
+          ) : price ? (
+            <p className="text-xs font-bold" style={{ color: style.text }}>{price}</p>
+          ) : null
+        )}
       </div>
     </a>
+  );
+}
+
+function VitrineCarousel({ live, username, style }: { live: Live; username: string; style: CardStyle }) {
+  const products = live.previewProducts ?? [];
+  return (
+    <div>
+      <div className="flex items-center justify-between gap-3 mb-2">
+        <h3 className="text-sm font-semibold truncate" style={{ color: style.text }}>{live.title}</h3>
+        <a
+          href={`/${username}/${live.slug}`}
+          className="flex items-center gap-0.5 text-xs font-semibold shrink-0 hover:underline"
+          style={{ color: style.text }}
+        >
+          Ver mais <ChevronRight className="w-3.5 h-3.5" />
+        </a>
+      </div>
+      {products.length === 0 ? (
+        <div
+          className="rounded-2xl flex items-center justify-center py-10"
+          style={{ background: style.bg, border: `1px solid ${style.border}` }}
+        >
+          <Package className="w-6 h-6 opacity-40" style={{ color: style.muted }} />
+        </div>
+      ) : (
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {products.map(p => (
+            <ProductMiniCard
+              key={p.id}
+              id={p.id}
+              name={p.name}
+              imageUrl={p.imageUrl}
+              price={p.price}
+              discount={live.discount}
+              showPrices={live.showPrices}
+              style={style}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -149,7 +203,7 @@ export default async function CreatorProfilePage({ params }: Props) {
         ) : groups.length === 1 ? (
           <div className="flex flex-col gap-4">
             {groups[0].lives.map(live => (
-              <VitrineCard key={live.id} live={live} username={profile.username} style={cardStyle} />
+              <VitrineCarousel key={live.id} live={live} username={profile.username} style={cardStyle} />
             ))}
           </div>
         ) : (
@@ -161,7 +215,7 @@ export default async function CreatorProfilePage({ params }: Props) {
               </div>
               <div className="flex flex-col gap-4">
                 {group.lives.map(live => (
-                  <VitrineCard key={live.id} live={live} username={profile.username} style={cardStyle} />
+                  <VitrineCarousel key={live.id} live={live} username={profile.username} style={cardStyle} />
                 ))}
               </div>
             </section>

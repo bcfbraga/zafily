@@ -21,8 +21,16 @@ export interface Live {
   updatedAt: string;
   productCount?: number;
   thumbnails?: string[];
+  previewProducts?: PreviewProduct[];
   views?: number;
   clicks?: number;
+}
+
+export interface PreviewProduct {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+  price: string | null;
 }
 
 export interface VitrineSection {
@@ -387,20 +395,19 @@ export async function getPublicGallery(
     const db: DB = getSupabase();
     const { data: productRows } = await db
       .from("live_products")
-      .select("live_id, image_url, position")
+      .select("id, live_id, image_url, name, price, position")
       .in("live_id", liveIds)
       .order("position", { ascending: true });
 
-    const thumbsByLive = new Map<string, string[]>();
-    for (const row of (productRows ?? []) as Array<{ live_id: string; image_url: string | null }>) {
-      if (!row.image_url) continue;
-      const list = thumbsByLive.get(row.live_id) ?? [];
+    const previewsByLive = new Map<string, PreviewProduct[]>();
+    for (const row of (productRows ?? []) as Array<{ id: string; live_id: string; image_url: string | null; name: string | null; price: string | null }>) {
+      const list = previewsByLive.get(row.live_id) ?? [];
       if (list.length < 5) {
-        list.push(row.image_url);
-        thumbsByLive.set(row.live_id, list);
+        list.push({ id: row.id, name: row.name, imageUrl: row.image_url, price: row.price });
+        previewsByLive.set(row.live_id, list);
       }
     }
-    for (const l of lives) l.thumbnails = thumbsByLive.get(l.id) ?? [];
+    for (const l of lives) l.previewProducts = previewsByLive.get(l.id) ?? [];
   }
 
   return { profile, sections, lives };

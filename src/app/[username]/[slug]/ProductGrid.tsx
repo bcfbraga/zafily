@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Package } from "lucide-react";
-import { titleCase } from "@/lib/utils";
+import { titleCase, discountedPrice } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -18,32 +18,6 @@ interface Props {
   products: Product[];
   discount?: number | null;
   showPrices?: boolean;
-}
-
-function parsePrice(raw: string | null): number | null {
-  if (!raw) return null;
-  const clean = raw.replace(/[^\d.,]/g, "");
-  const lastDot   = clean.lastIndexOf(".");
-  const lastComma = clean.lastIndexOf(",");
-  let normalized: string;
-  if (lastDot > -1 && lastComma > -1) {
-    normalized = lastComma > lastDot ? clean.replace(/\./g, "").replace(",", ".") : clean.replace(/,/g, "");
-  } else if (lastComma > -1) {
-    normalized = clean.replace(",", ".");
-  } else {
-    normalized = clean;
-  }
-  const n = parseFloat(normalized);
-  return isNaN(n) ? null : n;
-}
-
-function discountedPrice(price: string | null, discount: number | null | undefined) {
-  if (!discount || !price) return null;
-  const n = parsePrice(price);
-  if (!n) return null;
-  const discounted = n * (1 - discount / 100);
-  const fmt = (v: number) => `R$ ${v.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
-  return { original: fmt(n), discounted: fmt(discounted) };
 }
 
 function shortCategory(cat: string | null): string | null {
