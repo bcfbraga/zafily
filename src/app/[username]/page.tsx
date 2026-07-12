@@ -90,7 +90,7 @@ export default async function CreatorProfilePage({ params }: Props) {
             <p className="cr-body-text">Nenhuma vitrine publicada ainda.</p>
           </div>
         ) : groups.length === 1 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
+          <div className="flex flex-col gap-y-10">
             {groups[0].lives.map(live => (
               <VitrineSection key={live.id} live={live} username={profile.username} />
             ))}
@@ -102,7 +102,7 @@ export default async function CreatorProfilePage({ params }: Props) {
                 {group.icon}
                 <h2 className="cr-card-title">{group.title}</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
+              <div className="flex flex-col gap-y-10">
                 {group.lives.map(live => (
                   <VitrineSection key={live.id} live={live} username={profile.username} />
                 ))}
