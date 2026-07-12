@@ -431,14 +431,20 @@ export async function listLives(userId: string): Promise<Live[]> {
 
   const { data: productRows } = await db
     .from("live_products")
-    .select("id, live_id, image_url, position")
+    .select("id, live_id, image_url, name, price, position")
     .in("live_id", liveIds)
     .order("position", { ascending: true });
 
   const thumbsByLive = new Map<string, string[]>();
+  const previewsByLive = new Map<string, PreviewProduct[]>();
   const liveIdByProductId = new Map<string, string>();
-  for (const row of (productRows ?? []) as Array<{ id: string; live_id: string; image_url: string | null }>) {
+  for (const row of (productRows ?? []) as Array<{ id: string; live_id: string; image_url: string | null; name: string | null; price: string | null }>) {
     liveIdByProductId.set(row.id, row.live_id);
+    const previews = previewsByLive.get(row.live_id) ?? [];
+    if (previews.length < 5) {
+      previews.push({ id: row.id, name: row.name, imageUrl: row.image_url, price: row.price });
+      previewsByLive.set(row.live_id, previews);
+    }
     if (!row.image_url) continue;
     const list = thumbsByLive.get(row.live_id) ?? [];
     if (list.length < 4) {
@@ -470,6 +476,7 @@ export async function listLives(userId: string): Promise<Live[]> {
   return lives.map(l => ({
     ...l,
     thumbnails: thumbsByLive.get(l.id) ?? [],
+    previewProducts: previewsByLive.get(l.id) ?? [],
     clicks: clicksByLive.get(l.id) ?? 0,
     views: viewsByLive.get(l.id) ?? 0,
   }));

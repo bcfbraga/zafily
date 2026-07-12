@@ -1,6 +1,7 @@
 "use client";
 
 import { Package } from "lucide-react";
+import { VitrineCarousel, type CarouselProduct } from "./VitrineCarousel";
 
 export interface PreviewLive {
   id: string;
@@ -10,6 +11,9 @@ export interface PreviewLive {
   sectionId: string | null;
   imageUrl: string | null;
   productCount: number;
+  discount?: number | null;
+  showPrices?: boolean;
+  previewProducts?: CarouselProduct[];
 }
 
 export interface PreviewSection {
@@ -25,8 +29,8 @@ export interface PreviewProfile {
 }
 
 const PLACEHOLDER_LIVES: PreviewLive[] = [
-  { id: "p1", title: "Favoritos da semana", status: "published", liveDate: null, sectionId: null, imageUrl: null, productCount: 6 },
-  { id: "p2", title: "Calças em alta", status: "published", liveDate: null, sectionId: null, imageUrl: null, productCount: 4 },
+  { id: "p1", title: "Favoritos da semana", status: "published", liveDate: null, sectionId: null, imageUrl: null, productCount: 6, showPrices: true, discount: null, previewProducts: [] },
+  { id: "p2", title: "Calças em alta", status: "published", liveDate: null, sectionId: null, imageUrl: null, productCount: 4, showPrices: true, discount: null, previewProducts: [] },
 ];
 
 export function VitrinePreviewFrame({ profile, sections, lives }: {
@@ -48,9 +52,9 @@ export function VitrinePreviewFrame({ profile, sections, lives }: {
   const uncategorized = showLives.filter(l => !l.liveDate && !l.sectionId);
 
   const groups = [
-    { title: "Vitrines de Live", lives: liveShopping },
     ...sectionGroups,
     { title: "Outras vitrines", lives: uncategorized },
+    { title: "Vitrines de Live", lives: liveShopping },
   ].filter(g => g.lives.length > 0);
 
   const displayName = profile?.displayName || profile?.username || "Sua vitrine";
@@ -86,15 +90,15 @@ export function VitrinePreviewFrame({ profile, sections, lives }: {
               <p className="text-xs" style={{ color: "var(--cr-text-tertiary)" }}>Nenhuma vitrine publicada ainda.</p>
             </div>
           ) : groups.length === 1 ? (
-            <div className="flex flex-col gap-3">
-              {groups[0].lives.map(live => <PreviewCard key={live.id} live={live} />)}
+            <div className="flex flex-col gap-6">
+              {groups[0].lives.map(live => <PreviewSection key={live.id} live={live} />)}
             </div>
           ) : (
             groups.map(group => (
               <section key={group.title} className="mb-6 last:mb-0">
                 <h2 className="text-[11px] font-semibold mb-2">{group.title}</h2>
-                <div className="flex flex-col gap-3">
-                  {group.lives.map(live => <PreviewCard key={live.id} live={live} />)}
+                <div className="flex flex-col gap-6">
+                  {group.lives.map(live => <PreviewSection key={live.id} live={live} />)}
                 </div>
               </section>
             ))
@@ -105,21 +109,15 @@ export function VitrinePreviewFrame({ profile, sections, lives }: {
   );
 }
 
-function PreviewCard({ live }: { live: PreviewLive }) {
+function PreviewSection({ live }: { live: PreviewLive }) {
   return (
-    <div className="cr-showcase-card flex flex-col">
-      <div className="w-full aspect-[3/1] overflow-hidden relative flex items-center justify-center" style={{ background: "var(--cr-surface-soft)" }}>
-        {live.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
-        ) : (
-          <Package className="w-6 h-6" style={{ color: "var(--cr-text-tertiary)" }} />
-        )}
-      </div>
-      <div className="p-2.5">
-        <p className="text-[11px] font-medium leading-snug mb-0.5">{live.title}</p>
-        <p className="text-[9px]" style={{ color: "var(--cr-text-tertiary)" }}>{live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}</p>
-      </div>
-    </div>
+    <VitrineCarousel
+      title={live.title}
+      products={live.previewProducts ?? []}
+      discount={live.discount ?? null}
+      showPrices={live.showPrices ?? true}
+      bannerImageUrl={live.liveDate ? live.imageUrl : null}
+      interactive={false}
+    />
   );
 }

@@ -331,11 +331,6 @@ export default function VitrinePage() {
             </div>
           ) : (
             <div className="space-y-8">
-              {liveShopping.length > 0 && (
-                <GroupSection title="Lives" icon={<Radio className="w-4 h-4 text-[var(--cr-danger)]" />} count={liveShopping.length}>
-                  {liveShopping.map(renderCard)}
-                </GroupSection>
-              )}
               {sectionGroups.filter(g => g.items.length > 0).map(({ section, items }) => (
                 <GroupSection key={section.id} title={section.name} icon={<Layers className="w-4 h-4 text-[var(--cr-brand-600)]" />} count={items.length}>
                   {items.map(renderCard)}
@@ -344,6 +339,11 @@ export default function VitrinePage() {
               {uncategorized.length > 0 && (
                 <GroupSection title="Sem seção" count={uncategorized.length}>
                   {uncategorized.map(renderCard)}
+                </GroupSection>
+              )}
+              {liveShopping.length > 0 && (
+                <GroupSection title="Lives" icon={<Radio className="w-4 h-4 text-[var(--cr-danger)]" />} count={liveShopping.length}>
+                  {liveShopping.map(renderCard)}
                 </GroupSection>
               )}
             </div>
