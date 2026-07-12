@@ -18,7 +18,7 @@ function VitrineSection({ live, username }: { live: Live; username: string }) {
       showPrices={live.showPrices}
       viewMoreHref={`/${username}/${live.slug}`}
       bannerImageUrl={live.liveDate ? live.imageUrl : null}
-      productHref={id => `/api/click/${id}`}
+      productHrefBase="/api/click"
     />
   );
 }

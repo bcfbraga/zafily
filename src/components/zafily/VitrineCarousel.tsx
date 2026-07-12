@@ -72,14 +72,14 @@ function BannerMiniCard({ imageUrl, href }: { imageUrl: string; href?: string })
   );
 }
 
-export function VitrineCarousel({ title, products, discount, showPrices, viewMoreHref, bannerImageUrl, productHref, interactive = true }: {
+export function VitrineCarousel({ title, products, discount, showPrices, viewMoreHref, bannerImageUrl, productHrefBase, interactive = true }: {
   title: string;
   products: CarouselProduct[];
   discount: number | null;
   showPrices: boolean;
   viewMoreHref?: string;
   bannerImageUrl?: string | null;
-  productHref?: (productId: string) => string;
+  productHrefBase?: string;
   interactive?: boolean;
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -146,7 +146,7 @@ export function VitrineCarousel({ title, products, discount, showPrices, viewMor
                 price={p.price}
                 discount={discount}
                 showPrices={showPrices}
-                href={interactive ? productHref?.(p.id) : undefined}
+                href={interactive && productHrefBase ? `${productHrefBase}/${p.id}` : undefined}
               />
             ))}
           </div>
