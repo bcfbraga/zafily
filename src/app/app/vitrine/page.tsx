@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Globe, Calendar,
   CheckCircle2, FileText, Radio, Layers,
-  X, Settings2, GripVertical, Share2, Check, Package
+  X, Settings2, GripVertical, Share2, Check, Package, ExternalLink
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
@@ -272,12 +272,23 @@ export default function VitrinePage() {
   return (
     <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
       <Topbar title="Minha Vitrine" action={
-        <button
-          onClick={() => setManagingSections(true)}
-          className="flex items-center gap-1.5 h-8 px-4 bg-white border border-black/[0.12] hover:border-black/[0.20] text-[#4B4768] text-xs font-semibold rounded-lg transition-colors"
-        >
-          <Settings2 className="w-3.5 h-3.5" /> Seções
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setManagingSections(true)}
+            title="Seções"
+            className="w-8 h-8 flex items-center justify-center bg-white border border-black/[0.12] hover:border-black/[0.20] text-[#4B4768] rounded-full transition-colors"
+          >
+            <Settings2 className="w-3.5 h-3.5" />
+          </button>
+          <a
+            href={profile ? `/${profile.username}` : "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 h-8 px-4 bg-white border border-black/[0.12] hover:border-black/[0.20] text-[#4B4768] text-xs font-semibold rounded-full transition-colors"
+          >
+            <ExternalLink className="w-3.5 h-3.5" /> Ver página
+          </a>
+        </div>
       } />
 
       <VitrineTabs />
