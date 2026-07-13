@@ -125,6 +125,7 @@ export async function getBudget(id: string, userId: string): Promise<Budget | nu
 export async function getPublicBudget(username: string, slug: string): Promise<(Budget & { items: BudgetItem[] }) | null> {
   const profile = await getProfileByUsername(username);
   if (!profile) return null;
+  if (profile.accountStatus !== "active") return null;
 
   const db: DB = getSupabase();
   const { data: budget } = await db

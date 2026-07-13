@@ -31,6 +31,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const profile = await updateProfile(userId, {
+    displayName: body.displayName !== undefined ? (body.displayName || null) : undefined,
     instagramHandle: body.instagramHandle !== undefined ? (body.instagramHandle || null) : undefined,
     location: body.location !== undefined ? (body.location || null) : undefined,
     followersLabel: body.followersLabel !== undefined ? (body.followersLabel || null) : undefined,
@@ -45,6 +46,9 @@ export async function PUT(req: NextRequest) {
     bio: body.bio !== undefined ? (body.bio || null) : undefined,
     socialLinks: body.socialLinks !== undefined ? body.socialLinks : undefined,
     designSettings: body.designSettings !== undefined ? body.designSettings : undefined,
+    mainGoal: body.mainGoal !== undefined ? (body.mainGoal || null) : undefined,
+    platformsUsed: body.platformsUsed !== undefined ? (body.platformsUsed || null) : undefined,
+    onboardedAt: body.onboardedAt !== undefined ? body.onboardedAt : undefined,
   });
   return NextResponse.json(profile);
 }

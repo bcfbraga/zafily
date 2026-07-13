@@ -1,13 +1,14 @@
 import { ZafilyLogo } from "@/components/zafily/Logo";
 import Link from "next/link";
 import {
-  Link2,
+  Palette,
+  LayoutGrid,
   Package,
-  BarChart2,
-  Plug,
+  Link2,
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import { buildActivationWhatsappLink } from "@/lib/whatsapp";
 
 const features = [
   {
@@ -17,38 +18,31 @@ const features = [
   },
   {
     icon: Package,
-    title: "Detecte produtos automaticamente",
-    description: "Os produtos são identificados e organizados na sua biblioteca — sem precisar digitar nada.",
+    title: "Organize produtos e vitrines",
+    description: "Monte vitrines por tema, campanha ou live e organize seus produtos sem depender de planilhas.",
   },
   {
-    icon: Plug,
-    title: "Conecte plataformas",
-    description: "Vincule Amazon, Shopee, Hotmart e mais. Todas as suas contas de afiliada em um só lugar.",
+    icon: Palette,
+    title: "Personalize sua página",
+    description: "Escolha cores, tipografia e estilo visual para criar uma página com a sua cara.",
   },
   {
-    icon: BarChart2,
-    title: "Acompanhe sua performance",
-    description: "Monitore cliques, conversões e receita estimada de todos os seus produtos.",
+    icon: LayoutGrid,
+    title: "Estrutura pronta pra vender",
+    description: "Uma página profissional que organiza sua audiência em torno dos produtos que você recomenda.",
   },
 ];
 
-const testimonials = [
-  {
-    text: "Finalmente uma ferramenta que organiza meus links afiliados sem bagunça. Limpa, rápida e realmente útil.",
-    name: "Camila R.",
-    role: "Afiliada digital, 200+ produtos",
-  },
-  {
-    text: "Importei 80 links da Amazon e tudo ficou organizado em menos de 3 minutos. Mudou meu jeito de trabalhar.",
-    name: "Rafael M.",
-    role: "Criador de conteúdo",
-  },
-  {
-    text: "Só a tela de performance já me poupou horas de planilha toda semana.",
-    name: "Ana P.",
-    role: "Afiliada em tempo integral",
-  },
+const zafilyIncludes = [
+  "Identidade visual personalizada",
+  "Organização das vitrines",
+  "Cadastro inicial de produtos",
+  "Revisão dos links",
+  "Estrutura de campanhas",
+  "Suporte direto pelo WhatsApp",
 ];
+
+const whatsappLink = buildActivationWhatsappLink();
 
 export default function LandingPage() {
   return (
@@ -59,7 +53,8 @@ export default function LandingPage() {
           <ZafilyLogo size={28} />
           <div className="hidden md:flex items-center gap-6 text-sm text-[#B8B4E8]">
             <a href="#features" className="hover:text-white transition-colors">Funcionalidades</a>
-            <a href="#how-it-works" className="hover:text-white transition-colors">Como funciona</a>
+            <a href="#zafily" className="hover:text-white transition-colors">Como funciona</a>
+            <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -72,7 +67,7 @@ export default function LandingPage() {
               href="/app"
               className="flex h-9 px-4 items-center bg-[#6C63FF] hover:bg-[#7C75FF] text-white text-sm font-semibold rounded-[10px] transition-colors"
             >
-              Começar grátis
+              Criar minha vitrine
             </Link>
           </div>
         </div>
@@ -83,21 +78,20 @@ export default function LandingPage() {
         <div className="max-w-[900px] mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[rgba(108,99,255,0.14)] border border-[rgba(108,99,255,0.30)] text-xs font-semibold text-[#8B84FF] mb-8">
             <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA]" />
-            Integração com Awin e C&A disponível
+            Uma ferramenta personalizada para afiliados e influenciadores
           </div>
 
           <h1
-            className="font-heading font-bold text-[56px] leading-[64px] tracking-tight mb-6"
+            className="font-heading font-bold text-[52px] leading-[60px] tracking-tight mb-6"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Todas as suas ferramentas
+            Você cria conteúdo.
             <br />
-            <span className="text-[#6C63FF]">de afiliado em um lugar</span>
+            <span className="text-[#6C63FF]">A Zafily organiza sua estrutura de vendas.</span>
           </h1>
 
           <p className="text-lg text-[#B8B4E8] max-w-[560px] mx-auto leading-relaxed mb-10">
-            Conecte links, produtos e plataformas para organizar, acompanhar e
-            crescer seu negócio de afiliados.
+            Reúna seus produtos, links e recomendações em uma página profissional criada para transformar audiência em vendas.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -105,19 +99,19 @@ export default function LandingPage() {
               href="/app"
               className="flex items-center gap-2 h-12 px-7 bg-[#6C63FF] hover:bg-[#7C75FF] text-white font-semibold rounded-[12px] transition-colors shadow-[0_0_32px_rgba(108,99,255,0.28)]"
             >
-              Comece a organizar seus links
+              Criar minha vitrine
               <ArrowRight className="w-4 h-4" />
             </Link>
             <a
-              href="#how-it-works"
+              href="#zafily"
               className="flex items-center gap-2 h-12 px-7 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-[#B8B4E8] font-medium rounded-[12px] hover:bg-[rgba(255,255,255,0.09)] transition-colors"
             >
-              Ver como funciona
+              Conhecer o Zafily
             </a>
           </div>
 
           <p className="text-xs text-[#7E78B8] mt-5">
-            Grátis para começar · Sem cartão de crédito
+            Crie e visualize gratuitamente · Publique com ativação personalizada
           </p>
         </div>
 
@@ -135,7 +129,7 @@ export default function LandingPage() {
               <div className="flex-1 mx-4 h-6 bg-[rgba(255,255,255,0.05)] rounded-md" />
             </div>
             <div className="p-6 grid grid-cols-5 gap-4">
-              {["Cliques hoje", "Receita est.", "Produtos ativos", "Taxa conv.", "Plataformas"].map((m, i) => (
+              {["Cliques hoje", "Receita est.", "Produtos ativos", "Taxa conv.", "Vitrines"].map((m, i) => (
                 <div key={m} className="metric-card-bg rounded-[16px] p-4 border border-[rgba(255,255,255,0.08)]">
                   <p className="text-[10px] text-[#7E78B8] mb-3">{m}</p>
                   <p className="font-heading font-bold text-xl text-white">
@@ -154,10 +148,10 @@ export default function LandingPage() {
         <div className="max-w-[1100px] mx-auto">
           <div className="text-center mb-14">
             <h2 className="font-heading font-bold text-[40px] leading-[48px] tracking-tight mb-4">
-              Tudo que um afiliado precisa
+              Sua vitrine de afiliados, organizada e pronta para vender
             </h2>
-            <p className="text-[#B8B4E8] text-lg max-w-[480px] mx-auto">
-              Pare de depender de planilhas e favoritos no navegador.
+            <p className="text-[#B8B4E8] text-lg max-w-[520px] mx-auto">
+              Experimente adicionando seus primeiros produtos.
             </p>
           </div>
 
@@ -182,46 +176,101 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="py-24 px-6 bg-[#1A1A2E]">
+      {/* Zafily service explainer */}
+      <section id="zafily" className="py-24 px-6 bg-[#1A1A2E]">
         <div className="max-w-[900px] mx-auto text-center">
           <h2 className="font-heading font-bold text-[40px] leading-[48px] tracking-tight mb-4">
-            Pronto em minutos
+            Você cuida do conteúdo. A gente cuida da sua vitrine.
           </h2>
-          <p className="text-[#B8B4E8] text-lg mb-14">Três passos para organizar seu negócio de afiliados.</p>
+          <p className="text-[#B8B4E8] text-lg mb-14 max-w-[560px] mx-auto">
+            O Zafily configura, organiza e personaliza sua página para que ela esteja pronta para divulgar e vender.
+          </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-            {[
-              { n: "01", title: "Importe seus links", desc: "Cole qualquer URL afiliada. Detectamos o produto, plataforma e comissão." },
-              { n: "02", title: "Organize sua biblioteca", desc: "Os produtos são ordenados por plataforma e categoria automaticamente." },
-              { n: "03", title: "Acompanhe e cresça", desc: "Monitore cliques e receita. Identifique seus produtos com melhor desempenho." },
-            ].map(({ n, title, desc }) => (
-              <div key={n} className="bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-6">
-                <p className="font-heading font-bold text-[32px] text-[rgba(108,99,255,0.40)] mb-4">{n}</p>
-                <h3 className="font-heading font-semibold text-lg text-white mb-2">{title}</h3>
-                <p className="text-sm text-[#B8B4E8] leading-relaxed">{desc}</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-left mb-12">
+            {zafilyIncludes.map((item) => (
+              <div key={item} className="flex items-center gap-2.5 bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[14px] p-4">
+                <CheckCircle2 className="w-4 h-4 text-[#00D4AA] shrink-0" />
+                <span className="text-sm text-[#B8B4E8]">{item}</span>
               </div>
             ))}
           </div>
+
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 h-12 px-7 bg-[#6C63FF] hover:bg-[#7C75FF] text-white font-semibold rounded-[12px] transition-colors"
+          >
+            Quero uma vitrine personalizada
+            <ArrowRight className="w-4 h-4" />
+          </a>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-24 px-6">
-        <div className="max-w-[1100px] mx-auto">
-          <h2 className="font-heading font-bold text-[40px] text-center mb-12 tracking-tight">
-            Afiliados adoram
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {testimonials.map(({ text, name, role }) => (
-              <div key={name} className="bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-6">
-                <p className="text-[#B8B4E8] text-sm leading-relaxed mb-5">&ldquo;{text}&rdquo;</p>
-                <div>
-                  <p className="text-sm font-semibold text-white">{name}</p>
-                  <p className="text-xs text-[#7E78B8]">{role}</p>
-                </div>
-              </div>
-            ))}
+      {/* Pricing */}
+      <section id="planos" className="py-24 px-6">
+        <div className="max-w-[1000px] mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="font-heading font-bold text-[40px] leading-[48px] tracking-tight mb-4">
+              Planos
+            </h2>
+            <p className="text-[#B8B4E8] text-lg">Sem checkout automático — cada ativação é feita com você, pelo WhatsApp.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-8 flex flex-col">
+              <h3 className="font-heading font-bold text-2xl text-white mb-1">Zafily Essencial</h3>
+              <p className="text-sm text-[#7E78B8] mb-6">Para quem está começando a organizar sua vitrine.</p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {[
+                  "Página personalizada",
+                  "Até 5 vitrines",
+                  "Configuração visual",
+                  "Cadastro inicial de até 30 produtos",
+                  "Publicação",
+                  "Suporte de ativação",
+                ].map((t) => (
+                  <li key={t} className="flex items-center gap-2.5 text-sm text-[#B8B4E8]">
+                    <CheckCircle2 className="w-4 h-4 text-[#00D4AA] shrink-0" /> {t}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center h-11 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-white font-semibold rounded-[12px] hover:bg-[rgba(255,255,255,0.09)] transition-colors"
+              >
+                Solicitar proposta
+              </a>
+            </div>
+
+            <div className="card-highlight rounded-[20px] p-8 flex flex-col shadow-[0_0_32px_rgba(108,99,255,0.20)]">
+              <h3 className="font-heading font-bold text-2xl text-white mb-1">Zafily Pro</h3>
+              <p className="text-sm text-[#7E78B8] mb-6">Para quem quer levar a vitrine mais a sério.</p>
+              <ul className="space-y-3 mb-8 flex-1">
+                {[
+                  "Página personalizada",
+                  "Vitrines ampliadas",
+                  "Organização estratégica dos produtos",
+                  "Destaques para campanhas",
+                  "Identidade visual avançada",
+                  "Suporte prioritário via WhatsApp",
+                ].map((t) => (
+                  <li key={t} className="flex items-center gap-2.5 text-sm text-[#B8B4E8]">
+                    <CheckCircle2 className="w-4 h-4 text-[#00D4AA] shrink-0" /> {t}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center h-11 bg-[#6C63FF] hover:bg-[#7C75FF] text-white font-semibold rounded-[12px] transition-colors"
+              >
+                Falar sobre o plano Pro
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -231,21 +280,21 @@ export default function LandingPage() {
         <div className="max-w-[640px] mx-auto text-center">
           <div className="card-highlight rounded-[28px] p-12 shadow-[0_0_32px_rgba(108,99,255,0.28)]">
             <h2 className="font-heading font-bold text-[40px] leading-[48px] tracking-tight mb-4">
-              Seus produtos estão prontos
-              <br />para ser organizados.
+              Sua vitrine de afiliados,
+              <br />pronta para vender.
             </h2>
             <p className="text-[#B8B4E8] mb-8">
-              Junte-se a afiliados que já centralizaram seus links e pararam de perder receita com a desorganização.
+              Monte sua página gratuitamente e ative com nossa ajuda quando estiver pronta para publicar.
             </p>
             <Link
               href="/app"
               className="inline-flex items-center gap-2 h-12 px-7 bg-[#6C63FF] hover:bg-[#7C75FF] text-white font-semibold rounded-[12px] transition-colors"
             >
-              Comece a organizar seus links
+              Criar minha vitrine
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <div className="flex items-center justify-center gap-5 mt-6">
-              {["Sem cartão de crédito", "Grátis para começar", "Cancele quando quiser"].map((t) => (
+            <div className="flex items-center justify-center gap-5 mt-6 flex-wrap">
+              {["Crie e visualize gratuitamente", "Publique com ativação personalizada"].map((t) => (
                 <div key={t} className="flex items-center gap-1.5 text-xs text-[#7E78B8]">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#00D4AA]" />
                   {t}
@@ -260,7 +309,7 @@ export default function LandingPage() {
       <footer className="border-t border-[rgba(255,255,255,0.06)] py-8 px-6">
         <div className="max-w-[1100px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <ZafilyLogo size={24} />
-          <p className="text-xs text-[#7E78B8]">© 2025 Zafily. Todos os direitos reservados.</p>
+          <p className="text-xs text-[#7E78B8]">© 2026 Zafily. Todos os direitos reservados.</p>
           <div className="flex items-center gap-5 text-xs text-[#7E78B8]">
             <a href="#" className="hover:text-white transition-colors">Privacidade</a>
             <a href="#" className="hover:text-white transition-colors">Termos</a>

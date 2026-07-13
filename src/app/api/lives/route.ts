@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { listLives, createLive } from "@/lib/lives-store";
+import { listLives, createLive, getAccountStatus } from "@/lib/lives-store";
+
+const FREE_TIER_MAX_LIVES = 2;
 
 export async function GET(req: NextRequest) {
   let userId: string;
@@ -19,6 +21,16 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   if (!body.title?.trim()) {
     return NextResponse.json({ error: "Título obrigatório" }, { status: 400 });
+  }
+  const accountStatus = await getAccountStatus(userId);
+  if (accountStatus !== "active") {
+    const existing = await listLives(userId);
+    if (existing.length >= FREE_TIER_MAX_LIVES) {
+      return NextResponse.json({
+        error: `No plano gratuito você pode criar até ${FREE_TIER_MAX_LIVES} vitrines. Ative sua conta para criar mais.`,
+        code: "activation_required",
+      }, { status: 403 });
+    }
   }
   const live = await createLive(userId, {
     title: body.title.trim(),

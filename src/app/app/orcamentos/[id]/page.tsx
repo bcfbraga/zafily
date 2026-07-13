@@ -10,6 +10,8 @@ import {
 import { ProposalView, HOURS_ITEM, formatDateBR, type ProposalProfile } from "@/components/zafily/ProposalView";
 import { SCOPE_DEFAULT_NOTES } from "@/lib/scope-defaults";
 import { CurrencyInput } from "@/components/zafily/CurrencyInput";
+import { ActivationModal } from "@/components/zafily/ActivationModal";
+import type { AccountStatus } from "@/lib/lives-store";
 
 const SCOPE_PRESETS: { key: string; hint?: string; defaultNotes?: string }[] = [
   { key: "Reels / Feed", defaultNotes: SCOPE_DEFAULT_NOTES["Reels / Feed"] },
@@ -120,6 +122,8 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
   const [budget, setBudget] = useState<Budget | null>(null);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
+  const [accountStatus, setAccountStatus] = useState<AccountStatus>("draft");
+  const [showActivationModal, setShowActivationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showValueModal, setShowValueModal] = useState(false);
   const [showConditionsModal, setShowConditionsModal] = useState(false);
@@ -139,6 +143,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
     ]).then(([budgetData, profileData]) => {
       setBudget(budgetData);
       setProfile(profileData ?? null);
+      setAccountStatus(profileData?.accountStatus ?? "draft");
       setLoading(false);
     });
   }, [id]);
@@ -285,6 +290,10 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
   async function publishBudget() {
     if (!budget) return;
+    if (accountStatus !== "active") {
+      setShowActivationModal(true);
+      return;
+    }
     setTogglingStatus(true);
     const res = await fetch(`/api/budgets/${id}/status`, {
       method: "PATCH",
@@ -294,6 +303,8 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
     if (res.ok) {
       setBudget(prev => prev ? { ...prev, status: "published" } : prev);
       setShowPublishSuccess(true);
+    } else if (res.status === 403) {
+      setShowActivationModal(true);
     }
     setTogglingStatus(false);
   }
@@ -574,6 +585,10 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
           onClose={() => setShowEditModal(false)}
           onSave={(updated) => { setBudget(prev => prev ? { ...prev, ...updated } : prev); setShowEditModal(false); }}
         />
+      )}
+
+      {showActivationModal && (
+        <ActivationModal profile={profile} onClose={() => setShowActivationModal(false)} />
       )}
 
       {/* Value Gerado modal */}

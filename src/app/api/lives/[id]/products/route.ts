@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { getLive, countProducts, addProduct } from "@/lib/lives-store";
+import { getLive, countProducts, addProduct, getAccountStatus } from "@/lib/lives-store";
 import { fetchUrlMetadata } from "@/lib/metadata";
 
 const MAX_PRODUCTS = 40;
+const FREE_TIER_MAX_PRODUCTS = 5;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   let userId: string;
@@ -31,9 +32,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const current = await countProducts(id);
-  const slots = MAX_PRODUCTS - current;
+  const accountStatus = await getAccountStatus(userId);
+  const cap = accountStatus === "active" ? MAX_PRODUCTS : FREE_TIER_MAX_PRODUCTS;
+  const slots = cap - current;
   if (slots <= 0) {
-    return NextResponse.json({ error: `Limite de ${MAX_PRODUCTS} produtos atingido` }, { status: 400 });
+    return NextResponse.json({
+      error: accountStatus === "active"
+        ? `Limite de ${MAX_PRODUCTS} produtos atingido`
+        : `No plano gratuito você pode adicionar até ${FREE_TIER_MAX_PRODUCTS} produtos por vitrine. Ative sua conta para adicionar mais.`,
+      code: accountStatus === "active" ? undefined : "activation_required",
+    }, { status: accountStatus === "active" ? 400 : 403 });
   }
 
   const toProcess = urls.slice(0, slots);

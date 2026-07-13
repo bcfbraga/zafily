@@ -1,4 +1,5 @@
 import { Sidebar } from "@/components/zafily/Sidebar";
+import { OnboardingGate } from "@/components/zafily/OnboardingGate";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -7,6 +8,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
         {children}
       </div>
+      <OnboardingGate />
     </div>
   );
 }

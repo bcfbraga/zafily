@@ -8,10 +8,10 @@ import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
 
 const perks = [
-  "Importe links afiliados ilimitados",
-  "Detecção automática de produtos e comissões",
-  "Conecte todas as principais plataformas",
-  "Acompanhe cliques e performance",
+  "Monte sua vitrine e visualize gratuitamente",
+  "Personalize cores, tipografia e estilo visual",
+  "Organize produtos, links e recomendações",
+  "Publique com ativação personalizada",
 ];
 
 export default function SignupPage() {
@@ -80,7 +80,7 @@ export default function SignupPage() {
 
         <div className="bg-white border border-black/[0.08] rounded-[20px] p-8 shadow-[0_24px_80px_rgba(23,23,60,0.10)]">
           <h1 className="font-heading font-bold text-[24px] text-[#16162B] mb-1">Criar sua conta</h1>
-          <p className="text-sm text-[#716C8C] mb-6">Grátis para começar. Sem cartão de crédito.</p>
+          <p className="text-sm text-[#716C8C] mb-6">Crie e visualize gratuitamente. Publique com ativação personalizada.</p>
 
           <div className="space-y-2 mb-7">
             {perks.map((p) => (

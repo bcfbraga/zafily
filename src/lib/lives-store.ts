@@ -79,6 +79,8 @@ export const DEFAULT_DESIGN_SETTINGS: DesignSettings = {
   colors: "Marsala",
 };
 
+export type AccountStatus = "draft" | "pending_activation" | "active" | "suspended";
+
 export interface Profile {
   userId: string;
   username: string;
@@ -97,6 +99,10 @@ export interface Profile {
   bio: string | null;
   socialLinks: SocialLink[];
   designSettings: DesignSettings;
+  accountStatus: AccountStatus;
+  mainGoal: string | null;
+  platformsUsed: string | null;
+  onboardedAt: string | null;
 }
 
 // ─── Slug ─────────────────────────────────────────────────────────────────────
@@ -144,6 +150,10 @@ function rowToProfile(row: Record<string, unknown>): Profile {
     bio: (row.bio as string) ?? null,
     socialLinks: (row.social_links as SocialLink[]) ?? [],
     designSettings: { ...DEFAULT_DESIGN_SETTINGS, ...((row.design_settings as Partial<DesignSettings>) ?? {}) },
+    accountStatus: (row.account_status as AccountStatus) ?? "draft",
+    mainGoal: (row.main_goal as string) ?? null,
+    platformsUsed: (row.platforms_used as string) ?? null,
+    onboardedAt: (row.onboarded_at as string) ?? null,
   };
 }
 
@@ -170,9 +180,16 @@ export async function getOrCreateProfile(userId: string, email: string): Promise
   return rowToProfile(created);
 }
 
+export async function getAccountStatus(userId: string): Promise<AccountStatus> {
+  const db: DB = getSupabase();
+  const { data } = await db.from("profiles").select("account_status").eq("user_id", userId).maybeSingle();
+  return (data?.account_status as AccountStatus) ?? "draft";
+}
+
 export async function updateProfile(
   userId: string,
   data: {
+    displayName?: string | null;
     instagramHandle?: string | null;
     location?: string | null;
     followersLabel?: string | null;
@@ -187,12 +204,17 @@ export async function updateProfile(
     bio?: string | null;
     socialLinks?: SocialLink[];
     designSettings?: DesignSettings;
+    accountStatus?: AccountStatus;
+    mainGoal?: string | null;
+    platformsUsed?: string | null;
+    onboardedAt?: string | null;
   }
 ): Promise<Profile> {
   const db: DB = getSupabase();
   const { data: row } = await db
     .from("profiles")
     .update({
+      ...(data.displayName !== undefined && { display_name: data.displayName }),
       ...(data.instagramHandle !== undefined && { instagram_handle: data.instagramHandle }),
       ...(data.location !== undefined && { location: data.location }),
       ...(data.followersLabel !== undefined && { followers_label: data.followersLabel }),
@@ -207,6 +229,10 @@ export async function updateProfile(
       ...(data.bio !== undefined && { bio: data.bio }),
       ...(data.socialLinks !== undefined && { social_links: data.socialLinks }),
       ...(data.designSettings !== undefined && { design_settings: data.designSettings }),
+      ...(data.accountStatus !== undefined && { account_status: data.accountStatus }),
+      ...(data.mainGoal !== undefined && { main_goal: data.mainGoal }),
+      ...(data.platformsUsed !== undefined && { platforms_used: data.platformsUsed }),
+      ...(data.onboardedAt !== undefined && { onboarded_at: data.onboardedAt }),
     })
     .eq("user_id", userId)
     .select()
@@ -374,6 +400,7 @@ export async function getPublicGallery(
 ): Promise<{ profile: Profile; sections: VitrineSection[]; lives: Live[] } | null> {
   const profile = await getProfileByUsername(username);
   if (!profile) return null;
+  if (profile.accountStatus !== "active") return null;
 
   const [{ data }, sections] = await Promise.all([
     getSupabase()
@@ -500,6 +527,7 @@ export async function getLive(id: string, userId: string): Promise<Live | null> 
 export async function getPublicLive(username: string, slug: string): Promise<(Live & { products: LiveProduct[] }) | null> {
   const profile = await getProfileByUsername(username);
   if (!profile) return null;
+  if (profile.accountStatus !== "active") return null;
 
   const db: DB = getSupabase();
   const { data: live } = await db

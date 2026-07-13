@@ -1,8 +1,26 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { AwinCard } from "@/components/zafily/AwinCard";
+import { ActivationGate } from "@/components/zafily/ActivationGate";
 import { Info } from "lucide-react";
+import type { AccountStatus } from "@/lib/lives-store";
+
+interface ProfileSummary {
+  accountStatus: AccountStatus;
+  displayName: string | null;
+  username: string;
+  instagramHandle: string | null;
+}
 
 export default function IntegrationsPage() {
+  const [profile, setProfile] = useState<ProfileSummary | null>(null);
+
+  useEffect(() => {
+    fetch("/api/profile").then(r => r.json()).then(setProfile);
+  }, []);
+
   return (
     <>
       <Topbar
@@ -28,7 +46,17 @@ export default function IntegrationsPage() {
             <p className="text-xs text-[#716C8C] mb-4">
               Mais redes serão adicionadas em breve.
             </p>
-            <AwinCard />
+            {profile && (
+              <ActivationGate
+                featureName="Integrações"
+                title="Integrações disponíveis após ativação"
+                description="Conecte suas contas de afiliada assim que sua vitrine estiver ativada."
+                userStatus={profile.accountStatus}
+                profile={profile}
+              >
+                <AwinCard />
+              </ActivationGate>
+            )}
           </div>
 
         </div>

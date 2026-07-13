@@ -12,7 +12,9 @@ import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
 import { VitrinePreviewFrame } from "@/components/zafily/VitrinePreviewFrame";
+import { ActivationModal } from "@/components/zafily/ActivationModal";
 import type { DesignSettings } from "@/lib/design-presets";
+import type { AccountStatus } from "@/lib/lives-store";
 
 interface Live {
   id: string;
@@ -50,7 +52,11 @@ interface Profile {
   bio: string | null;
   socialLinks: SocialLink[];
   designSettings: DesignSettings;
+  accountStatus: AccountStatus;
+  instagramHandle?: string | null;
 }
+
+const FREE_TIER_MAX_LIVES = 2;
 
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
@@ -120,6 +126,7 @@ export default function VitrinePage() {
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [dragLiveId, setDragLiveId] = useState<string | null>(null);
   const [overLiveId, setOverLiveId] = useState<string | null>(null);
+  const [showActivationModal, setShowActivationModal] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -136,6 +143,10 @@ export default function VitrinePage() {
 
   async function toggleStatus(live: Live) {
     const next = live.status === "published" ? "draft" : "published";
+    if (next === "published" && profile?.accountStatus !== "active") {
+      setShowActivationModal(true);
+      return;
+    }
     const res = await fetch(`/api/lives/${live.id}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -143,6 +154,8 @@ export default function VitrinePage() {
     });
     if (res.ok) {
       setLives(prev => prev.map(l => l.id === live.id ? { ...l, status: next } : l));
+    } else if (res.status === 403) {
+      setShowActivationModal(true);
     }
   }
 
@@ -306,12 +319,21 @@ export default function VitrinePage() {
         <div className="flex-1 overflow-y-auto px-8 py-8">
           <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
 
-          <Link
-            href="/app/vitrine/nova"
-            className="flex items-center justify-center gap-2 w-full h-12 mb-8 bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-full transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Adicionar vitrine
-          </Link>
+          {profile?.accountStatus !== "active" && lives.length >= FREE_TIER_MAX_LIVES ? (
+            <button
+              onClick={() => setShowActivationModal(true)}
+              className="flex items-center justify-center gap-2 w-full h-12 mb-8 bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-full transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Adicionar vitrine
+            </button>
+          ) : (
+            <Link
+              href="/app/vitrine/nova"
+              className="flex items-center justify-center gap-2 w-full h-12 mb-8 bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-full transition-colors"
+            >
+              <Plus className="w-4 h-4" /> Adicionar vitrine
+            </Link>
+          )}
 
           {loading ? (
             <div className="space-y-3">
@@ -398,6 +420,10 @@ export default function VitrinePage() {
           onSaved={setProfile}
         />
       )}
+
+      {showActivationModal && (
+        <ActivationModal profile={profile} onClose={() => setShowActivationModal(false)} />
+      )}
     </div>
   );
 }
@@ -481,7 +507,7 @@ function ProfileEditModal({ profile, onClose, onSaved }: {
     });
     if (res.ok) {
       const updated = await res.json();
-      onSaved({ username: updated.username, displayName: updated.displayName, photoUrl: updated.photoUrl, bio: updated.bio, socialLinks: updated.socialLinks, designSettings: updated.designSettings });
+      onSaved({ username: updated.username, displayName: updated.displayName, photoUrl: updated.photoUrl, bio: updated.bio, socialLinks: updated.socialLinks, designSettings: updated.designSettings, accountStatus: updated.accountStatus, instagramHandle: updated.instagramHandle });
       onClose();
     }
     setSaving(false);

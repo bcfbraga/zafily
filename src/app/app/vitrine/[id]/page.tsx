@@ -11,7 +11,9 @@ import {
 } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
 import { SectionSelect } from "@/components/zafily/SectionSelect";
+import { ActivationModal } from "@/components/zafily/ActivationModal";
 import { titleCase } from "@/lib/utils";
+import type { AccountStatus } from "@/lib/lives-store";
 
 interface Product {
   id: string;
@@ -277,6 +279,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [copiedLink, setCopiedLink] = useState(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
   const [username, setUsername] = useState<string | null>(null);
+  const [profile, setProfile] = useState<{ accountStatus: AccountStatus; displayName: string | null; username: string; instagramHandle: string | null } | null>(null);
+  const [showActivationModal, setShowActivationModal] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
   const [editingSizeId, setEditingSizeId] = useState<string | null>(null);
@@ -289,6 +293,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     ]).then(([liveData, profileData]) => {
       setLive(liveData);
       setUsername(profileData?.username ?? null);
+      setProfile(profileData ?? null);
       setLoading(false);
     });
   }, [id]);
@@ -332,6 +337,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   async function publishVitrine() {
     if (!live) return;
+    if (profile?.accountStatus !== "active") {
+      setShowActivationModal(true);
+      return;
+    }
     setTogglingStatus(true);
     const res = await fetch(`/api/lives/${id}/status`, {
       method: "PATCH",
@@ -341,6 +350,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     if (res.ok) {
       setLive(prev => prev ? { ...prev, status: "published" } : prev);
       setShowPublishSuccess(true);
+    } else if (res.status === 403) {
+      setShowActivationModal(true);
     }
     setTogglingStatus(false);
   }
@@ -668,6 +679,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           onClose={() => setShowEditModal(false)}
           onSave={(updated) => { setLive(prev => prev ? { ...prev, ...updated } : prev); setShowEditModal(false); }}
         />
+      )}
+
+      {showActivationModal && (
+        <ActivationModal profile={profile} onClose={() => setShowActivationModal(false)} />
       )}
 
       {/* ── Edit product modal ─────────────────────────────────────────────── */}
