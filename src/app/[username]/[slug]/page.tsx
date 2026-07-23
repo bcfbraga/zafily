@@ -93,7 +93,7 @@ export default async function VitrinePage({ params }: Props) {
             </p>
           </div>
         ) : (
-          <ProductGrid products={live.products} discount={live.discount} showPrices={live.showPrices} />
+          <ProductGrid products={live.products} discount={live.discount} discountType={live.discountType} couponCode={live.couponCode} showPrices={live.showPrices} />
         )}
       </div>
 

@@ -36,3 +36,8 @@ export function discountedPrice(price: string | null, discount: number | null | 
   if (!n) return null;
   return { original: formatPrice(n), discounted: formatPrice(n * (1 - discount / 100)) };
 }
+
+export function discountLabel(discountType: "cart" | "coupon" | null | undefined, couponCode: string | null | undefined): string {
+  if (discountType === "coupon" && couponCode) return `Cupom ${couponCode}`;
+  return "Desconto aplicado direto no carrinho";
+}

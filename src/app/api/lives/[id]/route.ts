@@ -34,6 +34,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     imageUrl: body.imageUrl,
     store: body.store !== undefined ? (body.store ?? null) : undefined,
     discount: body.discount !== undefined ? (body.discount === null ? null : Number(body.discount)) : undefined,
+    discountType: body.discountType !== undefined ? body.discountType : undefined,
+    couponCode: body.couponCode !== undefined ? (body.couponCode || null) : undefined,
     sectionId: body.sectionId !== undefined ? (body.sectionId ?? null) : undefined,
     showPrices: body.showPrices !== undefined ? Boolean(body.showPrices) : undefined,
   });

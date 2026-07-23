@@ -12,7 +12,7 @@ import {
 import { StoreSelect } from "@/components/zafily/StoreSelect";
 import { SectionSelect } from "@/components/zafily/SectionSelect";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
-import { titleCase } from "@/lib/utils";
+import { titleCase, discountLabel } from "@/lib/utils";
 import type { AccountStatus } from "@/lib/lives-store";
 
 interface Product {
@@ -37,6 +37,8 @@ interface Live {
   status: "draft" | "published";
   store: string | null;
   discount: number | null;
+  discountType: "cart" | "coupon";
+  couponCode: string | null;
   sectionId: string | null;
   showPrices: boolean;
   updatedAt: string;
@@ -231,13 +233,13 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                             {p.name ? titleCase(p.name) : "Produto"}
                           </p>
                           {p.size && (
-                            <p className="text-[10px] text-zinc-400 mb-1">Tamanho Pam: {p.size}</p>
+                            <p className="text-[10px] text-zinc-400 mb-1">Tamanho: {p.size}</p>
                           )}
                           {disc ? (
                             <div>
                               <p className="text-[10px] text-zinc-400 line-through leading-none">{disc.original}</p>
                               <p className="text-sm font-bold text-[#8C2F45] leading-tight">{disc.discounted}</p>
-                              <p className="text-[9px] text-[#B37A87] font-medium mt-0.5">Desconto aplicado direto no carrinho</p>
+                              <p className="text-[9px] text-[#B37A87] font-medium mt-0.5">{discountLabel(live.discountType, live.couponCode)}</p>
                             </div>
                           ) : (
                             live.showPrices && p.price && <p className="text-xs font-bold text-zinc-900">{p.price}</p>
@@ -718,6 +720,8 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
   const [imagePreview, setImagePreview] = useState<string | null>(live.imageUrl);
   const [store, setStore] = useState(live.store ?? "cea");
   const [discount, setDiscount] = useState<string>(live.discount != null ? String(live.discount) : "");
+  const [discountType, setDiscountType] = useState<"cart" | "coupon">(live.discountType ?? "cart");
+  const [couponCode, setCouponCode] = useState(live.couponCode ?? "");
   const [sectionId, setSectionId] = useState<string | null>(live.sectionId);
   const [showPrices, setShowPrices] = useState(live.showPrices);
   const [uploading, setUploading] = useState(false);
@@ -748,6 +752,8 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
       body: JSON.stringify({
         title, slug, liveDate: date || null, liveTime: time || null, imageUrl, store,
         discount: discount.trim() ? Math.min(99, Math.max(1, parseInt(discount))) : null,
+        discountType,
+        couponCode: discountType === "coupon" ? (couponCode.trim() || null) : null,
         sectionId,
         showPrices,
       }),
@@ -755,7 +761,7 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
     const data = await res.json();
     setSaving(false);
     if (!res.ok) { setError(data.error ?? "Erro ao salvar"); return; }
-    onSave({ title: data.title, slug: data.slug, liveDate: data.liveDate, liveTime: data.liveTime, imageUrl: data.imageUrl, store: data.store ?? null, discount: data.discount ?? null, sectionId: data.sectionId ?? null, showPrices: data.showPrices ?? true });
+    onSave({ title: data.title, slug: data.slug, liveDate: data.liveDate, liveTime: data.liveTime, imageUrl: data.imageUrl, store: data.store ?? null, discount: data.discount ?? null, discountType: data.discountType ?? "cart", couponCode: data.couponCode ?? null, sectionId: data.sectionId ?? null, showPrices: data.showPrices ?? true });
   }
 
   return (
@@ -814,6 +820,45 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
               </div>
             </div>
           </div>
+
+          {discount.trim() && (
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-[#4B4768]">Como o desconto é aplicado</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDiscountType("cart")}
+                  className={`h-11 px-3 rounded-xl border text-xs font-medium transition-colors ${
+                    discountType === "cart"
+                      ? "bg-[#6C63FF]/10 border-[#6C63FF] text-[#6C63FF]"
+                      : "bg-[#F1F0F7] border-black/[0.12] text-[#4B4768] hover:border-black/[0.20]"
+                  }`}
+                >
+                  Desconto direto no carrinho
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDiscountType("coupon")}
+                  className={`h-11 px-3 rounded-xl border text-xs font-medium transition-colors ${
+                    discountType === "coupon"
+                      ? "bg-[#6C63FF]/10 border-[#6C63FF] text-[#6C63FF]"
+                      : "bg-[#F1F0F7] border-black/[0.12] text-[#4B4768] hover:border-black/[0.20]"
+                  }`}
+                >
+                  Cupom
+                </button>
+              </div>
+              {discountType === "coupon" && (
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={e => setCouponCode(e.target.value)}
+                  placeholder="Nome do cupom, ex: ZAFILY10"
+                  className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                />
+              )}
+            </div>
+          )}
 
           <div className={`w-full flex items-center justify-between px-4 h-11 rounded-xl border bg-white transition-colors ${showPrices ? "border-black/[0.12]" : "border-black/[0.12] opacity-60"}`}>
             <span className="text-sm font-medium text-[#4B4768]">Mostrar preços</span>

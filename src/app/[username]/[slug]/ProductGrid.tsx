@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Package } from "lucide-react";
-import { titleCase, discountedPrice } from "@/lib/utils";
+import { titleCase, discountedPrice, discountLabel } from "@/lib/utils";
 
 interface Product {
   id: string;
@@ -17,6 +17,8 @@ interface Product {
 interface Props {
   products: Product[];
   discount?: number | null;
+  discountType?: "cart" | "coupon" | null;
+  couponCode?: string | null;
   showPrices?: boolean;
 }
 
@@ -26,7 +28,7 @@ function shortCategory(cat: string | null): string | null {
   return parts[parts.length - 1] ?? null;
 }
 
-export function ProductGrid({ products, discount, showPrices = true }: Props) {
+export function ProductGrid({ products, discount, discountType, couponCode, showPrices = true }: Props) {
   const productsWithShortCat = products.map(p => ({ ...p, category: shortCategory(p.category) }));
   const categories = ["Tudo", ...Array.from(new Set(productsWithShortCat.map(p => p.category).filter(Boolean) as string[]))];
   const [active, setActive] = useState("Tudo");
@@ -104,7 +106,7 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
                   {product.name ? titleCase(product.name) : "Produto"}
                 </p>
                 {product.size && (
-                  <p className="text-[10px] mb-1" style={{ color: "var(--cr-text-tertiary)" }}>Tamanho Pam: {product.size}</p>
+                  <p className="text-[10px] mb-1" style={{ color: "var(--cr-text-tertiary)" }}>Tamanho: {product.size}</p>
                 )}
                 {showPrices && (() => {
                   const disc = discountedPrice(product.price, discount);
@@ -112,7 +114,7 @@ export function ProductGrid({ products, discount, showPrices = true }: Props) {
                     <div className="mb-2">
                       <p className="text-[10px] line-through leading-none" style={{ color: "var(--cr-text-tertiary)" }}>{disc.original}</p>
                       <p className="text-sm font-bold leading-tight" style={{ color: "var(--cr-brand-700)" }}>{disc.discounted}</p>
-                      <p className="text-[9px] font-medium mt-0.5" style={{ color: "var(--cr-brand-500)" }}>Desconto aplicado direto no carrinho</p>
+                      <p className="text-[9px] font-medium mt-0.5" style={{ color: "var(--cr-brand-500)" }}>{discountLabel(discountType, couponCode)}</p>
                     </div>
                   );
                   if (product.price) return (
