@@ -528,6 +528,63 @@ export async function getLive(id: string, userId: string): Promise<Live | null> 
   return data ? rowToLive(data) : null;
 }
 
+export interface ProductClickStat {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+  price: string | null;
+  clicks: number;
+}
+
+export interface LivePerformance {
+  live: Live;
+  views: number;
+  products: ProductClickStat[];
+  clickTimestamps: string[];
+}
+
+export async function getLivePerformance(id: string, userId: string): Promise<LivePerformance | null> {
+  const live = await getLive(id, userId);
+  if (!live) return null;
+
+  const db: DB = getSupabase();
+  const [{ data: products }, { count: viewCount }] = await Promise.all([
+    db.from("live_products").select("id, name, image_url, price").eq("live_id", id).order("position", { ascending: true }),
+    db.from("live_views").select("*", { count: "exact", head: true }).eq("live_id", id),
+  ]);
+
+  const productIds = (products ?? []).map((p: Record<string, unknown>) => p.id as string);
+  let clickRows: Array<{ product_id: string; created_at: string }> = [];
+  if (productIds.length > 0) {
+    const { data } = await db
+      .from("product_clicks")
+      .select("product_id, created_at")
+      .in("product_id", productIds)
+      .order("created_at", { ascending: true });
+    clickRows = (data ?? []) as Array<{ product_id: string; created_at: string }>;
+  }
+
+  const clicksByProduct = new Map<string, number>();
+  for (const row of clickRows) clicksByProduct.set(row.product_id, (clicksByProduct.get(row.product_id) ?? 0) + 1);
+
+  const productStats: ProductClickStat[] = (products ?? [])
+    .map((p: Record<string, unknown>) => ({
+      id: p.id as string,
+      name: (p.name as string) ?? null,
+      imageUrl: (p.image_url as string) ?? null,
+      price: (p.price as string) ?? null,
+      clicks: clicksByProduct.get(p.id as string) ?? 0,
+    }))
+    .sort((a: ProductClickStat, b: ProductClickStat) => b.clicks - a.clicks);
+
+  return {
+    live,
+    views: viewCount ?? 0,
+    products: productStats,
+    clickTimestamps: clickRows.map(r => r.created_at),
+  };
+}
+
 export async function getPublicLive(username: string, slug: string): Promise<(Live & { products: LiveProduct[] }) | null> {
   const profile = await getProfileByUsername(username);
   if (!profile) return null;

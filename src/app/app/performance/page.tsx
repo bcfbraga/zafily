@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BarChart2, Eye, MousePointerClick, Percent, ExternalLink, Package } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { BarChart2, Eye, MousePointerClick, Percent, ExternalLink, Package, ChevronRight } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 
 interface Live {
@@ -38,6 +39,7 @@ function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string
 }
 
 export default function PerformancePage() {
+  const router = useRouter();
   const [lives, setLives] = useState<Live[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +110,11 @@ export default function PerformancePage() {
                     const barWidth = Math.max(4, (views / maxViews) * 100);
                     const thumb = live.thumbnails?.[0];
                     return (
-                      <div key={live.id} className="flex items-center gap-4 px-5 py-4">
+                      <div
+                        key={live.id}
+                        onClick={() => router.push(`/app/performance/${live.id}`)}
+                        className="flex items-center gap-4 px-5 py-4 hover:bg-[var(--cr-surface-hover)] transition-colors cursor-pointer"
+                      >
                         <div className="w-10 h-10 rounded-lg bg-[var(--cr-brand-100)] overflow-hidden shrink-0 flex items-center justify-center">
                           {thumb
                             // eslint-disable-next-line @next/next/no-img-element
@@ -127,6 +133,7 @@ export default function PerformancePage() {
                                 href={`/${profile.username}/${live.slug}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
                                 className="text-[var(--cr-text-tertiary)] hover:text-[var(--cr-brand-600)] shrink-0 transition-colors"
                               >
                                 <ExternalLink className="w-3 h-3" />
@@ -151,6 +158,7 @@ export default function PerformancePage() {
                             <p className="text-[10px] text-[var(--cr-text-tertiary)]">CTR</p>
                           </div>
                         </div>
+                        <ChevronRight className="w-4 h-4 text-[var(--cr-text-tertiary)] shrink-0" />
                       </div>
                     );
                   })}
