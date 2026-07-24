@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Globe, Calendar,
   CheckCircle2, FileText, Radio, Layers,
-  X, Settings2, GripVertical, Share2, Check, Package, ExternalLink
+  X, Settings2, GripVertical, Share2, Check, Package, ExternalLink, BarChart2
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
@@ -310,6 +310,12 @@ export default function VitrinePage() {
           >
             <ExternalLink className="w-3.5 h-3.5" /> Ver página
           </a>
+          <Link
+            href="/app/performance"
+            className="flex items-center gap-1.5 h-8 px-4 bg-white border border-[var(--cr-border)] hover:border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-xs font-semibold rounded-full transition-colors"
+          >
+            <BarChart2 className="w-3.5 h-3.5" /> Performance
+          </Link>
         </div>
       } />
 
