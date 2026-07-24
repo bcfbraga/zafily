@@ -77,11 +77,24 @@ function buildTimeline(timestamps: string[]): { buckets: Bucket[]; granularity: 
   return { buckets, granularity };
 }
 
+const NICE_STEPS = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10];
+
+function niceCeil(n: number): number {
+  if (n <= 4) return 4;
+  const magnitude = Math.pow(10, Math.floor(Math.log10(n)));
+  const residual = n / magnitude;
+  const niceResidual = NICE_STEPS.find(step => step >= residual) ?? 10;
+  return Math.round(niceResidual * magnitude);
+}
+
+const PLOT_HEIGHT = 128; // px — the bars' content box; x-axis labels live below it
+
 function TimelineChart({ timestamps }: { timestamps: string[] }) {
   const { buckets, granularity } = useMemo(() => buildTimeline(timestamps), [timestamps]);
   const [hover, setHover] = useState<number | null>(null);
   const [showTable, setShowTable] = useState(false);
   const maxCount = Math.max(1, ...buckets.map(b => b.count));
+  const axisMax = niceCeil(maxCount);
 
   if (buckets.length === 0) {
     return (
@@ -124,43 +137,63 @@ function TimelineChart({ timestamps }: { timestamps: string[] }) {
           </table>
         </div>
       ) : (
-        <div className="relative h-40 flex items-end gap-[3px] pb-6" onMouseLeave={() => setHover(null)}>
-          {buckets.map((b, i) => {
-            const heightPct = Math.max(3, (b.count / maxCount) * 100);
-            const isFirst = i === 0;
-            const isLast = i === buckets.length - 1;
-            const isMid = i === Math.floor((buckets.length - 1) / 2) && buckets.length > 6;
-            return (
-              <button
-                key={b.start}
-                type="button"
-                onMouseEnter={() => setHover(i)}
-                onFocus={() => setHover(i)}
-                onBlur={() => setHover(null)}
-                className="relative flex-1 h-full flex flex-col items-center justify-end min-w-[3px] outline-none"
-                aria-label={`${b.label}: ${b.count} clique${b.count !== 1 ? "s" : ""}`}
-              >
-                {hover === i && (
-                  <div className="absolute bottom-full mb-2 z-10 whitespace-nowrap bg-[var(--cr-text-primary)] text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg pointer-events-none">
-                    <span className="font-semibold">{b.count}</span> clique{b.count !== 1 ? "s" : ""}
-                    <div className="text-[10px] text-white/70">{b.label}</div>
-                  </div>
-                )}
-                <div
-                  className="w-full max-w-[22px] rounded-t-[4px] transition-colors"
-                  style={{
-                    height: `${heightPct}%`,
-                    background: hover === i ? "var(--cr-brand-700)" : "var(--cr-brand-500)",
-                  }}
-                />
-                {(isFirst || isLast || isMid) && (
-                  <span className="absolute -bottom-5 text-[9px] text-[var(--cr-text-tertiary)] whitespace-nowrap">
-                    {b.label}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        <div className="flex gap-2">
+          {/* Y-axis reference labels */}
+          <div className="flex flex-col justify-between text-right w-7 shrink-0 [font-variant-numeric:tabular-nums]" style={{ height: PLOT_HEIGHT }}>
+            <span className="text-[9px] text-[var(--cr-text-tertiary)] leading-none">{axisMax}</span>
+            <span className="text-[9px] text-[var(--cr-text-tertiary)] leading-none">{Math.round(axisMax / 2)}</span>
+            <span className="text-[9px] text-[var(--cr-text-tertiary)] leading-none">0</span>
+          </div>
+
+          {/* Plot area */}
+          <div className="relative flex-1" style={{ height: PLOT_HEIGHT + 24 }} onMouseLeave={() => setHover(null)}>
+            {/* Reference gridlines */}
+            <div className="absolute inset-x-0 top-0 flex flex-col justify-between pointer-events-none" style={{ height: PLOT_HEIGHT }}>
+              <div className="border-t border-[var(--cr-border)]" />
+              <div className="border-t border-[var(--cr-border)]" />
+              <div className="border-t border-[var(--cr-border)]" />
+            </div>
+
+            {/* Bars */}
+            <div className="absolute inset-x-0 top-0 flex items-end gap-[3px]" style={{ height: PLOT_HEIGHT }}>
+              {buckets.map((b, i) => {
+                const heightPct = Math.max(b.count > 0 ? 3 : 0, (b.count / axisMax) * 100);
+                const isFirst = i === 0;
+                const isLast = i === buckets.length - 1;
+                const isMid = i === Math.floor((buckets.length - 1) / 2) && buckets.length > 6;
+                return (
+                  <button
+                    key={b.start}
+                    type="button"
+                    onMouseEnter={() => setHover(i)}
+                    onFocus={() => setHover(i)}
+                    onBlur={() => setHover(null)}
+                    className="relative flex-1 h-full flex flex-col items-center justify-end min-w-[3px] outline-none"
+                    aria-label={`${b.label}: ${b.count} clique${b.count !== 1 ? "s" : ""}`}
+                  >
+                    {hover === i && (
+                      <div className="absolute bottom-full mb-2 z-10 whitespace-nowrap bg-[var(--cr-text-primary)] text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg pointer-events-none">
+                        <span className="font-semibold">{b.count}</span> clique{b.count !== 1 ? "s" : ""}
+                        <div className="text-[10px] text-white/70">{b.label}</div>
+                      </div>
+                    )}
+                    <div
+                      className="w-full max-w-[22px] rounded-t-[4px] transition-colors"
+                      style={{
+                        height: `${heightPct}%`,
+                        background: hover === i ? "var(--cr-brand-700)" : "var(--cr-brand-500)",
+                      }}
+                    />
+                    {(isFirst || isLast || isMid) && (
+                      <span className="absolute -bottom-5 text-[9px] text-[var(--cr-text-tertiary)] whitespace-nowrap">
+                        {b.label}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
     </div>
