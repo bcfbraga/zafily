@@ -36,26 +36,49 @@ function formatCount(n: number): string {
 
 interface Bucket { start: number; count: number; label: string }
 
-function buildTimeline(timestamps: string[]): { buckets: Bucket[]; granularity: "hora" | "dia" | "semana" } {
-  if (timestamps.length === 0) return { buckets: [], granularity: "hora" };
+type Granularity = "minuto" | "hora" | "dia";
 
+const GRANULARITY_MS: Record<Granularity, number> = {
+  minuto: 60_000,
+  hora: 3_600_000,
+  dia: 86_400_000,
+};
+
+const GRANULARITY_LABEL: Record<Granularity, string> = {
+  minuto: "Minuto",
+  hora: "Hora",
+  dia: "Dia",
+};
+
+// Above this many buckets a granularity option is disabled — the bar chart
+// would need thousands of DOM nodes and stop being readable even scrolled.
+const MAX_BUCKETS = 1500;
+
+function bucketCount(timestamps: string[], granularity: Granularity): number {
+  if (timestamps.length === 0) return 0;
+  const times = timestamps.map(t => new Date(t).getTime());
+  const bucketMs = GRANULARITY_MS[granularity];
+  const first = Math.floor(Math.min(...times) / bucketMs) * bucketMs;
+  const last = Math.floor(Math.max(...times) / bucketMs) * bucketMs;
+  return Math.round((last - first) / bucketMs) + 1;
+}
+
+function autoGranularity(timestamps: string[]): Granularity {
+  if (timestamps.length < 2) return "hora";
+  const times = timestamps.map(t => new Date(t).getTime());
+  const spanHours = (Math.max(...times) - Math.min(...times)) / 3_600_000;
+  if (spanHours <= 3 && bucketCount(timestamps, "minuto") <= MAX_BUCKETS) return "minuto";
+  if (spanHours <= 48) return "hora";
+  return "dia";
+}
+
+function buildTimeline(timestamps: string[], granularity: Granularity): Bucket[] {
+  if (timestamps.length === 0) return [];
+
+  const bucketMs = GRANULARITY_MS[granularity];
   const times = timestamps.map(t => new Date(t).getTime()).sort((a, b) => a - b);
   const first = times[0];
   const last = times[times.length - 1];
-  const spanHours = (last - first) / 3_600_000;
-
-  let bucketMs: number;
-  let granularity: "hora" | "dia" | "semana";
-  if (spanHours <= 48) {
-    bucketMs = 3_600_000;
-    granularity = "hora";
-  } else if (spanHours <= 60 * 24) {
-    bucketMs = 86_400_000;
-    granularity = "dia";
-  } else {
-    bucketMs = 7 * 86_400_000;
-    granularity = "semana";
-  }
 
   const bucketStart = (t: number) => Math.floor(t / bucketMs) * bucketMs;
   const counts = new Map<number, number>();
@@ -69,12 +92,14 @@ function buildTimeline(timestamps: string[]): { buckets: Bucket[]; granularity: 
   const buckets: Bucket[] = [];
   for (let t = startBucket; t <= endBucket; t += bucketMs) {
     const d = new Date(t);
-    const label = granularity === "hora"
-      ? `${d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} ${d.toLocaleTimeString("pt-BR", { hour: "2-digit" }).replace(":", "")}`
-      : d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+    const label = granularity === "dia"
+      ? d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })
+      : granularity === "hora"
+        ? `${d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })} ${d.toLocaleTimeString("pt-BR", { hour: "2-digit" }).replace(":", "")}`
+        : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
     buckets.push({ start: t, count: counts.get(t) ?? 0, label });
   }
-  return { buckets, granularity };
+  return buckets;
 }
 
 const NICE_STEPS = [1, 1.2, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10];
@@ -88,13 +113,16 @@ function niceCeil(n: number): number {
 }
 
 const PLOT_HEIGHT = 128; // px — the bars' content box; x-axis labels live below it
+const MIN_SLOT = 10; // px — minimum width per bar column before the chart scrolls
 
 function TimelineChart({ timestamps }: { timestamps: string[] }) {
-  const { buckets, granularity } = useMemo(() => buildTimeline(timestamps), [timestamps]);
+  const [granularity, setGranularity] = useState<Granularity>(() => autoGranularity(timestamps));
+  const buckets = useMemo(() => buildTimeline(timestamps, granularity), [timestamps, granularity]);
   const [hover, setHover] = useState<number | null>(null);
   const [showTable, setShowTable] = useState(false);
   const maxCount = Math.max(1, ...buckets.map(b => b.count));
   const axisMax = niceCeil(maxCount);
+  const plotWidth = `max(100%, ${buckets.length * MIN_SLOT}px)`;
 
   if (buckets.length === 0) {
     return (
@@ -106,8 +134,30 @@ function TimelineChart({ timestamps }: { timestamps: string[] }) {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-xs text-[var(--cr-text-tertiary)]">Cliques por {granularity}</p>
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <div className="flex items-center gap-1 bg-[var(--cr-surface-soft)] rounded-full p-1">
+          {(Object.keys(GRANULARITY_MS) as Granularity[]).map(g => {
+            const disabled = g !== granularity && bucketCount(timestamps, g) > MAX_BUCKETS;
+            return (
+              <button
+                key={g}
+                type="button"
+                disabled={disabled}
+                onClick={() => setGranularity(g)}
+                title={disabled ? "Período muito longo para essa granularidade" : undefined}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                  granularity === g
+                    ? "bg-white shadow-sm text-[var(--cr-text-primary)]"
+                    : disabled
+                      ? "text-[var(--cr-text-tertiary)] opacity-40 cursor-not-allowed"
+                      : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)]"
+                }`}
+              >
+                {GRANULARITY_LABEL[g]}
+              </button>
+            );
+          })}
+        </div>
         <button
           type="button"
           onClick={() => setShowTable(v => !v)}
@@ -145,53 +195,55 @@ function TimelineChart({ timestamps }: { timestamps: string[] }) {
             <span className="text-[9px] text-[var(--cr-text-tertiary)] leading-none">0</span>
           </div>
 
-          {/* Plot area */}
-          <div className="relative flex-1" style={{ height: PLOT_HEIGHT + 24 }} onMouseLeave={() => setHover(null)}>
-            {/* Reference gridlines */}
-            <div className="absolute inset-x-0 top-0 flex flex-col justify-between pointer-events-none" style={{ height: PLOT_HEIGHT }}>
-              <div className="border-t border-[var(--cr-border)]" />
-              <div className="border-t border-[var(--cr-border)]" />
-              <div className="border-t border-[var(--cr-border)]" />
-            </div>
+          {/* Plot area — scrolls horizontally once bars are too dense to read */}
+          <div className="flex-1 overflow-x-auto overflow-y-hidden" onMouseLeave={() => setHover(null)}>
+            <div className="relative" style={{ height: PLOT_HEIGHT + 24, width: plotWidth }}>
+              {/* Reference gridlines */}
+              <div className="absolute inset-x-0 top-0 flex flex-col justify-between pointer-events-none" style={{ height: PLOT_HEIGHT }}>
+                <div className="border-t border-[var(--cr-border)]" />
+                <div className="border-t border-[var(--cr-border)]" />
+                <div className="border-t border-[var(--cr-border)]" />
+              </div>
 
-            {/* Bars */}
-            <div className="absolute inset-x-0 top-0 flex items-end gap-[3px]" style={{ height: PLOT_HEIGHT }}>
-              {buckets.map((b, i) => {
-                const heightPct = Math.max(b.count > 0 ? 3 : 0, (b.count / axisMax) * 100);
-                const isFirst = i === 0;
-                const isLast = i === buckets.length - 1;
-                const isMid = i === Math.floor((buckets.length - 1) / 2) && buckets.length > 6;
-                return (
-                  <button
-                    key={b.start}
-                    type="button"
-                    onMouseEnter={() => setHover(i)}
-                    onFocus={() => setHover(i)}
-                    onBlur={() => setHover(null)}
-                    className="relative flex-1 h-full flex flex-col items-center justify-end min-w-[3px] outline-none"
-                    aria-label={`${b.label}: ${b.count} clique${b.count !== 1 ? "s" : ""}`}
-                  >
-                    {hover === i && (
-                      <div className="absolute bottom-full mb-2 z-10 whitespace-nowrap bg-[var(--cr-text-primary)] text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg pointer-events-none">
-                        <span className="font-semibold">{b.count}</span> clique{b.count !== 1 ? "s" : ""}
-                        <div className="text-[10px] text-white/70">{b.label}</div>
-                      </div>
-                    )}
-                    <div
-                      className="w-full max-w-[22px] rounded-t-[4px] transition-colors"
-                      style={{
-                        height: `${heightPct}%`,
-                        background: hover === i ? "var(--cr-brand-700)" : "var(--cr-brand-500)",
-                      }}
-                    />
-                    {(isFirst || isLast || isMid) && (
-                      <span className="absolute -bottom-5 text-[9px] text-[var(--cr-text-tertiary)] whitespace-nowrap">
-                        {b.label}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+              {/* Bars */}
+              <div className="absolute inset-x-0 top-0 flex items-end gap-[3px]" style={{ height: PLOT_HEIGHT }}>
+                {buckets.map((b, i) => {
+                  const heightPct = Math.max(b.count > 0 ? 3 : 0, (b.count / axisMax) * 100);
+                  const isFirst = i === 0;
+                  const isLast = i === buckets.length - 1;
+                  const isMid = i === Math.floor((buckets.length - 1) / 2) && buckets.length > 6;
+                  return (
+                    <button
+                      key={b.start}
+                      type="button"
+                      onMouseEnter={() => setHover(i)}
+                      onFocus={() => setHover(i)}
+                      onBlur={() => setHover(null)}
+                      className="relative flex-1 h-full flex flex-col items-center justify-end min-w-[3px] outline-none"
+                      aria-label={`${b.label}: ${b.count} clique${b.count !== 1 ? "s" : ""}`}
+                    >
+                      {hover === i && (
+                        <div className="absolute bottom-full mb-2 z-10 whitespace-nowrap bg-[var(--cr-text-primary)] text-white text-[11px] rounded-lg px-2.5 py-1.5 shadow-lg pointer-events-none">
+                          <span className="font-semibold">{b.count}</span> clique{b.count !== 1 ? "s" : ""}
+                          <div className="text-[10px] text-white/70">{b.label}</div>
+                        </div>
+                      )}
+                      <div
+                        className="w-full max-w-[22px] rounded-t-[4px] transition-colors"
+                        style={{
+                          height: `${heightPct}%`,
+                          background: hover === i ? "var(--cr-brand-700)" : "var(--cr-brand-500)",
+                        }}
+                      />
+                      {(isFirst || isLast || isMid) && (
+                        <span className="absolute -bottom-5 text-[9px] text-[var(--cr-text-tertiary)] whitespace-nowrap">
+                          {b.label}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>

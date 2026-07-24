@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Globe, Calendar,
   CheckCircle2, FileText, Radio, Layers,
-  X, Settings2, GripVertical, Share2, Check, Package, ExternalLink, BarChart2, ChevronDown
+  X, Settings2, GripVertical, Share2, Check, Package, ExternalLink, BarChart2
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
@@ -88,6 +88,29 @@ function GroupSection({ title, icon, count, children }: { title: string; icon?: 
   );
 }
 
+function QuickAction({ icon, label, href, onClick }: { icon: React.ReactNode; label: string; href?: string; onClick?: () => void }) {
+  const content = (
+    <>
+      <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-100)] group-hover:bg-[var(--cr-brand-200)] flex items-center justify-center text-[var(--cr-brand-700)] transition-colors">
+        {icon}
+      </div>
+      <span className="text-xs font-medium text-[var(--cr-text-secondary)]">{label}</span>
+    </>
+  );
+  if (href) {
+    return (
+      <Link href={href} className="group flex flex-col items-center gap-2 w-20">
+        {content}
+      </Link>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} className="group flex flex-col items-center gap-2 w-20">
+      {content}
+    </button>
+  );
+}
+
 function ThumbRow({ thumbnails, productCount }: { thumbnails?: string[]; productCount?: number }) {
   const imgs = (thumbnails ?? []).slice(0, 4);
   if (imgs.length === 0) {
@@ -127,7 +150,6 @@ export default function VitrinePage() {
   const [dragLiveId, setDragLiveId] = useState<string | null>(null);
   const [overLiveId, setOverLiveId] = useState<string | null>(null);
   const [showActivationModal, setShowActivationModal] = useState(false);
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -143,7 +165,6 @@ export default function VitrinePage() {
   }, []);
 
   function handleNewVitrine() {
-    setQuickActionsOpen(false);
     if (profile?.accountStatus !== "active" && lives.length >= FREE_TIER_MAX_LIVES) {
       setShowActivationModal(true);
       return;
@@ -335,44 +356,10 @@ export default function VitrinePage() {
         <div className="flex-1 overflow-y-auto px-8 py-8">
           <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
 
-          <div className="relative mb-8">
-            <button
-              type="button"
-              onClick={() => setQuickActionsOpen(v => !v)}
-              className="flex items-center justify-center gap-2 w-full h-12 bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-full transition-colors"
-            >
-              <Plus className="w-4 h-4" /> Ações rápidas
-              <ChevronDown className={`w-4 h-4 transition-transform ${quickActionsOpen ? "rotate-180" : ""}`} />
-            </button>
-
-            {quickActionsOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setQuickActionsOpen(false)} />
-                <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-[var(--cr-border)] rounded-2xl shadow-[var(--cr-shadow-floating)] overflow-hidden z-20">
-                  <button
-                    type="button"
-                    onClick={handleNewVitrine}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)] transition-colors text-left"
-                  >
-                    <Plus className="w-4 h-4 text-[var(--cr-brand-600)]" /> Nova vitrine
-                  </button>
-                  <Link
-                    href="/app/performance"
-                    onClick={() => setQuickActionsOpen(false)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)] transition-colors border-t border-[var(--cr-border)]"
-                  >
-                    <BarChart2 className="w-4 h-4 text-[var(--cr-brand-600)]" /> Performance
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => { setEditingProfile(true); setQuickActionsOpen(false); }}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)] transition-colors text-left border-t border-[var(--cr-border)]"
-                  >
-                    <Pencil className="w-4 h-4 text-[var(--cr-brand-600)]" /> Editar dados
-                  </button>
-                </div>
-              </>
-            )}
+          <div className="flex items-start justify-center gap-10 mb-8 py-2">
+            <QuickAction icon={<Plus className="w-5 h-5" />} label="Nova vitrine" onClick={handleNewVitrine} />
+            <QuickAction icon={<BarChart2 className="w-5 h-5" />} label="Performance" href="/app/performance" />
+            <QuickAction icon={<Pencil className="w-5 h-5" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
           </div>
 
           {loading ? (
