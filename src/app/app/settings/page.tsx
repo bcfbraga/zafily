@@ -126,7 +126,7 @@ export default function SettingsPage() {
                 <p className="text-xs text-[#716C8C] mt-0.5">Clique na foto para {profile.photoUrl ? "trocar" : "enviar"}. Aparece na vitrine e nas propostas públicas.</p>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {[
                 { label: "Primeiro nome", value: firstName },
                 { label: "Sobrenome", value: lastName },
@@ -186,7 +186,7 @@ export default function SettingsPage() {
                     placeholder="Criadora de Conteúdo" className={fieldClass} />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#4B4768]">Instagram</label>
                     <input type="text" value={profile.instagramHandle ?? ""} onChange={e => setField("instagramHandle", e.target.value)}
@@ -199,7 +199,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#4B4768]">Seguidores</label>
                     <input type="text" value={profile.followersLabel ?? ""} onChange={e => setField("followersLabel", e.target.value)}
@@ -222,7 +222,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-[#4B4768]">WhatsApp</label>
                     <input type="text" value={profile.whatsapp ?? ""} onChange={e => setField("whatsapp", e.target.value)}

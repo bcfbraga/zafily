@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronRight, X, Check } from "lucide-react";
+import { ChevronRight, Check } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { VitrinePreviewFrame, type PreviewLive, type PreviewSection } from "@/components/zafily/VitrinePreviewFrame";
+import { Modal } from "@/components/zafily/Modal";
 import type { DesignSettings } from "@/lib/design-presets";
 
 interface Profile {
@@ -215,7 +216,7 @@ export default function DesignPage() {
 
   if (!profile) {
     return (
-      <div className="h-screen flex flex-col bg-[#F6F6FB]">
+      <div className="h-dvh flex flex-col bg-[#F6F6FB]">
         <Topbar title="Design" />
         <VitrineTabs />
       </div>
@@ -225,7 +226,7 @@ export default function DesignPage() {
   const s = profile.designSettings;
 
   return (
-    <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
+    <div className="h-dvh flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
       <Topbar title="Design" />
       <VitrineTabs />
 
@@ -291,15 +292,7 @@ function ThemeGridModal({ current, photoUrl, onSelect, onClose }: {
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[85vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#16162B]">Theme</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Modal open onClose={onClose} title="Theme" maxWidth="max-w-lg">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
           {Object.entries(THEME_PRESETS).map(([name, preset]) => {
             const selected = name === current;
@@ -338,8 +331,7 @@ function ThemeGridModal({ current, photoUrl, onSelect, onClose }: {
             );
           })}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -351,15 +343,7 @@ function PickerModal({ title, options, current, onSelect, onClose }: {
   onClose: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-[#16162B]">{title}</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Modal open onClose={onClose} title={title} maxWidth="max-w-sm">
         <div className="space-y-1.5">
           {options.map(opt => (
             <button
@@ -374,7 +358,6 @@ function PickerModal({ title, options, current, onSelect, onClose }: {
             </button>
           ))}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

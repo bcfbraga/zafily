@@ -12,6 +12,8 @@ import {
 import { StoreSelect } from "@/components/zafily/StoreSelect";
 import { SectionSelect } from "@/components/zafily/SectionSelect";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
+import { SplitEditorLayout } from "@/components/zafily/SplitEditorLayout";
+import { Modal } from "@/components/zafily/Modal";
 import { titleCase, discountLabel } from "@/lib/utils";
 import type { AccountStatus } from "@/lib/lives-store";
 
@@ -400,7 +402,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="h-screen bg-[#F6F6FB] flex items-center justify-center">
+      <div className="h-dvh bg-[#F6F6FB] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-[#6C63FF] animate-spin" />
       </div>
     );
@@ -408,7 +410,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   if (!live) {
     return (
-      <div className="h-screen bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
+      <div className="h-dvh bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
         Vitrine não encontrada.
       </div>
     );
@@ -417,10 +419,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const publicUrl = username ? `${typeof window !== "undefined" ? window.location.origin : ""}/${username}/${live.slug}` : null;
 
   return (
-    <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
+    <div className="h-dvh flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
       {/* ── Header ─────────────────────────────────────────────────────────── */}
-      <div className="h-14 shrink-0 border-b border-black/[0.08] bg-[#F6F6FB] flex items-center justify-between px-5 z-10">
-        <Link href="/app/vitrine" className="flex items-center gap-1.5 text-sm text-[#4B4768] hover:text-[#16162B] transition-colors">
+      <div className="h-14 shrink-0 border-b border-[var(--cr-border)] bg-[var(--cr-background)] flex items-center justify-between px-5 z-10">
+        <Link href="/app/vitrine" className="flex items-center gap-1.5 text-sm text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors">
           <ArrowLeft className="w-4 h-4" /> Suas vitrines
         </Link>
         <div className="flex items-center gap-2">
@@ -429,14 +431,14 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
             <button
               onClick={publishVitrine}
               disabled={togglingStatus}
-              className="h-8 px-4 text-xs font-semibold rounded-lg bg-[#6C63FF] hover:bg-[#5851E0] text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="h-8 px-4 text-xs font-semibold rounded-lg bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
               {togglingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Publicar"}
             </button>
           )}
           {publicUrl && live.status === "published" && (
             <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] transition-colors">
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors">
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
           )}
@@ -444,10 +446,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       </div>
 
       {/* ── Split body ─────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex overflow-hidden">
-
-        {/* LEFT: Edit panel */}
-        <div className="w-[360px] shrink-0 border-r border-black/[0.08] overflow-y-auto bg-[#F6F6FB] p-5 space-y-5">
+      <SplitEditorLayout
+        editPanelClassName="border-r border-[var(--cr-border)] bg-[var(--cr-background)] p-5 space-y-5"
+        editPanel={
+        <>
 
           {/* Vitrine info */}
           <div className="flex items-center gap-3">
@@ -627,10 +629,9 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               )}
             </div>
           )}
-        </div>
-
-        {/* RIGHT: Preview panel */}
-        <div className="flex-1 overflow-y-auto">
+        </>
+        }
+        previewPanel={
           <VitrinePreview live={live} onReorder={async (newProducts) => {
             setLive(prev => prev ? { ...prev, products: newProducts } : prev);
             await fetch(`/api/lives/${id}/products/reorder`, {
@@ -639,41 +640,38 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               body: JSON.stringify({ order: newProducts.map(p => p.id) }),
             });
           }} />
-        </div>
-      </div>
+        }
+      />
 
       {/* ── Publish success modal ──────────────────────────────────────────── */}
-      {showPublishSuccess && publicUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowPublishSuccess(false)} />
-          <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <div className="flex flex-col items-center text-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#16162B] text-lg">Vitrine publicada!</h3>
-                <p className="text-sm text-[#4B4768] mt-1">Sua vitrine já está disponível para suas seguidoras.</p>
-              </div>
-            </div>
-            <div onClick={() => copyPublicLink(publicUrl)}
-              className="flex items-center gap-2 bg-[#F1F0F7] border border-black/[0.12] hover:border-[#6C63FF]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5">
-              <span className="flex-1 text-xs text-[#4B4768] truncate">{publicUrl}</span>
-              {copiedLink ? <Check className="w-4 h-4 text-emerald-600 shrink-0" /> : <Copy className="w-4 h-4 text-[#716C8C] group-hover:text-[#16162B] shrink-0 transition-colors" />}
-            </div>
-            <div className="flex gap-3">
-              <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
-                Minha vitrine
-              </a>
-              <button onClick={() => setShowPublishSuccess(false)}
-                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-xl hover:border-black/[0.20] transition-colors">
-                Fechar
-              </button>
-            </div>
+      <Modal open={!!(showPublishSuccess && publicUrl)} onClose={() => setShowPublishSuccess(false)} maxWidth="max-w-sm">
+        <div className="flex flex-col items-center text-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-[var(--cr-text-primary)] text-lg">Vitrine publicada!</h3>
+            <p className="text-sm text-[var(--cr-text-secondary)] mt-1">Sua vitrine já está disponível para suas seguidoras.</p>
           </div>
         </div>
-      )}
+        {publicUrl && (
+          <div onClick={() => copyPublicLink(publicUrl)}
+            className="flex items-center gap-2 bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] hover:border-[var(--cr-brand-600)]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5">
+            <span className="flex-1 text-xs text-[var(--cr-text-secondary)] truncate">{publicUrl}</span>
+            {copiedLink ? <Check className="w-4 h-4 text-emerald-600 shrink-0" /> : <Copy className="w-4 h-4 text-[var(--cr-text-tertiary)] group-hover:text-[var(--cr-text-primary)] shrink-0 transition-colors" />}
+          </div>
+        )}
+        <div className="flex gap-3">
+          <a href={publicUrl ?? "#"} target="_blank" rel="noopener noreferrer"
+            className="flex-1 h-10 bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
+            Minha vitrine
+          </a>
+          <button onClick={() => setShowPublishSuccess(false)}
+            className="flex-1 h-10 bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-sm font-medium rounded-xl hover:border-[var(--cr-brand-300)] transition-colors">
+            Fechar
+          </button>
+        </div>
+      </Modal>
 
       {/* ── Edit vitrine modal ─────────────────────────────────────────────── */}
       {showEditModal && (
@@ -765,15 +763,7 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-semibold text-[#16162B]">Editar dados da vitrine</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Modal open onClose={onClose} title="Editar dados da vitrine" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Título</label>
@@ -824,7 +814,7 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
           {discount.trim() && (
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[#4B4768]">Como o desconto é aplicado</label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setDiscountType("cart")}
@@ -872,7 +862,7 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
             </button>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[#4B4768]">Data</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
@@ -914,8 +904,7 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -973,19 +962,17 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
+    <Modal open onClose={onClose} bodyClassName="">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-black/[0.08]">
-          <h3 className="font-semibold text-[#16162B]">Editar produto</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--cr-border)]">
+          <h3 className="font-semibold text-[var(--cr-text-primary)]">Editar produto</h3>
+          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-soft)] transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Product image + link */}
-        <div className="px-6 py-4 border-b border-black/[0.08] flex items-center gap-3">
+        <div className="px-6 py-4 border-b border-[var(--cr-border)] flex items-center gap-3">
           <label className="relative w-14 h-14 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0 cursor-pointer group">
             <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
             {imageUrl
@@ -1013,7 +1000,7 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Vestido Floral Verão"
               className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[#4B4768]">Preço</label>
               <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="R$ 89,90"
@@ -1045,7 +1032,6 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

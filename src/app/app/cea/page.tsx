@@ -180,7 +180,7 @@ export default function MinhaCeaPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs text-[#716C8C]">utm_source</label>
                   <input type="text" value={source} onChange={e => { setSource(e.target.value); setGeneratedUrl(null); }} placeholder="instagram"

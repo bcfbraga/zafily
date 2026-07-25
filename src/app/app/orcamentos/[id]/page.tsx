@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, use } from "react";
 import Link from "next/link";
 import {
-  ArrowLeft, Loader2, X, Upload, Package, CheckCircle2, FileText,
+  ArrowLeft, Loader2, Upload, Package, CheckCircle2, FileText,
   ExternalLink, Copy, Check, Download, Pencil, Eye, EyeOff,
   Minus, Plus, GripVertical, Trash2, PlusCircle
 } from "lucide-react";
@@ -11,6 +11,8 @@ import { ProposalView, HOURS_ITEM, formatDateBR, type ProposalProfile } from "@/
 import { SCOPE_DEFAULT_NOTES } from "@/lib/scope-defaults";
 import { CurrencyInput } from "@/components/zafily/CurrencyInput";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
+import { SplitEditorLayout } from "@/components/zafily/SplitEditorLayout";
+import { Modal } from "@/components/zafily/Modal";
 import type { AccountStatus } from "@/lib/lives-store";
 
 const SCOPE_PRESETS: { key: string; hint?: string; defaultNotes?: string }[] = [
@@ -317,7 +319,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="h-screen bg-[#F6F6FB] flex items-center justify-center">
+      <div className="h-dvh bg-[#F6F6FB] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-[#6C63FF] animate-spin" />
       </div>
     );
@@ -325,7 +327,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
   if (!budget) {
     return (
-      <div className="h-screen bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
+      <div className="h-dvh bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
         Proposta não encontrada.
       </div>
     );
@@ -338,10 +340,10 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
   const inactivePresets = SCOPE_PRESETS.filter(p => !activeDescriptions.has(p.key));
 
   return (
-    <div className="h-screen flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
+    <div className="h-dvh flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
       {/* Header */}
-      <div className="h-14 shrink-0 border-b border-black/[0.08] bg-[#F6F6FB] flex items-center justify-between px-5 z-10">
-        <Link href="/app/orcamentos" className="flex items-center gap-1.5 text-sm text-[#4B4768] hover:text-[#16162B] transition-colors">
+      <div className="h-14 shrink-0 border-b border-[var(--cr-border)] bg-[var(--cr-background)] flex items-center justify-between px-5 z-10">
+        <Link href="/app/orcamentos" className="flex items-center gap-1.5 text-sm text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors">
           <ArrowLeft className="w-4 h-4" /> Suas propostas
         </Link>
         <div className="flex items-center gap-2">
@@ -350,7 +352,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
             <button
               onClick={publishBudget}
               disabled={togglingStatus}
-              className="h-8 px-4 text-xs font-semibold rounded-lg bg-[#6C63FF] hover:bg-[#5851E0] text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              className="h-8 px-4 text-xs font-semibold rounded-lg bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white transition-colors disabled:opacity-50 flex items-center gap-1.5"
             >
               {togglingStatus ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Publicar"}
             </button>
@@ -359,11 +361,11 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
             <>
               <a href={`/api/budgets/${id}/pdf`} download
                 title="Baixar PDF"
-                className="h-8 px-3 flex items-center gap-1.5 rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] transition-colors text-xs font-medium">
+                className="h-8 px-3 flex items-center gap-1.5 rounded-lg bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors text-xs font-medium">
                 <Download className="w-3.5 h-3.5" /> PDF
               </a>
               <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] transition-colors">
+                className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors">
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             </>
@@ -372,9 +374,10 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
       </div>
 
       {/* Split body */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* LEFT: Edit panel */}
-        <div className="w-[360px] shrink-0 border-r border-black/[0.08] overflow-y-auto bg-[#F6F6FB] p-5 space-y-5">
+      <SplitEditorLayout
+        editPanelClassName="border-r border-[var(--cr-border)] bg-[var(--cr-background)] p-5 space-y-5"
+        editPanel={
+        <>
 
           {/* Budget info */}
           <div className="relative rounded-xl border border-black/[0.08] bg-white p-3 space-y-3">
@@ -534,50 +537,46 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
               </button>
             </div>
           </div>
-        </div>
-
-        {/* RIGHT: Preview panel */}
-        <div className="flex-1 overflow-y-auto">
+        </>
+        }
+        previewPanel={
           <BudgetPreview budget={budget} profile={profile} />
-        </div>
-      </div>
+        }
+      />
 
       {/* Publish success modal */}
-      {showPublishSuccess && publicUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowPublishSuccess(false)} />
-          <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <div className="flex flex-col items-center text-center gap-3 mb-5">
-              <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-[#16162B] text-lg">Proposta publicada!</h3>
-                <p className="text-sm text-[#4B4768] mt-1">Envie o link abaixo para o seu cliente.</p>
-              </div>
-            </div>
-            <div onClick={() => copyPublicLink(publicUrl)}
-              className="flex items-center gap-2 bg-[#F1F0F7] border border-black/[0.12] hover:border-[#6C63FF]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5">
-              <span className="flex-1 text-xs text-[#4B4768] truncate">{publicUrl}</span>
-              {copiedLink ? <Check className="w-4 h-4 text-emerald-600 shrink-0" /> : <Copy className="w-4 h-4 text-[#716C8C] group-hover:text-[#16162B] shrink-0 transition-colors" />}
-            </div>
-            <div className="flex gap-3 mb-3">
-              <a href={publicUrl} target="_blank" rel="noopener noreferrer"
-                className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
-                Ver proposta
-              </a>
-              <a href={`/api/budgets/${id}/pdf`} download
-                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
-                <Download className="w-3.5 h-3.5" /> Baixar PDF
-              </a>
-            </div>
-            <button onClick={() => setShowPublishSuccess(false)}
-              className="w-full h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-xl hover:border-black/[0.20] transition-colors">
-              Fechar
-            </button>
+      <Modal open={!!(showPublishSuccess && publicUrl)} onClose={() => setShowPublishSuccess(false)} maxWidth="max-w-sm">
+        <div className="flex flex-col items-center text-center gap-3 mb-5">
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-[var(--cr-text-primary)] text-lg">Proposta publicada!</h3>
+            <p className="text-sm text-[var(--cr-text-secondary)] mt-1">Envie o link abaixo para o seu cliente.</p>
           </div>
         </div>
-      )}
+        {publicUrl && (
+          <div onClick={() => copyPublicLink(publicUrl)}
+            className="flex items-center gap-2 bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] hover:border-[var(--cr-brand-600)]/40 rounded-xl px-4 py-3 cursor-pointer group transition-colors mb-5">
+            <span className="flex-1 text-xs text-[var(--cr-text-secondary)] truncate">{publicUrl}</span>
+            {copiedLink ? <Check className="w-4 h-4 text-emerald-600 shrink-0" /> : <Copy className="w-4 h-4 text-[var(--cr-text-tertiary)] group-hover:text-[var(--cr-text-primary)] shrink-0 transition-colors" />}
+          </div>
+        )}
+        <div className="flex gap-3 mb-3">
+          <a href={publicUrl ?? "#"} target="_blank" rel="noopener noreferrer"
+            className="flex-1 h-10 bg-[var(--cr-brand-600)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-xl flex items-center justify-center transition-colors">
+            Ver proposta
+          </a>
+          <a href={`/api/budgets/${id}/pdf`} download
+            className="flex-1 h-10 bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] text-sm font-semibold rounded-xl flex items-center justify-center gap-1.5 transition-colors">
+            <Download className="w-3.5 h-3.5" /> Baixar PDF
+          </a>
+        </div>
+        <button onClick={() => setShowPublishSuccess(false)}
+          className="w-full h-10 bg-[var(--cr-surface-soft)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-sm font-medium rounded-xl hover:border-[var(--cr-brand-300)] transition-colors">
+          Fechar
+        </button>
+      </Modal>
 
       {/* Edit budget modal */}
       {showEditModal && (
@@ -676,15 +675,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-semibold text-[#16162B]">Editar dados da proposta</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Modal open onClose={onClose} title="Editar dados da proposta" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Título interno</label>
@@ -692,7 +683,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
               className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[#4B4768]">Nome do cliente</label>
               <input type="text" value={clientName} onChange={e => setClientName(e.target.value)}
@@ -705,7 +696,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-[#4B4768]">Valor do investimento</label>
               <div className="relative">
@@ -753,8 +744,7 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -798,15 +788,7 @@ function ValueModal({ budget, budgetId, onClose, onSave }: ValueModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-semibold text-[#16162B]">Valor Gerado</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Modal open onClose={onClose} title="Valor Gerado" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Introdução <span className="text-[#716C8C] font-normal">(opcional)</span></label>
@@ -843,8 +825,7 @@ function ValueModal({ budget, budgetId, onClose, onSave }: ValueModalProps) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -876,15 +857,7 @@ function ConditionsModal({ budget, budgetId, onClose, onSave }: ConditionsModalP
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="font-semibold text-[#16162B]">Condições</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[#4B4768] hover:text-[#16162B] hover:bg-[#F1F0F7] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+    <Modal open onClose={onClose} title="Condições" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[#4B4768]">Uma condição por linha</label>
@@ -906,7 +879,6 @@ function ConditionsModal({ budget, budgetId, onClose, onSave }: ConditionsModalP
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </Modal>
   );
 }

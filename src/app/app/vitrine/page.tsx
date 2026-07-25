@@ -13,6 +13,7 @@ import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
 import { VitrinePreviewFrame } from "@/components/zafily/VitrinePreviewFrame";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
+import { Modal } from "@/components/zafily/Modal";
 import type { DesignSettings } from "@/lib/design-presets";
 import type { AccountStatus } from "@/lib/lives-store";
 
@@ -323,7 +324,7 @@ export default function VitrinePage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
+    <div className="h-dvh flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
       <Topbar title="Minha Vitrine" action={
         <div className="flex items-center gap-2">
           <button
@@ -405,32 +406,27 @@ export default function VitrinePage() {
       </div>
 
       {/* Confirm delete dialog */}
-      {confirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmId(null)} />
-          <div className="relative bg-white border border-[var(--cr-border)] rounded-2xl p-6 w-full max-w-sm shadow-[var(--cr-shadow-floating)]">
-            <h3 className="font-semibold text-[var(--cr-text-primary)] mb-2">Excluir vitrine?</h3>
-            <p className="text-sm text-[var(--cr-text-secondary)] mb-5">
-              Esta ação remove a vitrine e todos os produtos vinculados permanentemente. Não poderá ser desfeito.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => deleteLive(confirmId)}
-                disabled={deletingId === confirmId}
-                className="flex-1 h-10 bg-[var(--cr-danger)] hover:bg-[#b8404b] disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
-              >
-                {deletingId === confirmId ? "Excluindo..." : "Sim, excluir"}
-              </button>
-              <button
-                onClick={() => setConfirmId(null)}
-                className="flex-1 h-10 bg-[var(--cr-surface)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-sm font-medium rounded-lg hover:border-[var(--cr-border-strong)] transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
+      <Modal open={!!confirmId} onClose={() => setConfirmId(null)} maxWidth="max-w-sm">
+        <h3 className="font-semibold text-[var(--cr-text-primary)] mb-2">Excluir vitrine?</h3>
+        <p className="text-sm text-[var(--cr-text-secondary)] mb-5">
+          Esta ação remove a vitrine e todos os produtos vinculados permanentemente. Não poderá ser desfeito.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => confirmId && deleteLive(confirmId)}
+            disabled={deletingId === confirmId}
+            className="flex-1 h-10 bg-[var(--cr-danger)] hover:bg-[#b8404b] disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+          >
+            {deletingId === confirmId ? "Excluindo..." : "Sim, excluir"}
+          </button>
+          <button
+            onClick={() => setConfirmId(null)}
+            className="flex-1 h-10 bg-[var(--cr-surface)] border border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-sm font-medium rounded-lg hover:border-[var(--cr-border-strong)] transition-colors"
+          >
+            Cancelar
+          </button>
         </div>
-      )}
+      </Modal>
 
       {managingSections && (
         <ManageSectionsModal
@@ -541,16 +537,7 @@ function ProfileEditModal({ profile, onClose, onSaved }: {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-[var(--cr-border)] rounded-2xl p-6 w-full max-w-md shadow-[var(--cr-shadow-floating)]">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="font-semibold text-[var(--cr-text-primary)]">Editar perfil</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
+    <Modal open onClose={onClose} title="Editar perfil">
         <label className="block text-xs font-semibold text-[var(--cr-text-secondary)] mb-1.5">Bio</label>
         <textarea
           value={bio}
@@ -600,8 +587,7 @@ function ProfileEditModal({ profile, onClose, onSaved }: {
         >
           {saving ? "Salvando..." : "Salvar"}
         </button>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -687,16 +673,7 @@ function ManageSectionsModal({ sections, onClose, onChange }: {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white border border-[var(--cr-border)] rounded-2xl p-6 w-full max-w-md shadow-[var(--cr-shadow-floating)]">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="font-semibold text-[var(--cr-text-primary)]">Seções da galeria</h3>
-          <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)] transition-colors">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
+    <Modal open onClose={onClose} title="Seções da galeria">
         <div className="space-y-2 max-h-72 overflow-y-auto mb-4">
           {local.length === 0 && (
             <p className="text-sm text-[var(--cr-text-tertiary)] text-center py-6">Nenhuma seção criada ainda.</p>
@@ -761,7 +738,6 @@ function ManageSectionsModal({ sections, onClose, onChange }: {
             Criar
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

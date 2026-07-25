@@ -80,7 +80,7 @@ export default function NovoOrcamentoPage() {
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-[#4B4768]">Escopo</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {SCOPE_OPTIONS.map(option => {
                 const checked = scopeItems.includes(option);
                 return (

@@ -7,6 +7,7 @@ import {
   Plus, Trash2, Receipt, CheckCircle2, FileText, ExternalLink
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
+import { Modal } from "@/components/zafily/Modal";
 
 interface Budget {
   id: string;
@@ -171,32 +172,27 @@ export default function OrcamentosPage() {
       </div>
 
       {/* Confirm delete dialog */}
-      {confirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setConfirmId(null)} />
-          <div className="relative bg-white border border-black/[0.12] rounded-2xl p-6 w-full max-w-sm shadow-2xl">
-            <h3 className="font-semibold text-[#16162B] mb-2">Excluir proposta?</h3>
-            <p className="text-sm text-[#4B4768] mb-5">
-              Esta ação remove a proposta e todos os itens vinculados permanentemente. Não poderá ser desfeito.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => deleteBudget(confirmId)}
-                disabled={deletingId === confirmId}
-                className="flex-1 h-10 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
-              >
-                {deletingId === confirmId ? "Excluindo..." : "Sim, excluir"}
-              </button>
-              <button
-                onClick={() => setConfirmId(null)}
-                className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-lg hover:border-black/[0.20] transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
+      <Modal open={!!confirmId} onClose={() => setConfirmId(null)} maxWidth="max-w-sm">
+        <h3 className="font-semibold text-[#16162B] mb-2">Excluir proposta?</h3>
+        <p className="text-sm text-[#4B4768] mb-5">
+          Esta ação remove a proposta e todos os itens vinculados permanentemente. Não poderá ser desfeito.
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={() => confirmId && deleteBudget(confirmId)}
+            disabled={deletingId === confirmId}
+            className="flex-1 h-10 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition-colors"
+          >
+            {deletingId === confirmId ? "Excluindo..." : "Sim, excluir"}
+          </button>
+          <button
+            onClick={() => setConfirmId(null)}
+            className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-lg hover:border-black/[0.20] transition-colors"
+          >
+            Cancelar
+          </button>
         </div>
-      )}
+      </Modal>
     </div>
   );
 }

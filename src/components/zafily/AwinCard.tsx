@@ -136,7 +136,7 @@ export function AwinCard() {
 
         {/* Connected info */}
         {isConnected && connected && (
-          <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
             <InfoRow label="Publisher ID" value={connected.publisherId} />
             <InfoRow label="Advertiser" value="C&A BR (#17648)" />
             <InfoRow label="Conectada em" value={formatDate(connected.connectedAt)} />

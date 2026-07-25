@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { X, ExternalLink, Lock, Loader2, AlertCircle } from "lucide-react";
+import { Modal } from "./Modal";
 
 interface Props {
   onClose: () => void;
@@ -42,15 +43,7 @@ export function AwinConnectModal({ onClose, onSuccess }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[rgba(0,0,0,0.60)] backdrop-blur-sm"
-        onClick={onClose}
-      />
-
-      {/* Modal */}
-      <div className="relative w-full max-w-[480px] bg-white border border-black/[0.12] rounded-[24px] shadow-[0_24px_80px_rgba(23,23,60,0.16)] p-7">
+    <Modal open onClose={onClose} maxWidth="max-w-[480px]" radiusClassName="rounded-[24px]">
         {/* Header */}
         <div className="flex items-start justify-between mb-6">
           <div>
@@ -155,7 +148,6 @@ export function AwinConnectModal({ onClose, onSuccess }: Props) {
           <Lock className="w-3 h-3 shrink-0" />
           Seu token é criptografado antes de ser salvo e nunca fica visível após a conexão.
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

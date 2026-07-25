@@ -7,20 +7,14 @@ import { cn } from "@/lib/utils";
 import { ZafilyLogo } from "./Logo";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
+import { navItems } from "@/lib/nav-items";
 import {
-  ShoppingBag,
   Settings,
   ChevronRight,
   LogOut,
-  Receipt,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-
-const navItems = [
-  { label: "Minha Vitrine", href: "/app/vitrine", icon: ShoppingBag },
-  { label: "Propostas",     href: "/app/orcamentos", icon: Receipt },
-];
 
 const COLLAPSED_KEY = "zafily_sidebar_collapsed";
 
@@ -65,7 +59,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "shrink-0 h-screen bg-white border-r border-black/[0.08] flex flex-col transition-[width] duration-200 overflow-hidden",
+        "hidden lg:flex shrink-0 h-dvh bg-white border-r border-black/[0.08] flex-col transition-[width] duration-200 overflow-hidden",
         collapsed ? "w-[60px]" : "w-[260px]"
       )}
     >

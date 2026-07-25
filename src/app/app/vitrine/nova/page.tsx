@@ -94,7 +94,7 @@ export default function NovaLivePage() {
           {/* Type */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Tipo de vitrine</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setType("vitrine")}
@@ -163,7 +163,7 @@ export default function NovaLivePage() {
 
           {/* Date + Time (live only) */}
           {type === "live" && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Data da vitrine</label>
                 <input
