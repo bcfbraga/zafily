@@ -324,7 +324,7 @@ export default function VitrinePage() {
   }
 
   return (
-    <div className="h-dvh flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
+    <div className="h-full flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
       <Topbar title="Minha Vitrine" action={
         <div className="flex items-center gap-2">
           <button

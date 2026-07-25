@@ -319,7 +319,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="h-dvh bg-[#F6F6FB] flex items-center justify-center">
+      <div className="h-full bg-[#F6F6FB] flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-[#6C63FF] animate-spin" />
       </div>
     );
@@ -327,7 +327,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
   if (!budget) {
     return (
-      <div className="h-dvh bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
+      <div className="h-full bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
         Proposta não encontrada.
       </div>
     );
@@ -340,7 +340,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
   const inactivePresets = SCOPE_PRESETS.filter(p => !activeDescriptions.has(p.key));
 
   return (
-    <div className="h-dvh flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
+    <div className="h-full flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
       {/* Header */}
       <div className="h-14 shrink-0 border-b border-[var(--cr-border)] bg-[var(--cr-background)] flex items-center justify-between px-5 z-10">
         <Link href="/app/orcamentos" className="flex items-center gap-1.5 text-sm text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors">

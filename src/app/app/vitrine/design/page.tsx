@@ -216,7 +216,7 @@ export default function DesignPage() {
 
   if (!profile) {
     return (
-      <div className="h-dvh flex flex-col bg-[#F6F6FB]">
+      <div className="h-full flex flex-col bg-[#F6F6FB]">
         <Topbar title="Design" />
         <VitrineTabs />
       </div>
@@ -226,7 +226,7 @@ export default function DesignPage() {
   const s = profile.designSettings;
 
   return (
-    <div className="h-dvh flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
+    <div className="h-full flex flex-col bg-[#F6F6FB] text-[#16162B] overflow-hidden">
       <Topbar title="Design" />
       <VitrineTabs />
 
