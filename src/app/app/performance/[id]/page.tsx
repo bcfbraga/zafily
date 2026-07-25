@@ -7,6 +7,7 @@ import {
   Package, Trophy, Table2,
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
+import { PullToRefresh } from "@/components/zafily/PullToRefresh";
 
 interface ProductStat {
   id: string;
@@ -261,6 +262,22 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
+  function loadData() {
+    return Promise.all([
+      fetch(`/api/lives/${id}/performance`).then(r => {
+        if (!r.ok) throw new Error("not found");
+        return r.json();
+      }),
+      fetch("/api/profile").then(r => r.json()),
+    ])
+      .then(([perfData, profileData]) => {
+        setData(perfData);
+        setProfile(profileData ?? null);
+      })
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
+  }
+
   useEffect(() => {
     Promise.all([
       fetch(`/api/lives/${id}/performance`).then(r => {
@@ -296,7 +313,7 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
           </Link>
         }
       />
-      <main className="flex-1 overflow-y-auto scrollbar-hidden px-8 py-7">
+      <PullToRefresh onRefresh={loadData} className="flex-1 scrollbar-hidden px-8 py-7">
         <div className="max-w-[900px] mx-auto">
           {loading ? (
             <div className="space-y-6">
@@ -401,7 +418,7 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
             </div>
           )}
         </div>
-      </main>
+      </PullToRefresh>
     </>
   );
 }

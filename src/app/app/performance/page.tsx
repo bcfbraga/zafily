@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { BarChart2, Eye, MousePointerClick, Percent, ExternalLink, Package, ChevronRight } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
+import { PullToRefresh } from "@/components/zafily/PullToRefresh";
 
 interface Live {
   id: string;
@@ -44,6 +45,17 @@ export default function PerformancePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  function loadData() {
+    return Promise.all([
+      fetch("/api/lives").then(r => r.json()),
+      fetch("/api/profile").then(r => r.json()),
+    ]).then(([livesData, profileData]) => {
+      setLives(Array.isArray(livesData) ? livesData : []);
+      setProfile(profileData ?? null);
+      setLoading(false);
+    });
+  }
+
   useEffect(() => {
     Promise.all([
       fetch("/api/lives").then(r => r.json()),
@@ -67,7 +79,7 @@ export default function PerformancePage() {
   return (
     <>
       <Topbar title="Performance" description="Acompanhe visualizações e cliques das suas vitrines" />
-      <main className="flex-1 overflow-y-auto scrollbar-hidden px-8 py-7">
+      <PullToRefresh onRefresh={loadData} className="flex-1 scrollbar-hidden px-8 py-7">
         <div className="max-w-[900px] mx-auto">
           {loading ? (
             <div className="space-y-6">
@@ -167,7 +179,7 @@ export default function PerformancePage() {
             </div>
           )}
         </div>
-      </main>
+      </PullToRefresh>
     </>
   );
 }

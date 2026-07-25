@@ -14,6 +14,7 @@ import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
 import { VitrinePreviewFrame } from "@/components/zafily/VitrinePreviewFrame";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
 import { Modal } from "@/components/zafily/Modal";
+import { PullToRefresh } from "@/components/zafily/PullToRefresh";
 import type { DesignSettings } from "@/lib/design-presets";
 import type { AccountStatus } from "@/lib/lives-store";
 
@@ -151,6 +152,19 @@ export default function VitrinePage() {
   const [dragLiveId, setDragLiveId] = useState<string | null>(null);
   const [overLiveId, setOverLiveId] = useState<string | null>(null);
   const [showActivationModal, setShowActivationModal] = useState(false);
+
+  function loadData() {
+    return Promise.all([
+      fetch("/api/lives").then(r => r.json()),
+      fetch("/api/profile").then(r => r.json()),
+      fetch("/api/vitrine-sections").then(r => r.json()),
+    ]).then(([livesData, profileData, sectionsData]) => {
+      setLives(Array.isArray(livesData) ? livesData : []);
+      setProfile(profileData);
+      setSections(Array.isArray(sectionsData) ? sectionsData : []);
+      setLoading(false);
+    });
+  }
 
   useEffect(() => {
     Promise.all([
@@ -354,7 +368,7 @@ export default function VitrinePage() {
       <VitrineTabs />
 
       <div className="flex-1 flex overflow-hidden">
-        <div className="flex-1 overflow-y-auto px-8 py-8">
+        <PullToRefresh onRefresh={loadData} className="flex-1 px-8 py-8">
           <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
 
           <div className="flex items-start justify-center gap-10 mb-8 py-2">
@@ -398,7 +412,7 @@ export default function VitrinePage() {
               )}
             </div>
           )}
-        </div>
+        </PullToRefresh>
 
         <div className="hidden lg:flex w-[360px] shrink-0 border-l border-[var(--cr-border)] items-center justify-center p-6 bg-[var(--cr-background)] overflow-y-auto">
           <VitrinePreviewFrame profile={profile} sections={sections} lives={lives} />
