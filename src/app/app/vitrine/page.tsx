@@ -123,20 +123,29 @@ function ThumbRow({ thumbnails, productCount }: { thumbnails?: string[]; product
   const imgs = (thumbnails ?? []).slice(0, 4);
   if (imgs.length === 0) {
     return (
-      <div className="w-20 h-20 rounded-xl bg-[var(--cr-brand-100)] flex items-center justify-center shrink-0">
-        <Package className="w-6 h-6 text-[var(--cr-text-tertiary)]" />
+      <div className="w-9 h-9 rounded-full bg-[var(--cr-brand-100)] flex items-center justify-center shrink-0">
+        <Package className="w-4 h-4 text-[var(--cr-text-tertiary)]" />
       </div>
     );
   }
   const remaining = (productCount ?? imgs.length) - imgs.length;
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center -space-x-2">
       {imgs.map((url, i) => (
         // eslint-disable-next-line @next/next/no-img-element
-        <img key={i} src={url} alt="" className="w-20 h-20 rounded-xl object-cover bg-[var(--cr-brand-100)] shrink-0" />
+        <img
+          key={i}
+          src={url}
+          alt=""
+          className="w-9 h-9 rounded-full object-cover bg-[var(--cr-brand-100)] border-2 border-white shrink-0"
+          style={{ zIndex: imgs.length - i }}
+        />
       ))}
       {remaining > 0 && (
-        <div className="w-20 h-20 rounded-xl bg-[var(--cr-brand-100)] flex items-center justify-center text-sm font-semibold text-[var(--cr-text-secondary)] shrink-0">
+        <div
+          className="w-9 h-9 rounded-full bg-[var(--cr-brand-100)] border-2 border-white flex items-center justify-center text-[10px] font-semibold text-[var(--cr-text-secondary)] shrink-0"
+          style={{ zIndex: 0 }}
+        >
           +{remaining}
         </div>
       )}
@@ -274,7 +283,7 @@ export default function VitrinePage() {
         onDrop={handleDropLive}
         onDragEnd={() => { setDragLiveId(null); setOverLiveId(null); }}
         onClick={() => router.push(`/app/vitrine/${live.id}`)}
-        className={`group flex items-start gap-3 bg-white border rounded-2xl p-4 transition-colors cursor-pointer ${
+        className={`group relative flex items-start bg-white border rounded-2xl p-4 transition-colors cursor-pointer ${
           overLiveId === live.id && dragLiveId !== live.id
             ? "border-[var(--cr-brand-600)]"
             : dragLiveId === live.id
@@ -282,7 +291,7 @@ export default function VitrinePage() {
               : "border-[var(--cr-border)] hover:border-[var(--cr-border-strong)] hover:bg-[var(--cr-background)]"
         }`}
       >
-        <GripVertical className="w-4 h-4 mt-1 text-[var(--cr-text-tertiary)] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
+        <GripVertical className="absolute left-1.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cr-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
 
         <div className="flex-1 min-w-0">
           <ThumbRow thumbnails={live.thumbnails} productCount={live.productCount} />
