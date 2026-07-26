@@ -11,7 +11,6 @@ import {
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
-import { VitrinePreviewFrame } from "@/components/zafily/VitrinePreviewFrame";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
 import { Modal } from "@/components/zafily/Modal";
 import { PullToRefresh } from "@/components/zafily/PullToRefresh";
@@ -443,14 +442,6 @@ export default function VitrinePage() {
             </>
           )}
         </PullToRefresh>
-
-        <div className="hidden lg:flex w-[360px] shrink-0 border-l border-[var(--cr-border)] items-center justify-center p-6 bg-[var(--cr-background)] overflow-y-auto">
-          {loading ? (
-            <div className="w-[300px] h-[620px] rounded-[32px] border border-[var(--cr-border)] bg-white animate-pulse" />
-          ) : (
-            <VitrinePreviewFrame profile={profile} sections={sections} lives={lives} />
-          )}
-        </div>
       </div>
 
       {/* Confirm delete dialog */}
@@ -521,27 +512,6 @@ function ProfileHeader({ profile, onEdit }: { profile: Profile | null; onEdit: (
         >
           {profile?.bio || "Adicionar bio"}
         </button>
-        <div className="flex items-center gap-2 mt-2">
-          {(profile?.socialLinks ?? []).map((s, i) => (
-            <a
-              key={i}
-              href={s.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              className="w-8 h-8 flex items-center justify-center rounded-full bg-[var(--cr-brand-100)] text-[var(--cr-text-secondary)] hover:bg-[var(--cr-brand-200)] transition-colors"
-            >
-              <SocialIcon platform={s.platform} className="w-4 h-4" />
-            </a>
-          ))}
-          <button
-            onClick={onEdit}
-            title="Adicionar rede social"
-            className="w-8 h-8 flex items-center justify-center rounded-full border border-dashed border-[var(--cr-border-strong)] text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:border-[var(--cr-brand-300)] transition-colors"
-          >
-            <Plus className="w-3.5 h-3.5" />
-          </button>
-        </div>
       </div>
     </div>
   );
