@@ -65,6 +65,40 @@ function shortCat(cat: string | null) {
   return parts[parts.length - 1] ?? null;
 }
 
+// ── Product paste parsing ──────────────────────────────────────────────────
+// Clients often send "nome do produto-M" on one line followed by the link on
+// the next (e.g. "jaqueta jeans gola alta azul-P"). Pick up the trailing size
+// off the label line so it doesn't have to be typed in again by hand.
+const SIZE_SUFFIX = /-\s*(PP|P|M|G|GG|GGG|XG|EG|EXG|U|\d{2,3})\s*$/i;
+
+function isValidUrl(text: string): boolean {
+  try {
+    const u = new URL(text);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function parseProductInput(text: string): { url: string; size: string | null }[] {
+  const items: { url: string; size: string | null }[] = [];
+  let labelLine: string | null = null;
+
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+
+    if (isValidUrl(line)) {
+      const match = labelLine?.match(SIZE_SUFFIX);
+      items.push({ url: line, size: match ? match[1].toUpperCase() : null });
+      labelLine = null;
+    } else {
+      labelLine = line;
+    }
+  }
+  return items;
+}
+
 // ── Price helpers ────────────────────────────────────────────────────────────
 function parsePrice(raw: string | null): number | null {
   if (!raw) return null;
@@ -302,18 +336,18 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     });
   }, [id]);
 
-  const urls = urlsText.split("\n").map(l => l.trim()).filter(Boolean);
+  const productItems = parseProductInput(urlsText);
   const productCount = live?.products.length ?? 0;
   const slotsLeft = 40 - productCount;
 
   async function fetchProducts() {
-    if (urls.length === 0) return;
+    if (productItems.length === 0) return;
     setFetching(true);
     setFetchError(null);
     const res = await fetch(`/api/lives/${id}/products`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ urls }),
+      body: JSON.stringify({ items: productItems }),
     });
     const data = await res.json();
     setFetching(false);
@@ -508,17 +542,17 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               <textarea
                 value={urlsText}
                 onChange={e => setUrlsText(e.target.value)}
-                placeholder={"https://www.cea.com.br/produto...\nhttps://www.cea.com.br/produto..."}
+                placeholder={"Nome do produto-M\nhttps://www.cea.com.br/produto...\n\nOutro produto-G\nhttps://www.cea.com.br/produto..."}
                 rows={4}
                 disabled={fetching}
                 className="w-full bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#6C63FF] resize-none transition-all disabled:opacity-50"
               />
-              <p className="text-[10px] text-[#716C8C]">{urls.length} de {slotsLeft} slots disponíveis</p>
+              <p className="text-[10px] text-[#716C8C]">{productItems.length} de {slotsLeft} slots disponíveis · tamanho é lido automaticamente do texto acima do link (ex: &ldquo;Nome-M&rdquo;)</p>
               {fetchError && <p className="text-xs text-red-400">{fetchError}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={fetchProducts}
-                  disabled={fetching || urls.length === 0 || slotsLeft <= 0}
+                  disabled={fetching || productItems.length === 0 || slotsLeft <= 0}
                   className="flex-1 h-9 flex items-center justify-center gap-1.5 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-colors"
                 >
                   {fetching ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Buscando...</> : "Buscar produtos"}

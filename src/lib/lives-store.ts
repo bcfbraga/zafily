@@ -773,7 +773,7 @@ export async function countProducts(liveId: string): Promise<number> {
 
 export async function addProduct(
   liveId: string,
-  data: { url: string; name?: string | null; imageUrl?: string | null; price?: string | null; category?: string | null; productUrl?: string | null; position: number }
+  data: { url: string; name?: string | null; imageUrl?: string | null; price?: string | null; category?: string | null; productUrl?: string | null; size?: string | null; position: number }
 ): Promise<LiveProduct> {
   const db: DB = getSupabase();
   const { data: row } = await db
@@ -786,6 +786,7 @@ export async function addProduct(
       price: data.price ?? null,
       category: data.category ?? null,
       product_url: data.productUrl ?? null,
+      size: data.size ?? null,
       position: data.position,
     })
     .select()

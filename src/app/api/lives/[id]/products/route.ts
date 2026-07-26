@@ -16,18 +16,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const live = await getLive(id, userId);
   if (!live) return NextResponse.json({ error: "Live não encontrada" }, { status: 404 });
 
-  const { urls: rawUrls } = await req.json() as { urls: string[] };
-  if (!Array.isArray(rawUrls) || rawUrls.length === 0) {
+  const { items: rawItems } = await req.json() as { items: { url: string; size?: string | null }[] };
+  if (!Array.isArray(rawItems) || rawItems.length === 0) {
     return NextResponse.json({ error: "Nenhuma URL fornecida" }, { status: 400 });
   }
 
   // Filtra apenas entradas que são URLs válidas (ignora texto livre, espaços, etc.)
-  const urls = rawUrls.filter(u => {
-    try { const p = new URL(u.trim()); return p.protocol === "https:" || p.protocol === "http:"; }
+  const items = rawItems.filter(item => {
+    try { const p = new URL(item.url.trim()); return p.protocol === "https:" || p.protocol === "http:"; }
     catch { return false; }
   });
 
-  if (urls.length === 0) {
+  if (items.length === 0) {
     return NextResponse.json({ error: "Nenhuma URL válida encontrada" }, { status: 400 });
   }
 
@@ -44,21 +44,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }, { status: accountStatus === "active" ? 400 : 403 });
   }
 
-  const toProcess = urls.slice(0, slots);
+  const toProcess = items.slice(0, slots);
   const results = await Promise.all(
-    toProcess.map(async (url, i) => {
-      const meta = await fetchUrlMetadata(url);
+    toProcess.map(async (item, i) => {
+      const meta = await fetchUrlMetadata(item.url);
       return addProduct(id, {
-        url,
+        url: item.url,
         name: meta.name,
         imageUrl: meta.imageUrl,
         price: meta.price,
         category: meta.category,
         productUrl: meta.productUrl,
+        size: item.size ?? null,
         position: current + i,
       });
     })
   );
 
-  return NextResponse.json({ products: results, skipped: urls.length - toProcess.length });
+  return NextResponse.json({ products: results, skipped: items.length - toProcess.length });
 }
