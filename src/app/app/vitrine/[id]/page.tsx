@@ -270,7 +270,7 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
                           </p>
                           {p.size && (
                             <div className="inline-flex w-fit items-center px-2 py-0.5 rounded-full text-[11px] font-bold mb-1.5 bg-violet-100 text-violet-700">
-                              Tam {p.size}
+                              Tamanho {p.size}
                             </div>
                           )}
                           {disc ? (

@@ -376,55 +376,80 @@ export default function VitrinePage() {
 
       <div className="flex-1 flex overflow-hidden">
         <PullToRefresh onRefresh={loadData} className="flex-1 px-8 py-8">
-          <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
-
-          <div className="flex items-start justify-start gap-10 mb-8 py-2">
-            <QuickAction icon={<Plus className="w-5 h-5" />} label="Nova vitrine" onClick={handleNewVitrine} />
-            <QuickAction icon={<BarChart2 className="w-5 h-5" />} label="Performance" href="/app/performance" />
-            <QuickAction icon={<Pencil className="w-5 h-5" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
-            <QuickAction icon={<ExternalLink className="w-5 h-5" />} label="Ver página" href={profile ? `/${profile.username}` : "#"} external />
-            <QuickAction icon={<Layers className="w-5 h-5" />} label="Editar Seções" onClick={() => setManagingSections(true)} />
-          </div>
-
           {loading ? (
-            <div className="space-y-3">
-              {[1, 2].map(i => (
-                <div key={i} className="h-20 rounded-xl bg-white border border-[var(--cr-border)] animate-pulse" />
-              ))}
-            </div>
-          ) : lives.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-600)]/20 flex items-center justify-center">
-                <Globe className="w-6 h-6 text-[var(--cr-brand-600)]" />
+            <div className="space-y-8 animate-pulse">
+              <div className="flex items-start gap-4">
+                <div className="w-16 h-16 rounded-full bg-[var(--cr-brand-100)] shrink-0" />
+                <div className="flex-1 min-w-0 pt-1 space-y-2.5">
+                  <div className="h-4 w-40 rounded-full bg-[var(--cr-border)]" />
+                  <div className="h-3.5 w-56 rounded-full bg-[var(--cr-border)]" />
+                </div>
               </div>
-              <div>
-                <p className="text-[var(--cr-text-primary)] font-semibold text-lg">Nenhuma vitrine ainda</p>
-                <p className="text-[var(--cr-text-secondary)] text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
+              <div className="flex items-start justify-start gap-10 py-2">
+                {[1, 2, 3, 4, 5].map(i => (
+                  <div key={i} className="flex flex-col items-center gap-2 w-20">
+                    <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-100)]" />
+                    <div className="h-2.5 w-12 rounded-full bg-[var(--cr-border)]" />
+                  </div>
+                ))}
+              </div>
+              <div className="space-y-3">
+                {[1, 2].map(i => (
+                  <div key={i} className="h-20 rounded-xl bg-white border border-[var(--cr-border)]" />
+                ))}
               </div>
             </div>
           ) : (
-            <div className="space-y-8">
-              {sectionGroups.filter(g => g.items.length > 0).map(({ section, items }) => (
-                <GroupSection key={section.id} title={section.name} icon={<Layers className="w-4 h-4 text-[var(--cr-brand-600)]" />} count={items.length}>
-                  {items.map(renderCard)}
-                </GroupSection>
-              ))}
-              {uncategorized.length > 0 && (
-                <GroupSection title="Sem seção" count={uncategorized.length}>
-                  {uncategorized.map(renderCard)}
-                </GroupSection>
+            <>
+              <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
+
+              <div className="flex items-start justify-start gap-10 mb-8 py-2">
+                <QuickAction icon={<Plus className="w-5 h-5" />} label="Nova vitrine" onClick={handleNewVitrine} />
+                <QuickAction icon={<BarChart2 className="w-5 h-5" />} label="Performance" href="/app/performance" />
+                <QuickAction icon={<Pencil className="w-5 h-5" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
+                <QuickAction icon={<ExternalLink className="w-5 h-5" />} label="Ver página" href={profile ? `/${profile.username}` : "#"} external />
+                <QuickAction icon={<Layers className="w-5 h-5" />} label="Editar Seções" onClick={() => setManagingSections(true)} />
+              </div>
+
+              {lives.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-600)]/20 flex items-center justify-center">
+                    <Globe className="w-6 h-6 text-[var(--cr-brand-600)]" />
+                  </div>
+                  <div>
+                    <p className="text-[var(--cr-text-primary)] font-semibold text-lg">Nenhuma vitrine ainda</p>
+                    <p className="text-[var(--cr-text-secondary)] text-sm mt-1">Crie sua primeira vitrine e comece a compartilhar produtos.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {sectionGroups.filter(g => g.items.length > 0).map(({ section, items }) => (
+                    <GroupSection key={section.id} title={section.name} icon={<Layers className="w-4 h-4 text-[var(--cr-brand-600)]" />} count={items.length}>
+                      {items.map(renderCard)}
+                    </GroupSection>
+                  ))}
+                  {uncategorized.length > 0 && (
+                    <GroupSection title="Sem seção" count={uncategorized.length}>
+                      {uncategorized.map(renderCard)}
+                    </GroupSection>
+                  )}
+                  {liveShopping.length > 0 && (
+                    <GroupSection title="Lives" icon={<Radio className="w-4 h-4 text-[var(--cr-danger)]" />} count={liveShopping.length}>
+                      {liveShopping.map(renderCard)}
+                    </GroupSection>
+                  )}
+                </div>
               )}
-              {liveShopping.length > 0 && (
-                <GroupSection title="Lives" icon={<Radio className="w-4 h-4 text-[var(--cr-danger)]" />} count={liveShopping.length}>
-                  {liveShopping.map(renderCard)}
-                </GroupSection>
-              )}
-            </div>
+            </>
           )}
         </PullToRefresh>
 
         <div className="hidden lg:flex w-[360px] shrink-0 border-l border-[var(--cr-border)] items-center justify-center p-6 bg-[var(--cr-background)] overflow-y-auto">
-          <VitrinePreviewFrame profile={profile} sections={sections} lives={lives} />
+          {loading ? (
+            <div className="w-[300px] h-[620px] rounded-[32px] border border-[var(--cr-border)] bg-white animate-pulse" />
+          ) : (
+            <VitrinePreviewFrame profile={profile} sections={sections} lives={lives} />
+          )}
         </div>
       </div>
 

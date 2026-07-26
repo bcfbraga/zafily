@@ -368,7 +368,7 @@
   cursor: pointer;
   transition: background var(--cr-transition-fast), color var(--cr-transition-fast), border-color var(--cr-transition-fast);
 }
-.cr-category-filter__item[data-active="true"] { background: var(--cr-brand-600); border-color: var(--cr-brand-600); color: #fff; }
+.cr-category-filter__item[data-active="true"] { background: var(--cr-text-primary); border-color: var(--cr-text-primary); color: #fff; }
 
 .cr-form-input {
   width: 100%;

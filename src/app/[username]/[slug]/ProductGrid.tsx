@@ -103,7 +103,7 @@ export function ProductGrid({ products, discount, discountType, couponCode, show
                     className="inline-flex w-fit items-center px-2 py-0.5 rounded-full text-[11px] font-bold mb-1.5"
                     style={{ background: "var(--cr-brand-100)", color: "var(--cr-brand-700)" }}
                   >
-                    Tam {product.size}
+                    Tamanho {product.size}
                   </div>
                 )}
                 {showPrices && (() => {
