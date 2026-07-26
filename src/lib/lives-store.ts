@@ -18,6 +18,7 @@ export interface Live {
   couponCode: string | null;
   sectionId: string | null;
   showPrices: boolean;
+  showTitle: boolean;
   position: number;
   createdAt: string;
   updatedAt: string;
@@ -362,6 +363,7 @@ function rowToLive(row: Record<string, unknown>, count?: number): Live {
     couponCode: (row.coupon_code as string) ?? null,
     sectionId: (row.section_id as string) ?? null,
     showPrices: (row.show_prices as boolean) ?? true,
+    showTitle: (row.show_title as boolean) ?? true,
     position: (row.position as number) ?? 0,
     createdAt: row.created_at as string,
     updatedAt: row.updated_at as string,
@@ -612,7 +614,7 @@ export async function getPublicLive(username: string, slug: string): Promise<(Li
 
 export async function createLive(
   userId: string,
-  data: { title: string; liveDate?: string; liveTime?: string; imageUrl?: string; store?: string; sectionId?: string | null; discount?: number | null; discountType?: "cart" | "coupon"; couponCode?: string | null; showPrices?: boolean }
+  data: { title: string; liveDate?: string; liveTime?: string; imageUrl?: string; store?: string; sectionId?: string | null; discount?: number | null; discountType?: "cart" | "coupon"; couponCode?: string | null; showPrices?: boolean; showTitle?: boolean }
 ): Promise<Live> {
   const db: DB = getSupabase();
   const base = generateSlug(data.title);
@@ -642,6 +644,7 @@ export async function createLive(
       discount_type: data.discountType ?? "cart",
       coupon_code: data.couponCode ?? null,
       show_prices: data.showPrices ?? true,
+      show_title: data.showTitle ?? true,
       position,
       status: "draft",
     })
@@ -654,7 +657,7 @@ export async function createLive(
 export async function updateLive(
   id: string,
   userId: string,
-  data: { title?: string; liveDate?: string | null; liveTime?: string | null; imageUrl?: string | null; status?: "draft" | "published"; store?: string | null; discount?: number | null; discountType?: "cart" | "coupon"; couponCode?: string | null; sectionId?: string | null; showPrices?: boolean }
+  data: { title?: string; liveDate?: string | null; liveTime?: string | null; imageUrl?: string | null; status?: "draft" | "published"; store?: string | null; discount?: number | null; discountType?: "cart" | "coupon"; couponCode?: string | null; sectionId?: string | null; showPrices?: boolean; showTitle?: boolean }
 ): Promise<Live> {
   const db: DB = getSupabase();
   const { data: row } = await db
@@ -671,6 +674,7 @@ export async function updateLive(
       ...(data.couponCode !== undefined && { coupon_code: data.couponCode }),
       ...(data.sectionId !== undefined && { section_id: data.sectionId }),
       ...(data.showPrices !== undefined && { show_prices: data.showPrices }),
+      ...(data.showTitle !== undefined && { show_title: data.showTitle }),
     })
     .eq("id", id)
     .eq("user_id", userId)

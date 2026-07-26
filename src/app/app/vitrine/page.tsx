@@ -90,7 +90,7 @@ function GroupSection({ title, icon, count, children }: { title: string; icon?: 
   );
 }
 
-function QuickAction({ icon, label, href, onClick }: { icon: React.ReactNode; label: string; href?: string; onClick?: () => void }) {
+function QuickAction({ icon, label, href, external, onClick }: { icon: React.ReactNode; label: string; href?: string; external?: boolean; onClick?: () => void }) {
   const content = (
     <>
       <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-100)] group-hover:bg-[var(--cr-brand-200)] flex items-center justify-center text-[var(--cr-brand-700)] transition-colors">
@@ -99,6 +99,13 @@ function QuickAction({ icon, label, href, onClick }: { icon: React.ReactNode; la
       <span className="text-xs font-medium text-[var(--cr-text-secondary)]">{label}</span>
     </>
   );
+  if (href && external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center gap-2 w-20">
+        {content}
+      </a>
+    );
+  }
   if (href) {
     return (
       <Link href={href} className="group flex flex-col items-center gap-2 w-20">
@@ -371,10 +378,12 @@ export default function VitrinePage() {
         <PullToRefresh onRefresh={loadData} className="flex-1 px-8 py-8">
           <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
 
-          <div className="flex items-start justify-center gap-10 mb-8 py-2">
+          <div className="flex items-start justify-start gap-10 mb-8 py-2">
             <QuickAction icon={<Plus className="w-5 h-5" />} label="Nova vitrine" onClick={handleNewVitrine} />
             <QuickAction icon={<BarChart2 className="w-5 h-5" />} label="Performance" href="/app/performance" />
             <QuickAction icon={<Pencil className="w-5 h-5" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
+            <QuickAction icon={<ExternalLink className="w-5 h-5" />} label="Ver página" href={profile ? `/${profile.username}` : "#"} external />
+            <QuickAction icon={<Layers className="w-5 h-5" />} label="Editar Seções" onClick={() => setManagingSections(true)} />
           </div>
 
           {loading ? (

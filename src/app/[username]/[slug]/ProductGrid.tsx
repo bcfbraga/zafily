@@ -61,7 +61,7 @@ export function ProductGrid({ products, discount, discountType, couponCode, show
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {filtered.map((product, i) => (
+          {filtered.map(product => (
             <a
               key={product.id}
               href={`/api/click/${product.id}`}
@@ -82,13 +82,6 @@ export function ProductGrid({ products, discount, discountType, couponCode, show
                     <Package className="w-8 h-8" style={{ color: "var(--cr-text-tertiary)" }} />
                   </div>
                 )}
-                {/* Number badge */}
-                <div
-                  className="absolute top-2 left-2 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-sm"
-                  style={{ background: "rgba(255,255,255,0.9)", color: "var(--cr-text-secondary)" }}
-                >
-                  {i + 1}
-                </div>
                 {/* Discount badge */}
                 {showPrices && discount && (
                   <div className="cr-badge cr-badge--pink absolute top-2 right-2 shadow">
@@ -106,7 +99,12 @@ export function ProductGrid({ products, discount, discountType, couponCode, show
                   {product.name ? titleCase(product.name) : "Produto"}
                 </p>
                 {product.size && (
-                  <p className="text-[10px] mb-1" style={{ color: "var(--cr-text-tertiary)" }}>Tamanho: {product.size}</p>
+                  <div
+                    className="inline-flex w-fit items-center px-2 py-0.5 rounded-full text-[11px] font-bold mb-1.5"
+                    style={{ background: "var(--cr-brand-100)", color: "var(--cr-brand-700)" }}
+                  >
+                    Tam {product.size}
+                  </div>
                 )}
                 {showPrices && (() => {
                   const disc = discountedPrice(product.price, discount);

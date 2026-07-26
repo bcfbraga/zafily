@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Menu, Search } from "lucide-react";
+import { Menu } from "lucide-react";
 import { MobileNavDrawer } from "./MobileNavDrawer";
 
 interface TopbarProps {
@@ -30,13 +30,6 @@ export function Topbar({ title, description, action }: TopbarProps) {
         </div>
         <div className="flex items-center gap-3 overflow-x-auto scrollbar-hidden shrink-0">
           {action}
-          <button className="w-9 h-9 flex items-center justify-center rounded-[10px] bg-black/[0.03] border border-black/[0.08] text-[#716C8C] hover:text-[#16162B] transition-colors shrink-0">
-            <Search className="w-4 h-4" />
-          </button>
-          <button className="w-9 h-9 flex items-center justify-center rounded-[10px] bg-black/[0.03] border border-black/[0.08] text-[#716C8C] hover:text-[#16162B] transition-colors relative shrink-0">
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#6C63FF]" />
-          </button>
         </div>
       </header>
       <MobileNavDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />

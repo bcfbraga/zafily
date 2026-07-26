@@ -14,6 +14,7 @@ interface Live {
   thumbnails?: string[];
   clicks?: number;
   views?: number;
+  createdAt: string;
 }
 
 interface Profile {
@@ -23,6 +24,10 @@ interface Profile {
 function formatCount(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K`;
   return String(n);
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 }
 
 function StatTile({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
@@ -44,6 +49,7 @@ export default function PerformancePage() {
   const [lives, setLives] = useState<Live[]>([]);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<"views" | "date">("views");
 
   function loadData() {
     return Promise.all([
@@ -73,7 +79,9 @@ export default function PerformancePage() {
 
   const ranked = lives
     .slice()
-    .sort((a, b) => (b.views ?? 0) - (a.views ?? 0));
+    .sort((a, b) => sortBy === "date"
+      ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      : (b.views ?? 0) - (a.views ?? 0));
   const maxViews = Math.max(1, ...ranked.map(l => l.views ?? 0));
 
   return (
@@ -113,7 +121,29 @@ export default function PerformancePage() {
 
               {/* Per-vitrine breakdown */}
               <div>
-                <h2 className="text-sm font-semibold text-[var(--cr-text-primary)] mb-3">Por vitrine</h2>
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-sm font-semibold text-[var(--cr-text-primary)]">Por vitrine</h2>
+                  <div className="flex items-center gap-1 bg-[var(--cr-surface-soft)] rounded-full p-1">
+                    <button
+                      type="button"
+                      onClick={() => setSortBy("views")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        sortBy === "views" ? "bg-white shadow-sm text-[var(--cr-text-primary)]" : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)]"
+                      }`}
+                    >
+                      Mais vistas
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSortBy("date")}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        sortBy === "date" ? "bg-white shadow-sm text-[var(--cr-text-primary)]" : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)]"
+                      }`}
+                    >
+                      Mais recentes
+                    </button>
+                  </div>
+                </div>
                 <div className="bg-white border border-[var(--cr-border)] rounded-2xl divide-y divide-[var(--cr-border)]">
                   {ranked.map(live => {
                     const views = live.views ?? 0;
@@ -151,6 +181,7 @@ export default function PerformancePage() {
                                 <ExternalLink className="w-3 h-3" />
                               </a>
                             )}
+                            <span className="text-[10px] text-[var(--cr-text-tertiary)] shrink-0">· criada em {formatDate(live.createdAt)}</span>
                           </div>
                           <div className="h-1.5 rounded-full bg-[var(--cr-brand-100)] overflow-hidden">
                             <div className="h-full rounded-full bg-[var(--cr-brand-600)]" style={{ width: `${barWidth}%` }} />

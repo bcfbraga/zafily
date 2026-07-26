@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { getPublicGallery, resolveCurrentUsername, type Live } from "@/lib/lives-store";
 import { VitrineCarousel } from "@/components/zafily/VitrineCarousel";
 import { Package, MapPin, Radio, Layers } from "lucide-react";
@@ -7,6 +8,11 @@ export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ username: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username } = await params;
+  return { title: `Zafily - @${username}` };
 }
 
 function VitrineSection({ live, username }: { live: Live; username: string }) {

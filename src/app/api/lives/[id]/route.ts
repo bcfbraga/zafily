@@ -38,6 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     couponCode: body.couponCode !== undefined ? (body.couponCode || null) : undefined,
     sectionId: body.sectionId !== undefined ? (body.sectionId ?? null) : undefined,
     showPrices: body.showPrices !== undefined ? Boolean(body.showPrices) : undefined,
+    showTitle: body.showTitle !== undefined ? Boolean(body.showTitle) : undefined,
   });
   return NextResponse.json(live);
 }

@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug, recordLiveView } from "@/lib/lives-store";
 import { ShareButtons } from "./ShareButtons";
 import { ProductGrid } from "./ProductGrid";
@@ -8,6 +9,11 @@ export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ username: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { username } = await params;
+  return { title: `Zafily - @${username}` };
 }
 
 export default async function VitrinePage({ params }: Props) {
@@ -61,9 +67,11 @@ export default async function VitrinePage({ params }: Props) {
       <div className="max-w-3xl mx-auto px-5 pt-6 sm:pt-10 pb-8">
         {/* Title block */}
         <div className="mb-2">
-          <h1 className="cr-page-title mb-4" style={{ fontSize: "clamp(28px, 4.5vw, 40px)" }}>
-            {live.title}
-          </h1>
+          {live.showTitle && (
+            <h1 className="cr-page-title mb-4" style={{ fontSize: "clamp(28px, 4.5vw, 40px)" }}>
+              {live.title}
+            </h1>
+          )}
 
           {/* Meta pills */}
           <div className="flex items-center gap-3 flex-wrap text-xs" style={{ color: "var(--cr-text-tertiary)" }}>

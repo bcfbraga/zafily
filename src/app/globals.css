@@ -353,27 +353,22 @@
 .cr-category-filter {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 5px;
-  border: 1px solid var(--cr-border);
-  border-radius: var(--cr-radius-full);
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(12px);
+  gap: 8px;
 }
 .cr-category-filter__item {
   min-height: 38px;
   padding: 0 16px;
-  border: 0;
+  border: 1px solid var(--cr-border);
   border-radius: var(--cr-radius-full);
-  background: transparent;
+  background: var(--cr-surface);
   color: var(--cr-text-secondary);
   font-family: var(--cr-font);
   font-weight: 500;
   font-size: 14px;
   cursor: pointer;
-  transition: background var(--cr-transition-fast), color var(--cr-transition-fast);
+  transition: background var(--cr-transition-fast), color var(--cr-transition-fast), border-color var(--cr-transition-fast);
 }
-.cr-category-filter__item[data-active="true"] { background: var(--cr-surface); color: var(--cr-brand-700); box-shadow: var(--cr-shadow-xs); }
+.cr-category-filter__item[data-active="true"] { background: var(--cr-brand-600); border-color: var(--cr-brand-600); color: #fff; }
 
 .cr-form-input {
   width: 100%;
