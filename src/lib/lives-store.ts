@@ -486,24 +486,27 @@ export async function listLives(userId: string): Promise<Live[]> {
     }
   }
 
+  // Aggregated in Postgres (not fetched as raw rows) so historical totals
+  // never get truncated by PostgREST's per-request row cap once a live
+  // passes ~1000 clicks/views.
   const productIds = [...liveIdByProductId.keys()];
-  const [{ data: clickRows }, { data: viewRows }] = await Promise.all([
+  const [{ data: clickCounts }, { data: viewCounts }] = await Promise.all([
     productIds.length > 0
-      ? db.from("product_clicks").select("product_id").in("product_id", productIds)
+      ? db.rpc("product_click_counts", { p_product_ids: productIds })
       : Promise.resolve({ data: [] }),
-    db.from("live_views").select("live_id").in("live_id", liveIds),
+    db.rpc("live_view_counts", { p_live_ids: liveIds }),
   ]);
 
   const clicksByLive = new Map<string, number>();
-  for (const row of (clickRows ?? []) as Array<{ product_id: string }>) {
+  for (const row of (clickCounts ?? []) as Array<{ product_id: string; count: number }>) {
     const liveId = liveIdByProductId.get(row.product_id);
     if (!liveId) continue;
-    clicksByLive.set(liveId, (clicksByLive.get(liveId) ?? 0) + 1);
+    clicksByLive.set(liveId, (clicksByLive.get(liveId) ?? 0) + Number(row.count));
   }
 
   const viewsByLive = new Map<string, number>();
-  for (const row of (viewRows ?? []) as Array<{ live_id: string }>) {
-    viewsByLive.set(row.live_id, (viewsByLive.get(row.live_id) ?? 0) + 1);
+  for (const row of (viewCounts ?? []) as Array<{ live_id: string; count: number }>) {
+    viewsByLive.set(row.live_id, Number(row.count));
   }
 
   return lives.map(l => ({
@@ -556,18 +559,37 @@ export async function getLivePerformance(id: string, userId: string): Promise<Li
   ]);
 
   const productIds = (products ?? []).map((p: Record<string, unknown>) => p.id as string);
-  let clickRows: Array<{ product_id: string; created_at: string }> = [];
+
+  // Raw timestamps are needed for the click timeline, so they can't be
+  // replaced by an aggregate — fetch them a page at a time instead, since a
+  // single `.select()` silently truncates at PostgREST's row cap once a
+  // popular live passes ~1000 clicks.
+  const clickRows: Array<{ product_id: string; created_at: string }> = [];
   if (productIds.length > 0) {
-    const { data } = await db
-      .from("product_clicks")
-      .select("product_id, created_at")
-      .in("product_id", productIds)
-      .order("created_at", { ascending: true });
-    clickRows = (data ?? []) as Array<{ product_id: string; created_at: string }>;
+    const PAGE_SIZE = 1000;
+    const MAX_PAGES = 100; // 100k clicks safety ceiling — well beyond any real live
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const { data } = await db
+        .from("product_clicks")
+        .select("product_id, created_at")
+        .in("product_id", productIds)
+        .order("created_at", { ascending: true })
+        .range(page * PAGE_SIZE, page * PAGE_SIZE + PAGE_SIZE - 1);
+      const rows = (data ?? []) as Array<{ product_id: string; created_at: string }>;
+      if (rows.length === 0) break;
+      clickRows.push(...rows);
+    }
   }
 
+  // Per-product totals are aggregated in Postgres so they stay accurate
+  // regardless of how many raw click rows exist.
+  const { data: clickCounts } = productIds.length > 0
+    ? await db.rpc("product_click_counts", { p_product_ids: productIds })
+    : { data: [] as { product_id: string; count: number }[] };
   const clicksByProduct = new Map<string, number>();
-  for (const row of clickRows) clicksByProduct.set(row.product_id, (clicksByProduct.get(row.product_id) ?? 0) + 1);
+  for (const row of (clickCounts ?? []) as Array<{ product_id: string; count: number }>) {
+    clicksByProduct.set(row.product_id, Number(row.count));
+  }
 
   const productStats: ProductClickStat[] = (products ?? [])
     .map((p: Record<string, unknown>) => ({
