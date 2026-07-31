@@ -8,7 +8,7 @@ import { ZafilyLogo } from "./Logo";
 import { createClient } from "@/lib/supabase-browser";
 import type { User } from "@supabase/supabase-js";
 import { navItems } from "@/lib/nav-items";
-import { Settings, LogOut, X } from "lucide-react";
+import { Settings, Plug, LogOut, X } from "lucide-react";
 
 interface MobileNavDrawerProps {
   open: boolean;
@@ -91,6 +91,16 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
         </nav>
 
         <div className="px-2 pb-4 border-t border-black/[0.06] pt-3 space-y-0.5">
+          <Link
+            href="/app/integrations"
+            className={cn(
+              "flex items-center gap-3 h-11 px-3 rounded-[10px] text-sm font-medium transition-colors",
+              pathname === "/app/integrations" ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]" : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+            )}
+          >
+            <Plug className={cn("w-4 h-4 shrink-0", pathname === "/app/integrations" ? "text-[#6C63FF]" : "")} />
+            Integrações
+          </Link>
           <Link
             href="/app/settings"
             className={cn(
