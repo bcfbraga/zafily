@@ -87,13 +87,16 @@ export function AwinCard() {
         {/* Header row */}
         <div className="flex items-start justify-between gap-4 mb-5">
           <div className="flex items-center gap-3">
-            {/* C&A logo placeholder */}
-            <div className="w-11 h-11 rounded-[12px] bg-[#F1F0F7] border border-black/[0.08] flex items-center justify-center shrink-0">
-              <span className="font-heading font-bold text-sm text-[#16162B]">C&A</span>
+            {/* Awin logo */}
+            <div
+              className="w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0"
+              style={{ background: "linear-gradient(135deg, #E6007E, #6C2EB5)" }}
+            >
+              <span className="font-heading font-bold text-sm text-white lowercase">awin</span>
             </div>
             <div>
-              <p className="font-heading font-semibold text-[#16162B]">C&A via Awin</p>
-              <p className="text-xs text-[#716C8C] mt-0.5">Programa afiliados C&A BR · Awin #17648</p>
+              <p className="font-heading font-semibold text-[#16162B]">Awin</p>
+              <p className="text-xs text-[#716C8C] mt-0.5">Rede de afiliados</p>
             </div>
           </div>
           <StatusBadge status={status} />
@@ -102,7 +105,7 @@ export function AwinCard() {
         {/* Description */}
         {!isConnected && (
           <p className="text-sm text-[#4B4768] leading-relaxed mb-5">
-            Para gerar links afiliados da C&A, conecte sua conta Awin. Assim os produtos
+            Conecte sua conta Awin para gerar e rastrear links de afiliada. Os produtos
             e links criados no sistema ficam vinculados ao seu ID de afiliada.
           </p>
         )}
@@ -161,7 +164,7 @@ export function AwinCard() {
               onClick={handleConnectClick}
               className="flex items-center gap-2 h-10 px-5 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-[12px] transition-colors"
             >
-              Conectar C&A
+              Conectar Awin
             </button>
           )}
 

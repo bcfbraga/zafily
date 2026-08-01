@@ -7,18 +7,18 @@ import { getUserId } from "@/lib/auth";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const publisherId = String(body.publisherId ?? "").trim();
     const apiToken = String(body.apiToken ?? "").trim();
 
-    if (!publisherId || !apiToken) {
+    if (!apiToken) {
       return NextResponse.json(
-        { error: "Publisher ID and API Token are required." },
+        { error: "API Key is required." },
         { status: 400 }
       );
     }
 
-    // Validate with Awin before saving anything
-    const result = await validateAwinConnection(publisherId, apiToken);
+    // Validate with Awin before saving anything — the publisher account is
+    // discovered from the key itself, not typed in by the user.
+    const result = await validateAwinConnection(apiToken);
 
     if (!result.ok) {
       return NextResponse.json(
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       userId,
       provider: "awin",
       advertiserId: 17648,
-      publisherId,
+      publisherId: result.publisherId,
       encryptedToken,
       status: result.status,
       lastCheckedAt: now,
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       status: result.status,
-      publisherId,
+      publisherId: result.publisherId,
       connectedAt: now,
     });
   } catch (err) {
