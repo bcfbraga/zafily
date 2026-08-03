@@ -123,6 +123,11 @@ export function Sidebar() {
       <div className="px-2 pb-4 border-t border-black/[0.06] pt-3 space-y-0.5">
         {isAdmin && (
           <>
+            {!collapsed && (
+              <p className="px-3 pt-1 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[#9B96AF]">
+                Gestão
+              </p>
+            )}
             <Link
               href="/app/admin/access-requests"
               title={collapsed ? "Pedidos de acesso" : undefined}
