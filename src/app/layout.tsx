@@ -3,6 +3,7 @@ import "./globals.css";
 import { PwaRegister } from "@/components/zafily/PwaRegister";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.zafily.com.br"),
   title: "Zafily — All your affiliate tools in one place",
   description: "Connect links, products, and platforms to organize, track, and grow your affiliate business.",
   appleWebApp: {
