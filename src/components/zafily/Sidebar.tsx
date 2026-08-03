@@ -16,6 +16,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ShieldCheck,
+  Users,
 } from "lucide-react";
 
 const COLLAPSED_KEY = "zafily_sidebar_collapsed";
@@ -121,20 +122,36 @@ export function Sidebar() {
       {/* Bottom */}
       <div className="px-2 pb-4 border-t border-black/[0.06] pt-3 space-y-0.5">
         {isAdmin && (
-          <Link
-            href="/app/admin/access-requests"
-            title={collapsed ? "Admin" : undefined}
-            className={cn(
-              "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
-              collapsed ? "justify-center px-0" : "px-3",
-              pathname === "/app/admin/access-requests"
-                ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
-                : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
-            )}
-          >
-            <ShieldCheck className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/access-requests" ? "text-[#6C63FF]" : "")} />
-            {!collapsed && "Admin"}
-          </Link>
+          <>
+            <Link
+              href="/app/admin/access-requests"
+              title={collapsed ? "Pedidos de acesso" : undefined}
+              className={cn(
+                "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
+                collapsed ? "justify-center px-0" : "px-3",
+                pathname === "/app/admin/access-requests"
+                  ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
+                  : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+              )}
+            >
+              <ShieldCheck className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/access-requests" ? "text-[#6C63FF]" : "")} />
+              {!collapsed && "Pedidos de acesso"}
+            </Link>
+            <Link
+              href="/app/admin/users"
+              title={collapsed ? "Usuários" : undefined}
+              className={cn(
+                "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
+                collapsed ? "justify-center px-0" : "px-3",
+                pathname === "/app/admin/users"
+                  ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
+                  : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+              )}
+            >
+              <Users className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/users" ? "text-[#6C63FF]" : "")} />
+              {!collapsed && "Usuários"}
+            </Link>
+          </>
         )}
 
         <Link
