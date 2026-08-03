@@ -115,6 +115,7 @@ export interface Profile {
   mainGoal: string | null;
   platformsUsed: string | null;
   onboardedAt: string | null;
+  plan: string | null;
 }
 
 // ─── Slug ─────────────────────────────────────────────────────────────────────
@@ -166,6 +167,7 @@ function rowToProfile(row: Record<string, unknown>): Profile {
     mainGoal: (row.main_goal as string) ?? null,
     platformsUsed: (row.platforms_used as string) ?? null,
     onboardedAt: (row.onboarded_at as string) ?? null,
+    plan: (row.plan as string) ?? null,
   };
 }
 
@@ -190,7 +192,7 @@ export async function getOrCreateProfile(userId: string, email: string): Promise
 
   const { data: created } = await db
     .from("profiles")
-    .insert({ user_id: userId, username, display_name: null })
+    .insert({ user_id: userId, username, display_name: null, plan: "Teste grátis" })
     .select()
     .single();
 
@@ -227,6 +229,7 @@ export async function updateProfile(
     mainGoal?: string | null;
     platformsUsed?: string | null;
     onboardedAt?: string | null;
+    plan?: string | null;
   }
 ): Promise<Profile> {
   const db: DB = getSupabase();
@@ -252,6 +255,7 @@ export async function updateProfile(
       ...(data.mainGoal !== undefined && { main_goal: data.mainGoal }),
       ...(data.platformsUsed !== undefined && { platforms_used: data.platformsUsed }),
       ...(data.onboardedAt !== undefined && { onboarded_at: data.onboardedAt }),
+      ...(data.plan !== undefined && { plan: data.plan }),
     })
     .eq("user_id", userId)
     .select()

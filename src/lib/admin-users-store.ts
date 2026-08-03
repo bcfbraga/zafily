@@ -19,6 +19,7 @@ export interface ManagedUser {
   bannedUntil: string | null;
   username: string | null;
   accountStatus: string | null;
+  plan: string | null;
 }
 
 export async function listManagedUsers(): Promise<ManagedUser[]> {
@@ -27,9 +28,9 @@ export async function listManagedUsers(): Promise<ManagedUser[]> {
   if (error) throw error;
 
   const db: DB = getSupabase();
-  const { data: profiles } = await db.from("profiles").select("user_id, username, account_status");
-  const profileByUserId = new Map<string, { username: string; account_status: string }>(
-    (profiles ?? []).map((p: { user_id: string; username: string; account_status: string }) => [p.user_id, p])
+  const { data: profiles } = await db.from("profiles").select("user_id, username, account_status, plan");
+  const profileByUserId = new Map<string, { username: string; account_status: string; plan: string | null }>(
+    (profiles ?? []).map((p: { user_id: string; username: string; account_status: string; plan: string | null }) => [p.user_id, p])
   );
 
   return data.users
@@ -43,6 +44,7 @@ export async function listManagedUsers(): Promise<ManagedUser[]> {
         bannedUntil: u.banned_until ?? null,
         username: profile?.username ?? null,
         accountStatus: profile?.account_status ?? null,
+        plan: profile?.plan ?? null,
       };
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

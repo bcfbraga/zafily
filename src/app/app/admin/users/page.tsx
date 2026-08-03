@@ -32,11 +32,22 @@ export default function AdminUsersPage() {
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null);
   const [confirmText, setConfirmText] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/users")
-      .then(r => r.ok ? r.json() : [])
-      .then(data => {
+      .then(async r => {
+        if (!r.ok) {
+          const body = await r.json().catch(() => ({}));
+          setLoadError(
+            r.status === 403
+              ? "Seu login não está reconhecido como admin (ADMIN_EMAILS). Confira essa variável de ambiente no Vercel e refaça o deploy."
+              : body.error ?? "Não foi possível carregar os usuários."
+          );
+          setLoading(false);
+          return;
+        }
+        const data = await r.json();
         setUsers(Array.isArray(data) ? data : []);
         setLoading(false);
       });
@@ -93,11 +104,19 @@ export default function AdminUsersPage() {
           </div>
         )}
 
-        {loading ? (
+        {loadError ? (
+          <div className="max-w-4xl p-4 rounded-xl text-sm" style={{ background: "#fdeceb", border: "1px solid #f3c9c9", color: "var(--cr-danger)" }}>
+            {loadError}
+          </div>
+        ) : loading ? (
           <div className="max-w-4xl space-y-2">
             {[0, 1, 2].map(i => (
               <div key={i} className="h-20 rounded-xl animate-pulse" style={{ background: "var(--cr-surface-soft)" }} />
             ))}
+          </div>
+        ) : users.length === 0 ? (
+          <div className="cr-empty-state">
+            <p className="cr-body-text">Nenhum usuário encontrado.</p>
           </div>
         ) : (
           <div className="max-w-4xl space-y-3">

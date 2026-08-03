@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin";
 import { deleteUserAccount } from "@/lib/admin-users-store";
+import { updateProfile } from "@/lib/lives-store";
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const admin = await requireAdmin(req);
+  if (admin instanceof NextResponse) return admin;
+
+  const { id } = await params;
+  const body = await req.json();
+  const profile = await updateProfile(id, { plan: body.plan !== undefined ? (body.plan || null) : undefined });
+  return NextResponse.json(profile);
+}
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const admin = await requireAdmin(req);
