@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { getOrCreateProfile, updateProfile, updateUsername } from "@/lib/lives-store";
+import { getOrCreateProfile, updateProfile, updateUsername, AccessNotApprovedError } from "@/lib/lives-store";
 import { createClient } from "@/lib/supabase-server";
+import { isAdminEmail } from "@/lib/admin";
 
 export async function GET(req: NextRequest) {
   let userId: string;
@@ -13,8 +14,17 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const email = user?.email ?? `${userId}@unknown`;
 
-  const profile = await getOrCreateProfile(userId, email);
-  return NextResponse.json(profile);
+  let profile;
+  try {
+    profile = await getOrCreateProfile(userId, email);
+  } catch (err) {
+    if (err instanceof AccessNotApprovedError) {
+      return NextResponse.json({ error: "ACCESS_NOT_APPROVED" }, { status: 403 });
+    }
+    throw err;
+  }
+
+  return NextResponse.json({ ...profile, isAdmin: isAdminEmail(email) });
 }
 
 export async function PUT(req: NextRequest) {

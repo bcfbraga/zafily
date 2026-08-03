@@ -1,7 +1,16 @@
 import { getSupabase } from "./supabase";
+import { isAdminEmail } from "./admin";
+import { getApprovedRequestByEmail, markInviteConsumed } from "./access-requests-store";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type DB = any;
+
+export class AccessNotApprovedError extends Error {
+  constructor() {
+    super("Access not approved for this email");
+    this.name = "AccessNotApprovedError";
+  }
+}
 
 export interface Live {
   id: string;
@@ -165,6 +174,11 @@ export async function getOrCreateProfile(userId: string, email: string): Promise
   const { data } = await db.from("profiles").select("*").eq("user_id", userId).maybeSingle();
   if (data) return rowToProfile(data);
 
+  if (!isAdminEmail(email)) {
+    const approved = await getApprovedRequestByEmail(email);
+    if (!approved) throw new AccessNotApprovedError();
+  }
+
   const base = email.split("@")[0].toLowerCase().replace(/[^a-z0-9_]/g, "");
   let username = base;
   let i = 2;
@@ -179,6 +193,8 @@ export async function getOrCreateProfile(userId: string, email: string): Promise
     .insert({ user_id: userId, username, display_name: null })
     .select()
     .single();
+
+  await markInviteConsumed(email);
 
   return rowToProfile(created);
 }

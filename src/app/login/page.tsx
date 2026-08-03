@@ -121,9 +121,9 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-sm text-[#716C8C] mt-6">
-          Não tem conta?{" "}
-          <Link href="/signup" className="text-[#6C63FF] hover:text-[#5851E0] font-medium transition-colors">
-            Criar conta grátis
+          Ainda não tem acesso?{" "}
+          <Link href="/#acesso" className="text-[#6C63FF] hover:text-[#5851E0] font-medium transition-colors">
+            Solicite um convite
           </Link>
         </p>
       </div>

@@ -1,6 +1,6 @@
 import { Sidebar } from "@/components/zafily/Sidebar";
 import { MobileBottomNav } from "@/components/zafily/MobileBottomNav";
-import { OnboardingGate } from "@/components/zafily/OnboardingGate";
+import { AccountGate } from "@/components/zafily/AccountGate";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +10,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {children}
       </div>
       <MobileBottomNav />
-      <OnboardingGate />
+      <AccountGate />
     </div>
   );
 }
