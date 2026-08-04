@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Key, Ban, ShieldCheck, Trash2, Copy, CheckCheck, Loader2 } from "lucide-react";
+import { Key, Ban, ShieldCheck, Trash2, Copy, CheckCheck, Loader2, LayoutGrid, Pencil } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { Modal } from "@/components/zafily/Modal";
+import { PLAN_OPTIONS } from "@/lib/plans";
 
 interface ManagedUser {
   id: string;
@@ -13,6 +14,10 @@ interface ManagedUser {
   bannedUntil: string | null;
   username: string | null;
   accountStatus: string | null;
+  plan: string | null;
+  planExpiresAt: string | null;
+  liveCount: number;
+  activeLiveCount: number;
 }
 
 function formatDate(iso: string): string {
@@ -21,6 +26,10 @@ function formatDate(iso: string): string {
 
 function isBanned(bannedUntil: string | null): boolean {
   return !!bannedUntil && new Date(bannedUntil).getTime() > Date.now();
+}
+
+function isPlanExpired(planExpiresAt: string | null): boolean {
+  return !!planExpiresAt && new Date(planExpiresAt).getTime() < Date.now();
 }
 
 export default function AdminUsersPage() {
@@ -33,6 +42,10 @@ export default function AdminUsersPage() {
   const [confirmText, setConfirmText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [planTarget, setPlanTarget] = useState<ManagedUser | null>(null);
+  const [planValue, setPlanValue] = useState("");
+  const [planExpiresValue, setPlanExpiresValue] = useState("");
+  const [savingPlan, setSavingPlan] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -72,6 +85,34 @@ export default function AdminUsersPage() {
     setBusyId(null);
     if (!res.ok) { setError(data.error ?? "Erro ao atualizar status"); return; }
     setUsers(prev => prev.map(u => u.id === user.id ? { ...u, bannedUntil: banned ? null : "9999-01-01T00:00:00Z" } : u));
+  }
+
+  function openPlanEditor(user: ManagedUser) {
+    setPlanTarget(user);
+    setPlanValue(user.plan ?? "");
+    setPlanExpiresValue(user.planExpiresAt ? user.planExpiresAt.slice(0, 10) : "");
+  }
+
+  async function savePlan() {
+    if (!planTarget) return;
+    setSavingPlan(true);
+    setError(null);
+    const res = await fetch(`/api/admin/users/${planTarget.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan: planValue || null,
+        // Fixed at UTC noon so the calendar date survives timezone conversion
+        // on both write and read — a plain `new Date(dateOnly)` treats it as
+        // UTC midnight, which rolls back a day in any timezone behind UTC.
+        planExpiresAt: planExpiresValue ? `${planExpiresValue}T12:00:00.000Z` : null,
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setSavingPlan(false);
+    if (!res.ok) { setError(data.error ?? "Erro ao salvar plano"); return; }
+    setUsers(prev => prev.map(u => u.id === planTarget.id ? { ...u, plan: data.plan, planExpiresAt: data.planExpiresAt } : u));
+    setPlanTarget(null);
   }
 
   async function confirmDelete() {
@@ -143,9 +184,28 @@ export default function AdminUsersPage() {
                           </span>
                         )}
                       </div>
-                      <p className="text-xs" style={{ color: "var(--cr-text-tertiary)" }}>
+                      <p className="text-xs mb-2" style={{ color: "var(--cr-text-tertiary)" }}>
                         {user.username ? `@${user.username} · ` : ""}criado em {formatDate(user.createdAt)}
                       </p>
+                      <div className="flex items-center gap-3 flex-wrap text-xs" style={{ color: "var(--cr-text-secondary)" }}>
+                        <span className="inline-flex items-center gap-1.5">
+                          <LayoutGrid className="w-3.5 h-3.5" style={{ color: "var(--cr-text-tertiary)" }} />
+                          {user.activeLiveCount} ativa{user.activeLiveCount === 1 ? "" : "s"} de {user.liveCount} vitrine{user.liveCount === 1 ? "" : "s"}
+                        </span>
+                        <span className="inline-flex items-center gap-1.5">
+                          <span className="font-medium" style={{ color: user.plan ? "var(--cr-text-primary)" : "var(--cr-text-tertiary)" }}>
+                            {user.plan ?? "Plano não definido"}
+                          </span>
+                          {user.planExpiresAt && (
+                            <span style={{ color: isPlanExpired(user.planExpiresAt) ? "var(--cr-danger)" : "var(--cr-text-tertiary)" }}>
+                              · {isPlanExpired(user.planExpiresAt) ? "venceu em" : "vence em"} {formatDate(user.planExpiresAt)}
+                            </span>
+                          )}
+                          <button onClick={() => openPlanEditor(user)} className="w-5 h-5 inline-flex items-center justify-center rounded" style={{ color: "var(--cr-brand-600)" }} title="Editar plano">
+                            <Pencil className="w-3 h-3" />
+                          </button>
+                        </span>
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-2 shrink-0">
@@ -198,6 +258,50 @@ export default function AdminUsersPage() {
           </div>
         )}
       </div>
+
+      {planTarget && (
+        <Modal open onClose={() => setPlanTarget(null)} title="Editar plano">
+          <p className="text-sm mb-4" style={{ color: "var(--cr-text-secondary)" }}>{planTarget.email}</p>
+
+          <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--cr-text-secondary)" }}>Plano</label>
+          <select
+            value={planValue}
+            onChange={e => setPlanValue(e.target.value)}
+            className="w-full h-11 rounded-xl px-3 text-sm mb-4 focus:outline-none"
+            style={{ background: "var(--cr-background)", border: "1px solid var(--cr-border-strong)", color: "var(--cr-text-primary)" }}
+          >
+            <option value="">Não definido</option>
+            {PLAN_OPTIONS.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+
+          <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--cr-text-secondary)" }}>Vencimento</label>
+          <input
+            type="date"
+            value={planExpiresValue}
+            onChange={e => setPlanExpiresValue(e.target.value)}
+            className="w-full h-11 rounded-xl px-3 text-sm mb-5 focus:outline-none"
+            style={{ background: "var(--cr-background)", border: "1px solid var(--cr-border-strong)", color: "var(--cr-text-primary)" }}
+          />
+
+          <div className="flex gap-3">
+            <button
+              onClick={savePlan}
+              disabled={savingPlan}
+              className="flex-1 h-10 text-white text-sm font-semibold rounded-xl disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+              style={{ background: "var(--cr-brand-600)" }}
+            >
+              {savingPlan ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
+            </button>
+            <button
+              onClick={() => setPlanTarget(null)}
+              className="h-10 px-4 border rounded-xl text-sm transition-colors"
+              style={{ borderColor: "var(--cr-border)", color: "var(--cr-text-secondary)" }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </Modal>
+      )}
 
       {deleteTarget && (
         <Modal open onClose={() => setDeleteTarget(null)} title="Excluir conta">

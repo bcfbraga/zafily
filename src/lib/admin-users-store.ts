@@ -20,6 +20,9 @@ export interface ManagedUser {
   username: string | null;
   accountStatus: string | null;
   plan: string | null;
+  planExpiresAt: string | null;
+  liveCount: number;
+  activeLiveCount: number;
 }
 
 export async function listManagedUsers(): Promise<ManagedUser[]> {
@@ -28,14 +31,28 @@ export async function listManagedUsers(): Promise<ManagedUser[]> {
   if (error) throw error;
 
   const db: DB = getSupabase();
-  const { data: profiles } = await db.from("profiles").select("user_id, username, account_status, plan");
-  const profileByUserId = new Map<string, { username: string; account_status: string; plan: string | null }>(
-    (profiles ?? []).map((p: { user_id: string; username: string; account_status: string; plan: string | null }) => [p.user_id, p])
-  );
+  const [{ data: profiles }, { data: lives }] = await Promise.all([
+    db.from("profiles").select("user_id, username, account_status, plan, plan_expires_at"),
+    db.from("lives").select("user_id, status"),
+  ]);
+
+  const profileByUserId = new Map<
+    string,
+    { username: string; account_status: string; plan: string | null; plan_expires_at: string | null }
+  >((profiles ?? []).map((p: { user_id: string; username: string; account_status: string; plan: string | null; plan_expires_at: string | null }) => [p.user_id, p]));
+
+  const liveCounts = new Map<string, { total: number; active: number }>();
+  for (const l of (lives ?? []) as Array<{ user_id: string; status: string }>) {
+    const counts = liveCounts.get(l.user_id) ?? { total: 0, active: 0 };
+    counts.total += 1;
+    if (l.status === "published") counts.active += 1;
+    liveCounts.set(l.user_id, counts);
+  }
 
   return data.users
     .map(u => {
       const profile = profileByUserId.get(u.id);
+      const counts = liveCounts.get(u.id) ?? { total: 0, active: 0 };
       return {
         id: u.id,
         email: u.email ?? "",
@@ -45,6 +62,9 @@ export async function listManagedUsers(): Promise<ManagedUser[]> {
         username: profile?.username ?? null,
         accountStatus: profile?.account_status ?? null,
         plan: profile?.plan ?? null,
+        planExpiresAt: profile?.plan_expires_at ?? null,
+        liveCount: counts.total,
+        activeLiveCount: counts.active,
       };
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

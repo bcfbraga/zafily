@@ -116,6 +116,7 @@ export interface Profile {
   platformsUsed: string | null;
   onboardedAt: string | null;
   plan: string | null;
+  planExpiresAt: string | null;
 }
 
 // ─── Slug ─────────────────────────────────────────────────────────────────────
@@ -168,6 +169,7 @@ function rowToProfile(row: Record<string, unknown>): Profile {
     platformsUsed: (row.platforms_used as string) ?? null,
     onboardedAt: (row.onboarded_at as string) ?? null,
     plan: (row.plan as string) ?? null,
+    planExpiresAt: (row.plan_expires_at as string) ?? null,
   };
 }
 
@@ -230,6 +232,7 @@ export async function updateProfile(
     platformsUsed?: string | null;
     onboardedAt?: string | null;
     plan?: string | null;
+    planExpiresAt?: string | null;
   }
 ): Promise<Profile> {
   const db: DB = getSupabase();
@@ -256,6 +259,7 @@ export async function updateProfile(
       ...(data.platformsUsed !== undefined && { platforms_used: data.platformsUsed }),
       ...(data.onboardedAt !== undefined && { onboarded_at: data.onboardedAt }),
       ...(data.plan !== undefined && { plan: data.plan }),
+      ...(data.planExpiresAt !== undefined && { plan_expires_at: data.planExpiresAt }),
     })
     .eq("user_id", userId)
     .select()

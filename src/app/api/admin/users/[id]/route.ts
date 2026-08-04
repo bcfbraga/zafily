@@ -9,7 +9,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const { id } = await params;
   const body = await req.json();
-  const profile = await updateProfile(id, { plan: body.plan !== undefined ? (body.plan || null) : undefined });
+  const profile = await updateProfile(id, {
+    plan: body.plan !== undefined ? (body.plan || null) : undefined,
+    planExpiresAt: body.planExpiresAt !== undefined ? (body.planExpiresAt || null) : undefined,
+  });
   return NextResponse.json(profile);
 }
 

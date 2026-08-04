@@ -3,16 +3,11 @@
 import { useEffect, useState } from "react";
 import { Check, X, Copy, CheckCheck, Clock } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
+import { PLAN_OPTIONS } from "@/lib/plans";
 
 type Status = "pending" | "approved" | "rejected";
 
 const TRIAL_DAYS = 7;
-const PLAN_OPTIONS = [
-  "Teste grátis",
-  "Starter – R$ 197/mês",
-  "Creator Pro – R$ 397/mês",
-  "Creator Elite – sob consulta",
-];
 
 interface AccessRequest {
   id: string;
