@@ -3,7 +3,7 @@ import { getUserId } from "@/lib/auth";
 import { getLive, countProducts, addProduct, getAccountStatus } from "@/lib/lives-store";
 import { fetchUrlMetadata } from "@/lib/metadata";
 
-const MAX_PRODUCTS = 60;
+const MAX_PRODUCTS = 100;
 const FREE_TIER_MAX_PRODUCTS = 5;
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
