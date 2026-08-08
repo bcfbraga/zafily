@@ -310,6 +310,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [fetching, setFetching] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [confirmRemoveId, setConfirmRemoveId] = useState<string | null>(null);
   const [confirmClearAll, setConfirmClearAll] = useState(false);
   const [clearingAll, setClearingAll] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -338,6 +339,14 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     });
   }, [id]);
 
+  // The delete button is always visible on touch screens, so it arms first and
+  // only removes on a second tap — an accidental tap disarms itself.
+  useEffect(() => {
+    if (!confirmRemoveId) return;
+    const timer = setTimeout(() => setConfirmRemoveId(null), 3000);
+    return () => clearTimeout(timer);
+  }, [confirmRemoveId]);
+
   const productItems = parseProductInput(urlsText);
   const productCount = live?.products.length ?? 0;
   const slotsLeft = 100 - productCount;
@@ -364,6 +373,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     await fetch(`/api/lives/${id}/products/${productId}`, { method: "DELETE" });
     setLive(prev => prev ? { ...prev, products: prev.products.filter(p => p.id !== productId) } : prev);
     setRemovingId(null);
+    setConfirmRemoveId(null);
   }
 
   async function clearAllProducts() {
@@ -434,6 +444,26 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ order: reordered.map(p => p.id) }),
     });
+  }
+
+  // HTML5 drag & drop doesn't fire on touch screens, so the grip handle also
+  // drives reordering via touch events: track the finger, highlight the card
+  // under it, and drop with the same logic as the mouse path. touch-action is
+  // disabled on the handle (touch-none) so the page doesn't scroll instead.
+  function handleTouchStart(index: number) { setDragIndex(index); }
+  function handleTouchMove(e: React.TouchEvent) {
+    if (dragIndex === null) return;
+    const touch = e.touches[0];
+    const card = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("[data-prod-idx]");
+    if (card) setOverIndex(Number((card as HTMLElement).dataset.prodIdx));
+    // Auto-scroll the panel when the finger nears the top/bottom edge, so
+    // items can be dragged beyond the visible part of a long list.
+    const scroller = (e.currentTarget as HTMLElement).closest(".overflow-y-auto");
+    if (scroller) {
+      const bounds = scroller.getBoundingClientRect();
+      if (touch.clientY < bounds.top + 72) scroller.scrollTop -= 10;
+      else if (touch.clientY > bounds.bottom - 72) scroller.scrollTop += 10;
+    }
   }
 
   if (loading) {
@@ -571,17 +601,18 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           {live.products.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider px-1">
-                {live.products.length} produto{live.products.length !== 1 ? "s" : ""} · arraste para reordenar
+                {live.products.length} produto{live.products.length !== 1 ? "s" : ""} · arraste pela alça para reordenar
               </p>
               {live.products.map((product, i) => (
                 <div
                   key={product.id}
+                  data-prod-idx={i}
                   draggable
                   onDragStart={() => handleDragStart(i)}
                   onDragOver={e => handleDragOver(e, i)}
                   onDrop={handleDrop}
                   onDragEnd={() => { setDragIndex(null); setOverIndex(null); }}
-                  className={`group flex items-center gap-3 p-2.5 rounded-xl border transition-all cursor-grab active:cursor-grabbing ${
+                  className={`group flex items-center gap-2 p-2.5 rounded-xl border transition-all cursor-grab active:cursor-grabbing select-none ${
                     overIndex === i && dragIndex !== i
                       ? "border-[#6C63FF] bg-[#6C63FF]/10"
                       : dragIndex === i
@@ -589,7 +620,18 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                       : "border-black/[0.06] bg-white hover:border-black/[0.12]"
                   }`}
                 >
-                  <GripVertical className="w-3.5 h-3.5 text-[#716C8C] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div
+                    onTouchStart={() => handleTouchStart(i)}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleDrop}
+                    onTouchCancel={() => { setDragIndex(null); setOverIndex(null); }}
+                    className="w-6 h-9 -my-1 -ml-1.5 flex items-center justify-center shrink-0 touch-none cursor-grab active:cursor-grabbing"
+                  >
+                    <GripVertical className="w-3.5 h-3.5 text-[#716C8C] opacity-60 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity" />
+                  </div>
+                  <span className="w-5 shrink-0 text-right text-[11px] font-semibold text-[#716C8C] tabular-nums">
+                    {i + 1}
+                  </span>
                   <div className="w-9 h-9 rounded-lg bg-[#F1F0F7] overflow-hidden shrink-0">
                     {product.imageUrl
                       ? <img src={product.imageUrl} alt="" className="w-full h-full object-cover" />
@@ -628,14 +670,26 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                    <button onClick={() => setEditingProduct(product)}
-                      className="w-6 h-6 rounded-lg bg-[#F1F0F7] flex items-center justify-center text-[#4B4768] hover:text-white hover:bg-[#6C63FF] transition-colors">
-                      <Pencil className="w-3 h-3" />
+                  <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
+                    <button onClick={() => setEditingProduct(product)} title="Editar produto"
+                      className="w-8 h-8 lg:w-6 lg:h-6 rounded-lg bg-[#F1F0F7] flex items-center justify-center text-[#4B4768] hover:text-white hover:bg-[#6C63FF] transition-colors">
+                      <Pencil className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
                     </button>
-                    <button onClick={() => removeProduct(product.id)} disabled={removingId === product.id}
-                      className="w-6 h-6 rounded-lg bg-[#F1F0F7] flex items-center justify-center text-[#4B4768] hover:text-white hover:bg-red-600 transition-colors">
-                      {removingId === product.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <X className="w-3 h-3" />}
+                    <button
+                      onClick={() => confirmRemoveId === product.id ? removeProduct(product.id) : setConfirmRemoveId(product.id)}
+                      disabled={removingId === product.id}
+                      title={confirmRemoveId === product.id ? "Toque de novo para remover" : "Remover produto"}
+                      className={`w-8 h-8 lg:w-6 lg:h-6 rounded-lg flex items-center justify-center transition-colors ${
+                        confirmRemoveId === product.id
+                          ? "bg-red-600 text-white"
+                          : "bg-[#F1F0F7] text-[#4B4768] hover:text-white hover:bg-red-600"
+                      }`}
+                    >
+                      {removingId === product.id
+                        ? <Loader2 className="w-3.5 h-3.5 lg:w-3 lg:h-3 animate-spin" />
+                        : confirmRemoveId === product.id
+                        ? <Check className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
+                        : <X className="w-3.5 h-3.5 lg:w-3 lg:h-3" />}
                     </button>
                   </div>
                 </div>
