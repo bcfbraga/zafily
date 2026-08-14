@@ -79,7 +79,11 @@ function generatePassword(): string {
 export async function resetUserPassword(userId: string): Promise<string> {
   const auth = getAdminAuthClient();
   const password = generatePassword();
-  const { error } = await auth.auth.admin.updateUserById(userId, { password });
+  // Confirming the email alongside the reset is what makes the new password
+  // usable: an account that never confirmed its email is refused at sign-in no
+  // matter which password it is given. The admin handing over the password is
+  // already vouching for the account.
+  const { error } = await auth.auth.admin.updateUserById(userId, { password, email_confirm: true });
   if (error) throw error;
   return password;
 }

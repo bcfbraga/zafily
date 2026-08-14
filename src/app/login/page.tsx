@@ -7,6 +7,19 @@ import { createClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle } from "lucide-react";
 
+// Supabase returns a generic error object for every failed sign-in, so without
+// this mapping a blocked account, an unconfirmed email and a rate limit all
+// looked like a wrong password — with no way for the user to tell them apart.
+// Unknown emails stay on the credentials message on purpose, so the form can't
+// be used to find out which emails have an account.
+const SIGN_IN_ERRORS: Record<string, string> = {
+  invalid_credentials: "Email ou senha incorretos. Tente novamente.",
+  user_not_found: "Email ou senha incorretos. Tente novamente.",
+  email_not_confirmed: "Este email ainda não foi confirmado. Procure o email de confirmação ou peça um novo acesso a quem te convidou.",
+  user_banned: "Esta conta está bloqueada. Fale com quem administra a Zafily.",
+  over_request_rate_limit: "Muitas tentativas seguidas. Aguarde alguns minutos e tente de novo.",
+};
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +36,10 @@ export default function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setError("Email ou senha incorretos. Tente novamente.");
+      setError(
+        SIGN_IN_ERRORS[error.code ?? ""] ??
+        "Não foi possível entrar agora. Tente novamente em instantes."
+      );
       setLoading(false);
       return;
     }
