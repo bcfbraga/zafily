@@ -67,7 +67,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--cr-background)] flex flex-col items-center justify-center px-4">
+    <div className="zf-brand min-h-screen bg-[var(--cr-background)] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-[400px]">
         <div className="flex justify-center mb-10">
           <Link href="/"><ZafilyLogo size={32} /></Link>
