@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getPublicGallery, resolveCurrentUsername, type Live } from "@/lib/lives-store";
+import { getPublicGallery, resolveCurrentUsername, recordImpressions, type Live } from "@/lib/lives-store";
 import { VitrineCarousel } from "@/components/zafily/VitrineCarousel";
 import { PublicProfileHeader } from "@/components/zafily/PublicProfileHeader";
 import { PublicProfileTabs } from "@/components/zafily/PublicProfileTabs";
@@ -44,6 +44,10 @@ export default async function VitrinesIndexPage({ params }: Props) {
   }
 
   const { profile, sections, lives } = result;
+
+  // Os cliques do carrossel saem daqui, então a exibição precisa ser contada
+  // aqui também — senão o denominador do CTR fica menor que o de cliques.
+  await recordImpressions(lives.map(l => l.id));
 
   const liveShopping = lives.filter(l => l.liveDate);
   const sectionGroups = sections

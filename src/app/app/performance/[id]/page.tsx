@@ -295,7 +295,7 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
   }, [id]);
 
   const totalClicks = data?.products.reduce((sum, p) => sum + p.clicks, 0) ?? 0;
-  const ctr = data && data.views > 0 ? (totalClicks / data.views) * 100 : null;
+  const clicksPerView = data && data.views > 0 ? totalClicks / data.views : null;
   const maxProductClicks = Math.max(1, ...(data?.products.map(p => p.clicks) ?? [1]));
   const topClicked = data?.products.filter(p => p.clicks > 0).slice(0, 3).map(p => p.id) ?? [];
 
@@ -348,7 +348,7 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
                 <div className="flex-1 min-w-[180px] bg-white border border-[var(--cr-border)] rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-7 h-7 rounded-lg bg-[var(--cr-brand-100)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><Eye className="w-3.5 h-3.5" /></div>
-                    <span className="text-xs font-medium text-[var(--cr-text-secondary)]">Visualizações</span>
+                    <span className="text-xs font-medium text-[var(--cr-text-secondary)]">Exibições</span>
                   </div>
                   <p className="text-2xl font-bold text-[var(--cr-text-primary)]">{formatCount(data.views)}</p>
                 </div>
@@ -362,9 +362,9 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
                 <div className="flex-1 min-w-[180px] bg-white border border-[var(--cr-border)] rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-7 h-7 rounded-lg bg-[var(--cr-brand-100)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><Percent className="w-3.5 h-3.5" /></div>
-                    <span className="text-xs font-medium text-[var(--cr-text-secondary)]">CTR</span>
+                    <span className="text-xs font-medium text-[var(--cr-text-secondary)]">Cliques por exibição</span>
                   </div>
-                  <p className="text-2xl font-bold text-[var(--cr-text-primary)]">{ctr !== null ? `${ctr.toFixed(1)}%` : "—"}</p>
+                  <p className="text-2xl font-bold text-[var(--cr-text-primary)]">{clicksPerView !== null ? clicksPerView.toFixed(1).replace(".", ",") : "—"}</p>
                 </div>
               </div>
 

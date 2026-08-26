@@ -518,7 +518,7 @@ export async function listLives(userId: string): Promise<Live[]> {
     productIds.length > 0
       ? db.rpc("product_click_counts", { p_product_ids: productIds })
       : Promise.resolve({ data: [] }),
-    db.rpc("live_view_counts", { p_live_ids: liveIds }),
+    db.rpc("live_impression_counts", { p_live_ids: liveIds }),
   ]);
 
   const clicksByLive = new Map<string, number>();
@@ -577,10 +577,11 @@ export async function getLivePerformance(id: string, userId: string): Promise<Li
   if (!live) return null;
 
   const db: DB = getSupabase();
-  const [{ data: products }, { count: viewCount }] = await Promise.all([
+  const [{ data: products }, { data: impressionRows }] = await Promise.all([
     db.from("live_products").select("id, name, image_url, price").eq("live_id", id).order("position", { ascending: true }),
-    db.from("live_views").select("*", { count: "exact", head: true }).eq("live_id", id),
+    db.rpc("live_impression_counts", { p_live_ids: [id] }),
   ]);
+  const viewCount = Number((impressionRows ?? [])[0]?.count ?? 0);
 
   const productIds = (products ?? []).map((p: Record<string, unknown>) => p.id as string);
 
@@ -879,7 +880,14 @@ export async function recordProductClick(productId: string): Promise<void> {
   await db.from("product_clicks").insert({ product_id: productId });
 }
 
-export async function recordLiveView(liveId: string): Promise<void> {
+/**
+ * Registra a exibição das vitrines mostradas num carregamento — tanto a página
+ * da vitrine quanto a listagem, que é de onde saem os cliques do carrossel.
+ * Contar só a página da vitrine deixava o denominador menor que o número de
+ * cliques e o painel exibia CTR acima de 100%.
+ */
+export async function recordImpressions(liveIds: string[]): Promise<void> {
+  if (liveIds.length === 0) return;
   const db: DB = getSupabase();
-  await db.from("live_views").insert({ live_id: liveId });
+  await db.rpc("bump_live_impressions", { p_live_ids: liveIds });
 }

@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
-import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug, recordLiveView } from "@/lib/lives-store";
+import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug, recordImpressions } from "@/lib/lives-store";
 import { ShareButtons } from "./ShareButtons";
 import { ProductGrid } from "./ProductGrid";
 import { Calendar, Clock } from "lucide-react";
@@ -37,7 +37,7 @@ export default async function VitrinePage({ params }: Props) {
     notFound();
   }
 
-  await recordLiveView(live.id);
+  await recordImpressions([live.id]);
 
   return (
     <div className="min-h-screen" style={{ background: "var(--cr-background)", color: "var(--cr-text-primary)", fontFamily: "var(--cr-font)" }}>

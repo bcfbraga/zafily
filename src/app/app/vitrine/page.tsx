@@ -273,7 +273,10 @@ export default function VitrinePage() {
   const uncategorized = lives.filter(l => !l.liveDate && !l.sectionId);
 
   function renderCard(live: Live) {
-    const ctr = (live.clicks ?? 0) > 0 && (live.views ?? 0) > 0 ? ((live.clicks! / live.views!) * 100).toFixed(1) : null;
+    // Sem "% CTR": uma exibição pode render vários cliques (a vitrine mostra
+    // vários produtos), então a razão passa de 100% legitimamente e o rótulo
+    // enganava. Dois números concretos dizem mais.
+    const impressions = live.views ?? 0;
     return (
       <div
         key={live.id}
@@ -315,9 +318,9 @@ export default function VitrinePage() {
                   {formatCount(live.clicks!)} clique{live.clicks !== 1 ? "s" : ""}
                 </span>
               )}
-              {ctr && (
+              {impressions > 0 && (
                 <span className="px-2.5 py-1 rounded-full bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] text-xs font-medium">
-                  {ctr}% CTR
+                  {formatCount(impressions)} exibiç{impressions !== 1 ? "ões" : "ão"}
                 </span>
               )}
             </div>

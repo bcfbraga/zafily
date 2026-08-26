@@ -75,7 +75,9 @@ export default function PerformancePage() {
 
   const totalViews = lives.reduce((sum, l) => sum + (l.views ?? 0), 0);
   const totalClicks = lives.reduce((sum, l) => sum + (l.clicks ?? 0), 0);
-  const ctr = totalViews > 0 ? (totalClicks / totalViews) * 100 : null;
+  // Cliques por exibição, não CTR: cada exibição mostra vários produtos, então
+  // a razão passa de 1 sem que nada esteja errado.
+  const clicksPerView = totalViews > 0 ? totalClicks / totalViews : null;
 
   const ranked = lives
     .slice()
@@ -114,9 +116,9 @@ export default function PerformancePage() {
             <div className="space-y-8">
               {/* KPI row */}
               <div className="flex gap-4 flex-wrap">
-                <StatTile icon={<Eye className="w-3.5 h-3.5" />} label="Visualizações totais" value={formatCount(totalViews)} />
+                <StatTile icon={<Eye className="w-3.5 h-3.5" />} label="Exibições totais" value={formatCount(totalViews)} />
                 <StatTile icon={<MousePointerClick className="w-3.5 h-3.5" />} label="Cliques totais" value={formatCount(totalClicks)} />
-                <StatTile icon={<Percent className="w-3.5 h-3.5" />} label="CTR médio" value={ctr !== null ? `${ctr.toFixed(1)}%` : "—"} />
+                <StatTile icon={<Percent className="w-3.5 h-3.5" />} label="Cliques por exibição" value={clicksPerView !== null ? clicksPerView.toFixed(1).replace(".", ",") : "—"} />
               </div>
 
               {/* Per-vitrine breakdown */}
@@ -148,7 +150,7 @@ export default function PerformancePage() {
                   {ranked.map(live => {
                     const views = live.views ?? 0;
                     const clicks = live.clicks ?? 0;
-                    const liveCtr = views > 0 && clicks > 0 ? (clicks / views) * 100 : null;
+                    const liveClicksPerView = views > 0 && clicks > 0 ? clicks / views : null;
                     const barWidth = Math.max(4, (views / maxViews) * 100);
                     const thumb = live.thumbnails?.[0];
                     return (
@@ -197,8 +199,8 @@ export default function PerformancePage() {
                             <p className="text-[10px] text-[var(--cr-text-tertiary)]">cliques</p>
                           </div>
                           <div className="text-right w-12">
-                            <p className="text-sm font-semibold text-[var(--cr-text-primary)]">{liveCtr !== null ? `${liveCtr.toFixed(1)}%` : "—"}</p>
-                            <p className="text-[10px] text-[var(--cr-text-tertiary)]">CTR</p>
+                            <p className="text-sm font-semibold text-[var(--cr-text-primary)]">{liveClicksPerView !== null ? liveClicksPerView.toFixed(1).replace(".", ",") : "—"}</p>
+                            <p className="text-[10px] text-[var(--cr-text-tertiary)]">clq/exib.</p>
                           </div>
                         </div>
                         <ChevronRight className="w-4 h-4 text-[var(--cr-text-tertiary)] shrink-0" />

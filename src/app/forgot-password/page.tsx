@@ -32,15 +32,15 @@ export default function ForgotPasswordPage() {
 
   if (done) {
     return (
-      <div className="min-h-screen bg-[#F6F6FB] flex flex-col items-center justify-center px-4">
+      <div className="zf-brand min-h-screen bg-[var(--cr-background)] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-[400px] text-center">
           <MailCheck className="w-12 h-12 text-[#00D4AA] mx-auto mb-4" />
-          <h1 className="font-heading font-bold text-2xl text-[#16162B] mb-2">Verifique seu email</h1>
-          <p className="text-sm text-[#4B4768] mb-6">
-            Se houver uma conta com o email <span className="text-[#16162B] font-medium">{email}</span>,
+          <h1 className="font-heading font-bold text-2xl text-[var(--cr-text-primary)] mb-2">Verifique seu email</h1>
+          <p className="text-sm text-[var(--cr-text-secondary)] mb-6">
+            Se houver uma conta com o email <span className="text-[var(--cr-text-primary)] font-medium">{email}</span>,
             enviamos um link para redefinir sua senha.
           </p>
-          <Link href="/login" className="text-sm text-[#6C63FF] hover:text-[#5851E0] transition-colors">
+          <Link href="/login" className="text-sm text-[var(--cr-brand-500)] hover:text-[var(--cr-brand-700)] transition-colors">
             Voltar para o login
           </Link>
         </div>
@@ -49,19 +49,19 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F6FB] flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-[var(--cr-background)] flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-[400px]">
         <div className="flex justify-center mb-10">
           <Link href="/"><ZafilyLogo size={32} /></Link>
         </div>
 
         <div className="bg-white border border-black/[0.08] rounded-[20px] p-8 shadow-[0_24px_80px_rgba(23,23,60,0.10)]">
-          <h1 className="font-heading font-bold text-[24px] text-[#16162B] mb-1">Esqueci minha senha</h1>
-          <p className="text-sm text-[#716C8C] mb-8">Enviaremos um link para redefinir sua senha.</p>
+          <h1 className="font-heading font-bold text-[24px] text-[var(--cr-text-primary)] mb-1">Esqueci minha senha</h1>
+          <p className="text-sm text-[var(--cr-text-tertiary)] mb-8">Enviaremos um link para redefinir sua senha.</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-[#4B4768]">Email</label>
+              <label className="text-xs font-medium text-[var(--cr-text-secondary)]">Email</label>
               <input
                 type="email"
                 value={email}
@@ -69,7 +69,7 @@ export default function ForgotPasswordPage() {
                 placeholder="voce@email.com"
                 required
                 disabled={loading}
-                className="w-full h-12 bg-[#F6F6FB] border border-black/[0.10] text-[#16162B] placeholder:text-[#9B96AF] rounded-[12px] px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:shadow-[0_0_0_4px_rgba(108,99,255,0.18)] transition-all disabled:opacity-50"
+                className="w-full h-12 bg-[var(--cr-background)] border border-black/[0.10] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-[12px] px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:shadow-[0_0_0_4px_rgba(247, 89, 173,0.18)] transition-all disabled:opacity-50"
               />
             </div>
 
@@ -83,16 +83,16 @@ export default function ForgotPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 h-12 bg-[#6C63FF] hover:bg-[#7C75FF] disabled:opacity-50 text-white font-semibold rounded-[12px] transition-colors mt-2"
+              className="w-full flex items-center justify-center gap-2 h-12 bg-[var(--cr-brand-500)] hover:bg-[#7C75FF] disabled:opacity-50 text-white font-semibold rounded-[12px] transition-colors mt-2"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Enviar link"}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-sm text-[#716C8C] mt-6">
+        <p className="text-center text-sm text-[var(--cr-text-tertiary)] mt-6">
           Lembrou a senha?{" "}
-          <Link href="/login" className="text-[#6C63FF] hover:text-[#5851E0] font-medium transition-colors">
+          <Link href="/login" className="text-[var(--cr-brand-500)] hover:text-[var(--cr-brand-700)] font-medium transition-colors">
             Entrar
           </Link>
         </p>
