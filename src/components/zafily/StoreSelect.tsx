@@ -75,11 +75,11 @@ export function StoreSelect({ value, onChange }: StoreSelectProps) {
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className={`w-full h-12 bg-white border ${open ? "border-[#6C63FF] ring-2 ring-[#6C63FF]/20" : "border-black/[0.12] hover:border-black/[0.20]"} text-[#16162B] rounded-xl px-4 text-sm transition-all flex items-center gap-3 cursor-pointer`}
+        className={`w-full h-12 bg-white border ${open ? "border-[var(--cr-brand-500)] ring-2 ring-[var(--cr-brand-500)]/20" : "border-black/[0.12] hover:border-black/[0.20]"} text-[var(--cr-text-primary)] rounded-xl px-4 text-sm transition-all flex items-center gap-3 cursor-pointer`}
       >
         <StoreLogo value={selected.value} size={26} />
         <span className="flex-1 text-left font-medium">{selected.label}</span>
-        <ChevronDown className={`w-4 h-4 text-[#716C8C] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-4 h-4 text-[var(--cr-text-tertiary)] transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown */}
@@ -92,13 +92,13 @@ export function StoreSelect({ value, onChange }: StoreSelectProps) {
               onClick={() => { onChange(store.value); setOpen(false); }}
               className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors ${
                 store.value === selected.value
-                  ? "bg-[#6C63FF]/10 text-[#4338CA]"
-                  : "text-[#4B4768] hover:bg-black/[0.04] hover:text-[#16162B]"
+                  ? "bg-[var(--cr-brand-500)]/10 text-[var(--cr-brand-700)]"
+                  : "text-[var(--cr-text-secondary)] hover:bg-black/[0.04] hover:text-[var(--cr-text-primary)]"
               }`}
             >
               <StoreLogo value={store.value} size={28} />
               <span className="flex-1 text-left font-medium">{store.label}</span>
-              {store.value === selected.value && <Check className="w-4 h-4 text-[#6C63FF]" />}
+              {store.value === selected.value && <Check className="w-4 h-4 text-[var(--cr-brand-500)]" />}
             </button>
           ))}
         </div>

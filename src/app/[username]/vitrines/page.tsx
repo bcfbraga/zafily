@@ -5,6 +5,7 @@ import { VitrineCarousel } from "@/components/zafily/VitrineCarousel";
 import { PublicProfileHeader } from "@/components/zafily/PublicProfileHeader";
 import { PublicProfileTabs } from "@/components/zafily/PublicProfileTabs";
 import { Package, Radio, Layers } from "lucide-react";
+import { titleCase } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
-  return { title: `Zafily - @${username}` };
+  return { title: `${titleCase(username)} - Feito por Zafily` };
 }
 
 function VitrineSection({ live, username }: { live: Live; username: string }) {

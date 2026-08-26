@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
 import { createClient } from "@supabase/supabase-js";
+import { prepareImage } from "@/lib/image-upload";
 
 const BUCKET = "live-images";
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -18,9 +19,8 @@ export async function POST(req: NextRequest) {
   if (!ALLOWED.includes(file.type)) return NextResponse.json({ error: "Formato inválido. Use JPG, PNG ou WebP." }, { status: 400 });
   if (file.size > MAX_SIZE) return NextResponse.json({ error: "Arquivo muito grande. Máximo 5MB." }, { status: 400 });
 
-  const ext = file.type.split("/")[1].replace("jpeg", "jpg");
+  const { buffer, contentType, ext } = await prepareImage(Buffer.from(await file.arrayBuffer()), file.type);
   const path = `${userId}/profile-${Date.now()}.${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
   );
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, buffer, {
-    contentType: file.type,
+    contentType,
+    cacheControl: "31536000",
     upsert: false,
   });
 

@@ -9,6 +9,16 @@ export function titleCase(str: string): string {
   return str.replace(/\S+/g, word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
 }
 
+/**
+ * As lojas mandam a categoria como caminho ("Feminino/Vestidos"); em todo lugar
+ * exibimos e agrupamos só pela folha ("Vestidos").
+ */
+export function shortCategory(cat: string | null): string | null {
+  if (!cat) return null;
+  const parts = cat.split("/").map(s => s.trim()).filter(Boolean);
+  return parts[parts.length - 1] ?? null;
+}
+
 export function parsePrice(raw: string | null): number | null {
   if (!raw) return null;
   const clean = raw.replace(/[^\d.,]/g, "");

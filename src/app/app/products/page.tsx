@@ -20,7 +20,7 @@ interface Product {
 
 function ProductCard({ product }: { product: Product }) {
   return (
-    <div className="group relative bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.08)] rounded-[16px] overflow-hidden hover:border-[rgba(108,99,255,0.4)] hover:bg-[rgba(108,99,255,0.06)] transition-all duration-200">
+    <div className="group relative bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.08)] rounded-[4px] overflow-hidden hover:border-[rgba(247, 89, 173,0.4)] hover:bg-[rgba(247, 89, 173,0.06)] transition-all duration-200">
       {/* Image */}
       <div className="aspect-square bg-[rgba(0,0,0,0.03)] overflow-hidden">
         {product.image_url ? (
@@ -31,7 +31,7 @@ function ProductCard({ product }: { product: Product }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Tag className="w-8 h-8 text-[#716C8C]" />
+            <Tag className="w-8 h-8 text-[var(--cr-text-tertiary)]" />
           </div>
         )}
       </div>
@@ -39,15 +39,15 @@ function ProductCard({ product }: { product: Product }) {
       {/* Info */}
       <div className="p-3 space-y-2">
         {product.category && (
-          <span className="text-[10px] font-semibold text-[#00D4AA] uppercase tracking-wider">
+          <span className="text-[10px] font-semibold text-[var(--cr-success)] uppercase tracking-wider">
             {product.category}
           </span>
         )}
-        <p className="text-sm font-medium text-[#16162B] leading-tight line-clamp-2">
+        <p className="text-sm font-medium text-[var(--cr-text-primary)] leading-tight line-clamp-2">
           {product.name}
         </p>
         {product.price != null && (
-          <p className="text-base font-bold text-[#16162B]">
+          <p className="text-base font-bold text-[var(--cr-text-primary)]">
             R${" "}
             {product.price.toLocaleString("pt-BR", {
               minimumFractionDigits: 2,
@@ -59,7 +59,7 @@ function ProductCard({ product }: { product: Product }) {
           href={product.deep_link}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 w-full justify-center h-8 mt-1 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-xs font-semibold rounded-[8px] transition-colors"
+          className="flex items-center gap-1.5 w-full justify-center h-8 mt-1 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] text-white text-xs font-semibold rounded-[4px] transition-colors"
         >
           <ExternalLink className="w-3 h-3" />
           Link afiliado
@@ -131,19 +131,19 @@ export default function ProductsPage() {
           {/* Toolbar */}
           <div className="flex items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#716C8C]" />
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cr-text-tertiary)]" />
               <input
                 type="text"
                 placeholder="Buscar produtos..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full h-11 bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.10)] text-[#16162B] placeholder:text-[#716C8C] rounded-[12px] pl-10 pr-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all"
+                className="w-full h-11 bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.10)] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-[4px] pl-10 pr-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all"
               />
             </div>
             <button
               onClick={syncProducts}
               disabled={syncing}
-              className="flex items-center gap-2 h-11 px-5 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-60 text-white text-sm font-semibold rounded-[12px] transition-colors"
+              className="flex items-center gap-2 h-11 px-5 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-60 text-white text-sm font-semibold rounded-[4px] transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
               {syncing ? "Sincronizando..." : "Sincronizar Awin"}
@@ -152,7 +152,7 @@ export default function ProductsPage() {
 
           {/* Error */}
           {error && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-[12px] text-sm text-red-700">
+            <div className="p-4 bg-red-50 border border-red-200 rounded-[4px] text-sm text-red-700">
               {error}
             </div>
           )}
@@ -164,8 +164,8 @@ export default function ProductsPage() {
                 onClick={() => setCategory("")}
                 className={`shrink-0 h-8 px-4 rounded-full text-xs font-semibold transition-colors ${
                   category === ""
-                    ? "bg-[#6C63FF] text-white"
-                    : "bg-[rgba(0,0,0,0.03)] text-[#4B4768] hover:bg-[rgba(0,0,0,0.10)] border border-[rgba(0,0,0,0.06)]"
+                    ? "bg-[var(--cr-brand-500)] text-white"
+                    : "bg-[rgba(0,0,0,0.03)] text-[var(--cr-text-secondary)] hover:bg-[rgba(0,0,0,0.10)] border border-[rgba(0,0,0,0.06)]"
                 }`}
               >
                 Todos
@@ -176,8 +176,8 @@ export default function ProductsPage() {
                   onClick={() => setCategory(cat === category ? "" : cat)}
                   className={`shrink-0 h-8 px-4 rounded-full text-xs font-semibold transition-colors ${
                     cat === category
-                      ? "bg-[#6C63FF] text-white"
-                      : "bg-[rgba(0,0,0,0.03)] text-[#4B4768] hover:bg-[rgba(0,0,0,0.10)] border border-[rgba(0,0,0,0.06)]"
+                      ? "bg-[var(--cr-brand-500)] text-white"
+                      : "bg-[rgba(0,0,0,0.03)] text-[var(--cr-text-secondary)] hover:bg-[rgba(0,0,0,0.10)] border border-[rgba(0,0,0,0.06)]"
                   }`}
                 >
                   {cat}
@@ -189,13 +189,13 @@ export default function ProductsPage() {
           {/* Empty state */}
           {!loading && products.length === 0 && !error && (
             <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
-              <div className="w-16 h-16 rounded-full bg-[rgba(108,99,255,0.12)] flex items-center justify-center">
-                <Tag className="w-7 h-7 text-[#6C63FF]" />
+              <div className="w-16 h-16 rounded-full bg-[rgba(247, 89, 173,0.12)] flex items-center justify-center">
+                <Tag className="w-7 h-7 text-[var(--cr-brand-500)]" />
               </div>
               <div>
-                <p className="text-[#16162B] font-semibold text-lg">Nenhum produto ainda</p>
-                <p className="text-[#716C8C] text-sm mt-1">
-                  Clique em <strong className="text-[#16162B]">Sincronizar Awin</strong> para importar os produtos da C&A.
+                <p className="text-[var(--cr-text-primary)] font-semibold text-lg">Nenhum produto ainda</p>
+                <p className="text-[var(--cr-text-tertiary)] text-sm mt-1">
+                  Clique em <strong className="text-[var(--cr-text-primary)]">Sincronizar Awin</strong> para importar os produtos da C&A.
                 </p>
               </div>
             </div>
@@ -205,7 +205,7 @@ export default function ProductsPage() {
           {loading && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5">
               {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className="rounded-[16px] bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.06)] animate-pulse">
+                <div key={i} className="rounded-[4px] bg-[rgba(0,0,0,0.03)] border border-[rgba(0,0,0,0.06)] animate-pulse">
                   <div className="aspect-square bg-[rgba(0,0,0,0.03)]" />
                   <div className="p-3 space-y-2">
                     <div className="h-3 w-16 bg-[rgba(0,0,0,0.06)] rounded" />

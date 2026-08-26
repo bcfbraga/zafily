@@ -24,7 +24,7 @@ export function MobileBottomNav() {
             href={href}
             className={cn(
               "flex-1 flex flex-col items-center justify-center gap-0.5 h-14 text-[10px] font-medium transition-colors",
-              active ? "text-[#6C63FF]" : "text-[#716C8C]"
+              active ? "text-[var(--cr-brand-500)]" : "text-[var(--cr-text-tertiary)]"
             )}
           >
             <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} />

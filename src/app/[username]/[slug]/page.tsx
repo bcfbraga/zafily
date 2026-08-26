@@ -1,9 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug, recordLiveView } from "@/lib/lives-store";
 import { ShareButtons } from "./ShareButtons";
 import { ProductGrid } from "./ProductGrid";
 import { Calendar, Clock } from "lucide-react";
+import { titleCase } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
-  return { title: `Zafily - @${username}` };
+  return { title: `${titleCase(username)} - Feito por Zafily` };
 }
 
 export default async function VitrinePage({ params }: Props) {
@@ -54,9 +56,13 @@ export default async function VitrinePage({ params }: Props) {
       {live.imageUrl && (
         <div className="w-full sm:max-w-3xl sm:mx-auto sm:px-5 sm:pt-10">
           <div className="w-full h-auto sm:h-72 sm:rounded-[var(--cr-radius-xl)] overflow-hidden sm:mb-4" style={{ background: "var(--cr-surface-soft)" }}>
-            <img
+            <Image
               src={live.imageUrl}
               alt={live.title}
+              width={1600}
+              height={900}
+              sizes="(max-width: 640px) 100vw, 700px"
+              priority
               className="w-full h-auto sm:h-full object-contain sm:object-cover"
             />
           </div>

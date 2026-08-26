@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { Package, ChevronRight, ChevronLeft } from "lucide-react";
 import { titleCase, discountedPrice } from "@/lib/utils";
 
@@ -64,9 +65,10 @@ function FullBanner({ imageUrl, href }: { imageUrl: string; href?: string }) {
       {...(href ? { href, target: "_blank", rel: "noopener noreferrer" } : {})}
       className="block"
     >
-      <div className="aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-[var(--cr-radius-lg)]" style={{ background: "var(--cr-surface-soft)" }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+      <div className="relative aspect-[16/9] sm:aspect-[21/9] overflow-hidden rounded-[var(--cr-radius-lg)]" style={{ background: "var(--cr-surface-soft)" }}>
+        {/* Capa hospedada no Supabase — passa pelo otimizador da Vercel.
+            Os produtos abaixo ficam em <img> por serem imagens externas das lojas. */}
+        <Image src={imageUrl} alt="" fill sizes="(max-width: 640px) 100vw, 1100px" className="object-cover" />
       </div>
     </Tag>
   );

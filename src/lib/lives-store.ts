@@ -815,6 +815,23 @@ export async function listProducts(liveId: string): Promise<LiveProduct[]> {
   return products.map((p: LiveProduct) => ({ ...p, clicks: clicksByProduct.get(p.id) ?? 0 }));
 }
 
+/**
+ * Posição para o próximo produto da vitrine. Usa o maior `position` em vez da
+ * contagem porque, depois de excluir um produto do meio, a contagem colidiria
+ * com uma posição que ainda existe.
+ */
+export async function nextProductPosition(liveId: string): Promise<number> {
+  const db: DB = getSupabase();
+  const { data } = await db
+    .from("live_products")
+    .select("position")
+    .eq("live_id", liveId)
+    .order("position", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data ? (data.position as number) + 1 : 0;
+}
+
 export async function countProducts(liveId: string): Promise<number> {
   const db: DB = getSupabase();
   const { count } = await db.from("live_products").select("*", { count: "exact", head: true }).eq("live_id", liveId);

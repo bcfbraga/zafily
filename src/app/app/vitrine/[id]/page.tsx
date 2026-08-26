@@ -54,7 +54,7 @@ function StatusBadge({ status }: { status: "draft" | "published" }) {
       <CheckCircle2 className="w-3 h-3" /> Publicada
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F1F0F7] text-[#4B4768] border border-black/[0.12]">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] border border-black/[0.12]">
       <FileText className="w-3 h-3" /> Rascunho
     </span>
   );
@@ -468,15 +468,15 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="h-full bg-[#F6F6FB] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-[#6C63FF] animate-spin" />
+      <div className="h-full bg-[var(--cr-background)] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 text-[var(--cr-brand-500)] animate-spin" />
       </div>
     );
   }
 
   if (!live) {
     return (
-      <div className="h-full bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
+      <div className="h-full bg-[var(--cr-background)] flex items-center justify-center text-[var(--cr-text-secondary)]">
         Vitrine não encontrada.
       </div>
     );
@@ -519,18 +519,18 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
           {/* Vitrine info */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-[var(--cr-surface-soft)] overflow-hidden shrink-0">
               {live.imageUrl ? (
                 <img src={live.imageUrl} alt={live.title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <Package className="w-4 h-4 text-[#716C8C]" />
+                  <Package className="w-4 h-4 text-[var(--cr-text-tertiary)]" />
                 </div>
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-[#16162B] text-sm truncate">{live.title}</p>
-              <div className="flex items-center gap-2 text-xs text-[#4B4768] mt-0.5 flex-wrap">
+              <p className="font-semibold text-[var(--cr-text-primary)] text-sm truncate">{live.title}</p>
+              <div className="flex items-center gap-2 text-xs text-[var(--cr-text-secondary)] mt-0.5 flex-wrap">
                 {live.liveDate && (
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
@@ -551,7 +551,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           <div className="flex gap-2">
             <button
               onClick={() => setShowEditModal(true)}
-              className="flex-1 h-8 text-xs font-medium text-[#4B4768] hover:text-[#16162B] bg-[#F1F0F7] border border-black/[0.12] hover:border-black/[0.20] rounded-lg transition-colors"
+              className="flex-1 h-8 text-xs font-medium text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] bg-[var(--cr-surface-soft)] border border-black/[0.12] hover:border-black/[0.20] rounded-lg transition-colors"
             >
               Editar dados
             </button>
@@ -559,8 +559,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               onClick={() => setShowAddProducts(v => !v)}
               className={`flex-1 h-8 text-xs font-medium rounded-lg border transition-colors flex items-center justify-center gap-1 ${
                 showAddProducts
-                  ? "bg-[#6C63FF]/20 border-[#6C63FF]/40 text-[#6C63FF]"
-                  : "text-[#4B4768] hover:text-[#16162B] bg-[#F1F0F7] border-black/[0.12] hover:border-black/[0.20]"
+                  ? "bg-[var(--cr-brand-500)]/20 border-[var(--cr-brand-500)]/40 text-[var(--cr-brand-500)]"
+                  : "text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] bg-[var(--cr-surface-soft)] border-black/[0.12] hover:border-black/[0.20]"
               }`}
             >
               <Plus className="w-3 h-3" /> Produtos
@@ -570,27 +570,27 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           {/* Add products section */}
           {(showAddProducts || productCount === 0) && (
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-[#716C8C] uppercase tracking-wider">Adicionar produtos</p>
+              <p className="text-xs font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">Adicionar produtos</p>
               <textarea
                 value={urlsText}
                 onChange={e => setUrlsText(e.target.value)}
                 placeholder={"Nome do produto-M\nhttps://www.cea.com.br/produto...\n\nOutro produto-G\nhttps://www.cea.com.br/produto..."}
                 rows={4}
                 disabled={fetching}
-                className="w-full bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[#6C63FF] resize-none transition-all disabled:opacity-50"
+                className="w-full bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[var(--cr-brand-500)] resize-none transition-all disabled:opacity-50"
               />
-              <p className="text-[10px] text-[#716C8C]">{productItems.length} de {slotsLeft} slots disponíveis · tamanho é lido automaticamente do texto acima do link (ex: &ldquo;Nome-M&rdquo;)</p>
+              <p className="text-[10px] text-[var(--cr-text-tertiary)]">{productItems.length} de {slotsLeft} slots disponíveis · tamanho é lido automaticamente do texto acima do link (ex: &ldquo;Nome-M&rdquo;)</p>
               {fetchError && <p className="text-xs text-red-400">{fetchError}</p>}
               <div className="flex gap-2">
                 <button
                   onClick={fetchProducts}
                   disabled={fetching || productItems.length === 0 || slotsLeft <= 0}
-                  className="flex-1 h-9 flex items-center justify-center gap-1.5 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-colors"
+                  className="flex-1 h-9 flex items-center justify-center gap-1.5 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-40 text-white text-xs font-semibold rounded-xl transition-colors"
                 >
                   {fetching ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Buscando...</> : "Buscar produtos"}
                 </button>
                 <button onClick={() => setUrlsText("")} disabled={fetching}
-                  className="h-9 px-3 text-xs text-[#4B4768] bg-[#F1F0F7] border border-black/[0.12] rounded-xl transition-colors">
+                  className="h-9 px-3 text-xs text-[var(--cr-text-secondary)] bg-[var(--cr-surface-soft)] border border-black/[0.12] rounded-xl transition-colors">
                   Limpar
                 </button>
               </div>
@@ -600,7 +600,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           {/* Product list (mini cards) */}
           {live.products.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider px-1">
+              <p className="text-[10px] font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider px-1">
                 {live.products.length} produto{live.products.length !== 1 ? "s" : ""} · arraste pela alça para reordenar
               </p>
               {live.products.map((product, i) => (
@@ -614,7 +614,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   onDragEnd={() => { setDragIndex(null); setOverIndex(null); }}
                   className={`group flex items-center gap-2 p-2.5 rounded-xl border transition-all cursor-grab active:cursor-grabbing select-none ${
                     overIndex === i && dragIndex !== i
-                      ? "border-[#6C63FF] bg-[#6C63FF]/10"
+                      ? "border-[var(--cr-brand-500)] bg-[var(--cr-brand-500)]/10"
                       : dragIndex === i
                       ? "border-black/[0.08] bg-white opacity-40"
                       : "border-black/[0.06] bg-white hover:border-black/[0.12]"
@@ -627,23 +627,23 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     onTouchCancel={() => { setDragIndex(null); setOverIndex(null); }}
                     className="w-6 h-9 -my-1 -ml-1.5 flex items-center justify-center shrink-0 touch-none cursor-grab active:cursor-grabbing"
                   >
-                    <GripVertical className="w-3.5 h-3.5 text-[#716C8C] opacity-60 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity" />
+                    <GripVertical className="w-3.5 h-3.5 text-[var(--cr-text-tertiary)] opacity-60 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <span className="w-5 shrink-0 text-right text-[11px] font-semibold text-[#716C8C] tabular-nums">
+                  <span className="w-5 shrink-0 text-right text-[11px] font-semibold text-[var(--cr-text-tertiary)] tabular-nums">
                     {i + 1}
                   </span>
-                  <div className="w-9 h-9 rounded-lg bg-[#F1F0F7] overflow-hidden shrink-0">
+                  <div className="w-9 h-9 rounded-lg bg-[var(--cr-surface-soft)] overflow-hidden shrink-0">
                     {product.imageUrl
                       ? <img src={product.imageUrl} alt="" className="w-full h-full object-cover" />
-                      : <div className="w-full h-full flex items-center justify-center"><Package className="w-4 h-4 text-[#716C8C]" /></div>
+                      : <div className="w-full h-full flex items-center justify-center"><Package className="w-4 h-4 text-[var(--cr-text-tertiary)]" /></div>
                     }
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-[#16162B] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
+                    <p className="text-xs text-[var(--cr-text-primary)] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                      {product.price && <span className="text-[10px] text-[#6C63FF] font-semibold">{product.price}</span>}
+                      {product.price && <span className="text-[10px] text-[var(--cr-brand-500)] font-semibold">{product.price}</span>}
                       {(product.clicks ?? 0) > 0 && (
-                        <span className="text-[10px] text-[#716C8C]">{product.clicks} clique{product.clicks !== 1 ? "s" : ""}</span>
+                        <span className="text-[10px] text-[var(--cr-text-tertiary)]">{product.clicks} clique{product.clicks !== 1 ? "s" : ""}</span>
                       )}
                       {/* Inline size field */}
                       {editingSizeId === product.id ? (
@@ -654,15 +654,15 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                           onBlur={() => saveSize(product.id)}
                           onKeyDown={e => { if (e.key === "Enter") saveSize(product.id); if (e.key === "Escape") setEditingSizeId(null); }}
                           placeholder="ex: M, 38"
-                          className="h-4 w-16 bg-transparent border-b border-[#6C63FF] text-[10px] text-[#16162B] placeholder:text-[#716C8C] focus:outline-none"
+                          className="h-4 w-16 bg-transparent border-b border-[var(--cr-brand-500)] text-[10px] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] focus:outline-none"
                         />
                       ) : (
                         <button
                           onClick={() => openSizeEdit(product)}
                           className={`text-[10px] px-1.5 py-0.5 rounded border transition-colors ${
                             product.size
-                              ? "border-[#6C63FF]/40 text-[#6C63FF] bg-[#6C63FF]/10 hover:bg-[#6C63FF]/20"
-                              : "border-black/[0.10] text-[#716C8C] hover:text-[#4B4768] hover:border-black/[0.20]"
+                              ? "border-[var(--cr-brand-500)]/40 text-[var(--cr-brand-500)] bg-[var(--cr-brand-500)]/10 hover:bg-[var(--cr-brand-500)]/20"
+                              : "border-black/[0.10] text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:border-black/[0.20]"
                           }`}
                         >
                           {product.size ?? "+ tamanho"}
@@ -672,7 +672,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   </div>
                   <div className="flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity shrink-0">
                     <button onClick={() => setEditingProduct(product)} title="Editar produto"
-                      className="w-8 h-8 lg:w-6 lg:h-6 rounded-lg bg-[#F1F0F7] flex items-center justify-center text-[#4B4768] hover:text-white hover:bg-[#6C63FF] transition-colors">
+                      className="w-8 h-8 lg:w-6 lg:h-6 rounded-lg bg-[var(--cr-surface-soft)] flex items-center justify-center text-[var(--cr-text-secondary)] hover:text-white hover:bg-[var(--cr-brand-500)] transition-colors">
                       <Pencil className="w-3.5 h-3.5 lg:w-3 lg:h-3" />
                     </button>
                     <button
@@ -682,7 +682,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                       className={`w-8 h-8 lg:w-6 lg:h-6 rounded-lg flex items-center justify-center transition-colors ${
                         confirmRemoveId === product.id
                           ? "bg-red-600 text-white"
-                          : "bg-[#F1F0F7] text-[#4B4768] hover:text-white hover:bg-red-600"
+                          : "bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] hover:text-white hover:bg-red-600"
                       }`}
                     >
                       {removingId === product.id
@@ -707,11 +707,11 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                         Confirmar
                       </button>
                       <button onClick={() => setConfirmClearAll(false)}
-                        className="h-7 px-3 text-xs bg-black/5 hover:bg-black/10 text-[#4B4768] rounded-lg">Cancelar</button>
+                        className="h-7 px-3 text-xs bg-black/5 hover:bg-black/10 text-[var(--cr-text-secondary)] rounded-lg">Cancelar</button>
                     </div>
                   ) : (
                     <button onClick={() => setConfirmClearAll(true)}
-                      className="w-full h-8 text-xs text-[#716C8C] hover:text-red-400 border border-dashed border-black/[0.08] hover:border-red-600/30 rounded-xl transition-colors">
+                      className="w-full h-8 text-xs text-[var(--cr-text-tertiary)] hover:text-red-400 border border-dashed border-black/[0.08] hover:border-red-600/30 rounded-xl transition-colors">
                       Limpar tudo
                     </button>
                   )}
@@ -858,64 +858,64 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
     <Modal open onClose={onClose} title="Editar dados da vitrine" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Título</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Título</label>
             <input type="text" value={title} onChange={e => setTitle(e.target.value)} required
-              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
           </div>
           {!date && (
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Seção</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Seção</label>
               <SectionSelect value={sectionId} onChange={setSectionId} />
-              <p className="text-[11px] text-[#716C8C]">Agrupa essa vitrine na galeria pública.</p>
+              <p className="text-[11px] text-[var(--cr-text-tertiary)]">Agrupa essa vitrine na galeria pública.</p>
             </div>
           )}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Link da vitrine</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Link da vitrine</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">/{username ?? "..."}/</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[var(--cr-text-tertiary)]">/{username ?? "..."}/</span>
               <input
                 type="text"
                 value={slug}
                 onChange={e => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl pr-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all"
                 style={{ paddingLeft: `calc(1rem + ${2 + (username?.length ?? 3)}ch)` }}
               />
             </div>
-            <p className="text-[11px] text-[#716C8C]">Mudar o link não quebra o link antigo — ele redireciona para o novo.</p>
+            <p className="text-[11px] text-[var(--cr-text-tertiary)]">Mudar o link não quebra o link antigo — ele redireciona para o novo.</p>
           </div>
           {/* Store + Discount on same row */}
           <div className="grid grid-cols-[1fr_100px] gap-3 items-end">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Loja</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Loja</label>
               <StoreSelect value={store} onChange={setStore} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">
-                Desconto <span className="text-[#716C8C] font-normal">(opcional)</span>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">
+                Desconto <span className="text-[var(--cr-text-tertiary)] font-normal">(opcional)</span>
               </label>
               <div className="relative">
                 <input
                   type="number" min="1" max="99" value={discount}
                   onChange={e => setDiscount(e.target.value)}
                   placeholder="Ex: 10"
-                  className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 pr-8 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                  className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-3 pr-8 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all"
                 />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">%</span>
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-[var(--cr-text-tertiary)]">%</span>
               </div>
             </div>
           </div>
 
           {discount.trim() && (
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Como o desconto é aplicado</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Como o desconto é aplicado</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setDiscountType("cart")}
                   className={`h-11 px-3 rounded-xl border text-xs font-medium transition-colors ${
                     discountType === "cart"
-                      ? "bg-[#6C63FF]/10 border-[#6C63FF] text-[#6C63FF]"
-                      : "bg-[#F1F0F7] border-black/[0.12] text-[#4B4768] hover:border-black/[0.20]"
+                      ? "bg-[var(--cr-brand-500)]/10 border-[var(--cr-brand-500)] text-[var(--cr-brand-500)]"
+                      : "bg-[var(--cr-surface-soft)] border-black/[0.12] text-[var(--cr-text-secondary)] hover:border-black/[0.20]"
                   }`}
                 >
                   Desconto direto no carrinho
@@ -925,8 +925,8 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
                   onClick={() => setDiscountType("coupon")}
                   className={`h-11 px-3 rounded-xl border text-xs font-medium transition-colors ${
                     discountType === "coupon"
-                      ? "bg-[#6C63FF]/10 border-[#6C63FF] text-[#6C63FF]"
-                      : "bg-[#F1F0F7] border-black/[0.12] text-[#4B4768] hover:border-black/[0.20]"
+                      ? "bg-[var(--cr-brand-500)]/10 border-[var(--cr-brand-500)] text-[var(--cr-brand-500)]"
+                      : "bg-[var(--cr-surface-soft)] border-black/[0.12] text-[var(--cr-text-secondary)] hover:border-black/[0.20]"
                   }`}
                 >
                   Cupom
@@ -938,31 +938,31 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
                   value={couponCode}
                   onChange={e => setCouponCode(e.target.value)}
                   placeholder="Nome do cupom, ex: ZAFILY10"
-                  className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                  className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all"
                 />
               )}
             </div>
           )}
 
           <div className={`w-full flex items-center justify-between px-4 h-11 rounded-xl border bg-white transition-colors ${showPrices ? "border-black/[0.12]" : "border-black/[0.12] opacity-60"}`}>
-            <span className="text-sm font-medium text-[#4B4768]">Mostrar preços</span>
+            <span className="text-sm font-medium text-[var(--cr-text-secondary)]">Mostrar preços</span>
             <button
               type="button"
               onClick={() => setShowPrices(v => !v)}
               title={showPrices ? "Ocultar preços" : "Mostrar preços"}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors"
             >
               {showPrices ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             </button>
           </div>
 
           <div className={`w-full flex items-center justify-between px-4 h-11 rounded-xl border bg-white transition-colors ${showTitle ? "border-black/[0.12]" : "border-black/[0.12] opacity-60"}`}>
-            <span className="text-sm font-medium text-[#4B4768]">Mostrar título</span>
+            <span className="text-sm font-medium text-[var(--cr-text-secondary)]">Mostrar título</span>
             <button
               type="button"
               onClick={() => setShowTitle(v => !v)}
               title={showTitle ? "Ocultar título" : "Mostrar título"}
-              className="w-7 h-7 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors"
             >
               {showTitle ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
             </button>
@@ -970,18 +970,18 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Data</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Data</label>
               <input type="date" value={date} onChange={e => setDate(e.target.value)}
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Horário</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Horário</label>
               <input type="time" value={time} onChange={e => setTime(e.target.value)}
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all" />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Imagem</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Imagem</label>
             <label className="block cursor-pointer">
               <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
               {imagePreview ? (
@@ -992,8 +992,8 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
                 </div>
               ) : (
                 <div className="w-full h-24 rounded-xl border-2 border-dashed border-black/[0.12] hover:border-violet-500 flex items-center justify-center gap-2 transition-colors">
-                  <Upload className="w-5 h-5 text-[#716C8C]" />
-                  <span className="text-sm text-[#716C8C]">Upload de imagem</span>
+                  <Upload className="w-5 h-5 text-[var(--cr-text-tertiary)]" />
+                  <span className="text-sm text-[var(--cr-text-tertiary)]">Upload de imagem</span>
                 </div>
               )}
             </label>
@@ -1001,11 +1001,11 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
           {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving || uploading}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="flex-1 h-10 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar alterações"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
+              className="h-10 px-4 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>
@@ -1079,11 +1079,11 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
 
         {/* Product image + link */}
         <div className="px-6 py-4 border-b border-[var(--cr-border)] flex items-center gap-3">
-          <label className="relative w-14 h-14 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0 cursor-pointer group">
+          <label className="relative w-14 h-14 rounded-xl bg-[var(--cr-surface-soft)] overflow-hidden shrink-0 cursor-pointer group">
             <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" />
             {imageUrl
               ? <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
-              : <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-[#716C8C]" /></div>
+              : <div className="w-full h-full flex items-center justify-center"><Package className="w-5 h-5 text-[var(--cr-text-tertiary)]" /></div>
             }
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 flex items-center justify-center transition-colors">
               {uploadingImage
@@ -1093,7 +1093,7 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
             </div>
           </label>
           <a href={product.url} target="_blank" rel="noopener noreferrer"
-            className="text-xs text-[#6C63FF] hover:text-[#5851E0] truncate flex items-center gap-1">
+            className="text-xs text-[var(--cr-brand-500)] hover:text-[var(--cr-brand-700)] truncate flex items-center gap-1">
             <ExternalLink className="w-3 h-3 shrink-0" />
             <span className="truncate">{product.url}</span>
           </a>
@@ -1102,38 +1102,38 @@ function EditProductModal({ product, liveId, onClose, onSave }: EditProductModal
         {/* Form */}
         <form onSubmit={handleSave} className="px-6 py-5 space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Nome do produto</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Nome do produto</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ex: Vestido Floral Verão"
-              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Preço</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Preço</label>
               <input type="text" value={price} onChange={e => setPrice(e.target.value)} placeholder="R$ 89,90"
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Categoria</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Categoria</label>
               <input type="text" value={category} onChange={e => setCategory(e.target.value)} placeholder="Ex: Blusas"
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">
               Tamanho que você usou
-              <span className="ml-1.5 text-xs text-[#716C8C] font-normal">(ajuda suas seguidoras a escolher)</span>
+              <span className="ml-1.5 text-xs text-[var(--cr-text-tertiary)] font-normal">(ajuda suas seguidoras a escolher)</span>
             </label>
             <input type="text" value={size} onChange={e => setSize(e.target.value)} placeholder="Ex: M, 38, P/M..."
-              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
           </div>
           {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="flex gap-3 pt-1">
             <button type="submit" disabled={saving}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
+              className="flex-1 h-10 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-50 text-white text-sm font-semibold rounded-xl transition-colors flex items-center justify-center gap-2">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
+              className="h-10 px-4 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>

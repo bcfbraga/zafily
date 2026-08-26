@@ -51,22 +51,22 @@ export default function NovoOrcamentoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F6FB] text-[#16162B]">
-      <div className="border-b border-black/[0.08] bg-[#F6F6FB] sticky top-0 z-10">
+    <div className="min-h-screen bg-[var(--cr-background)] text-[var(--cr-text-primary)]">
+      <div className="border-b border-black/[0.08] bg-[var(--cr-background)] sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-6 h-16 flex items-center">
-          <Link href="/app/orcamentos" className="flex items-center gap-1.5 text-sm text-[#4B4768] hover:text-[#16162B] transition-colors">
+          <Link href="/app/orcamentos" className="flex items-center gap-1.5 text-sm text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] transition-colors">
             <ArrowLeft className="w-4 h-4" /> Voltar para propostas
           </Link>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <h1 className="text-2xl font-bold text-[#16162B] mb-1">Nova proposta comercial</h1>
-        <p className="text-[#4B4768] text-sm mb-8">O restante (fotos, contatos, valor gerado etc.) você ajusta depois no editor.</p>
+        <h1 className="text-2xl font-bold text-[var(--cr-text-primary)] mb-1">Nova proposta comercial</h1>
+        <p className="text-[var(--cr-text-secondary)] text-sm mb-8">O restante (fotos, contatos, valor gerado etc.) você ajusta depois no editor.</p>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Nome do cliente <span className="text-red-400">*</span></label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Nome do cliente <span className="text-red-400">*</span></label>
             <input
               type="text"
               value={clientName}
@@ -74,12 +74,12 @@ export default function NovoOrcamentoPage() {
               placeholder="Ex: Loja XYZ"
               required
               autoFocus
-              className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+              className="w-full h-12 bg-white border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-[#4B4768]">Escopo</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Escopo</label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {SCOPE_OPTIONS.map(option => {
                 const checked = scopeItems.includes(option);
@@ -90,12 +90,12 @@ export default function NovoOrcamentoPage() {
                     onClick={() => toggleScope(option)}
                     className={`flex items-center gap-2.5 h-11 px-3 rounded-xl border text-left text-sm font-medium transition-colors ${
                       checked
-                        ? "bg-[#6C63FF]/15 border-[#6C63FF] text-[#4338CA]"
-                        : "bg-white border-black/[0.12] text-[#4B4768] hover:border-black/[0.24]"
+                        ? "bg-[var(--cr-brand-500)]/15 border-[var(--cr-brand-500)] text-[var(--cr-brand-700)]"
+                        : "bg-white border-black/[0.12] text-[var(--cr-text-secondary)] hover:border-black/[0.24]"
                     }`}
                   >
                     <span className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ${
-                      checked ? "bg-[#6C63FF] border-[#6C63FF]" : "border-black/[0.24]"
+                      checked ? "bg-[var(--cr-brand-500)] border-[var(--cr-brand-500)]" : "border-black/[0.24]"
                     }`}>
                       {checked && <Check className="w-3 h-3 text-white" />}
                     </span>
@@ -107,13 +107,13 @@ export default function NovoOrcamentoPage() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Valor</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Valor</label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">R$</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[var(--cr-text-tertiary)]">R$</span>
               <CurrencyInput
                 defaultValue={null}
                 onChange={setFinalValue}
-                className="w-full h-12 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl pl-10 pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all"
+                className="w-full h-12 bg-white border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl pl-10 pr-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all"
               />
             </div>
           </div>
@@ -126,13 +126,13 @@ export default function NovoOrcamentoPage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 h-11 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="flex-1 h-11 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
             >
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Criando...</> : "Criar proposta"}
             </button>
             <Link
               href="/app/orcamentos"
-              className="h-11 px-5 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] text-sm font-medium rounded-xl flex items-center justify-center transition-colors"
+              className="h-11 px-5 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] text-sm font-medium rounded-xl flex items-center justify-center transition-colors"
             >
               Cancelar
             </Link>

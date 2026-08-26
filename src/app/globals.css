@@ -1,4 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap");
+/* Famílias da marca (tokens v1). Aplicadas só dentro de .zf-brand — as fontes
+   acima continuam servindo as páginas públicas. */
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -160,8 +163,12 @@
 
 /* ── Creator surface design tokens (Vitrine / Links) ──────────────────────── */
 /* Scoped to the creator-facing dashboard and public pages; the dark oklch
-   tokens above serve other parts of the app and are left untouched. */
-:root {
+   tokens above serve other parts of the app and are left untouched.
+   `.zf-public` repete estes valores de propósito: dentro do dashboard (que é
+   .zf-brand) ele devolve o visual público ao preview da vitrine, para o preview
+   não mostrar rosa/reto enquanto o visitante vê roxo/arredondado. */
+:root,
+.zf-public {
   --cr-brand-50: #f7f5ff;
   --cr-brand-100: #efebff;
   --cr-brand-200: #dfd7ff;
@@ -215,6 +222,89 @@
   --cr-transition-slow: 320ms ease;
 
   --cr-font: "Inter", "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ── Marca Zafily — escopo do dashboard ───────────────────────────────────── */
+/* Redeclara os mesmos tokens acima dentro de .zf-brand (raiz de /app), então o
+   dashboard fica rosa enquanto as páginas públicas seguem lendo o :root.
+   Referência: zafilybrandtokens.json v1 — rosa #F759AD é a única cor de marca;
+   roxo e azul são explicitamente proibidos. */
+.zf-brand {
+  /* Escala ancorada nos dois tons oficiais: 500 = pink, 700 = pink-deep */
+  --cr-brand-50: #fdf2f8;
+  --cr-brand-100: #fce7f3;
+  --cr-brand-200: #fbcfe8;
+  --cr-brand-300: #f9a8d4;
+  --cr-brand-400: #f87fbf;
+  --cr-brand-500: #f759ad;
+  --cr-brand-600: #e5308f;
+  --cr-brand-700: #c70a6e;
+  --cr-brand-800: #9d0857;
+  --cr-brand-900: #6b0539;
+
+  --cr-background: #ffffff;
+  --cr-background-alt: #fbf1f6;
+  --cr-surface: #ffffff;
+  --cr-surface-soft: #fbf1f6;
+  --cr-surface-hover: #f7e6ef;
+
+  --cr-text-primary: #0c0c0c;
+  --cr-text-secondary: #816a76;
+  --cr-text-tertiary: #a8959e;
+  --cr-text-inverse: #ffffff;
+
+  --cr-border: #ebe0e6;
+  --cr-border-strong: #ddccd5;
+
+  --cr-accent-pink: #f759ad;
+
+  /* Cantos retos (token: corner_radius_max_px 4). Os utilitários do Tailwind v4
+     leem --radius-*; as classes .cr-* leem --cr-radius-*. Avatares e badges
+     continuam redondos via --*-full. */
+  --radius-sm: 4px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-full: 999px;
+
+  --cr-radius-xs: 2px;
+  --cr-radius-sm: 4px;
+  --cr-radius-md: 4px;
+  --cr-radius-lg: 4px;
+  --cr-radius-xl: 4px;
+  --cr-radius-2xl: 4px;
+  --cr-radius-full: 999px;
+
+  /* Sombras re-ancoradas no preto ink em vez do roxo antigo */
+  --cr-shadow-xs: 0 1px 2px rgba(12, 12, 12, 0.04);
+  --cr-shadow-sm: 0 4px 12px rgba(12, 12, 12, 0.06);
+  --cr-shadow-md: 0 12px 30px rgba(12, 12, 12, 0.08);
+  --cr-shadow-floating: 0 18px 48px rgba(12, 12, 12, 0.12);
+
+  --cr-font: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-heading: "Bricolage Grotesque", "Hanken Grotesk", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
+
+  font-family: var(--font-body);
+}
+
+/* Cantos retos nos utilitários do Tailwind. O bloco @theme deste projeto usa
+   `inline`, que embute o valor literal (border-radius: 28px) em vez de emitir
+   var(--radius-xl) — então redeclarar a variável não basta e a regra abaixo é
+   necessária. O preview da vitrine (.zf-public) fica de fora para continuar
+   representando fielmente a página pública. */
+.zf-brand
+  :is(.rounded-sm, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl):not(
+    :is(.zf-public, .zf-public *)
+  ) {
+  border-radius: 4px;
+}
+
+/* Preços, métricas e percentuais falam em monoespaçada (token: typography.data) */
+.zf-brand .zf-data {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 
 .cr-page-title {

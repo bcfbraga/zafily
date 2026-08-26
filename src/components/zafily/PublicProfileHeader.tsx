@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { MapPin } from "lucide-react";
 import type { Profile } from "@/lib/lives-store";
 
@@ -8,8 +9,13 @@ export function PublicProfileHeader({ profile }: { profile: Profile }) {
       <div className="cr-avatar-wrapper mb-4">
         <div className="cr-avatar overflow-hidden flex items-center justify-center" style={{ background: "var(--cr-brand-50)" }}>
           {profile.photoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.photoUrl} alt={displayName} className="w-full h-full object-cover" />
+            <Image
+              src={profile.photoUrl}
+              alt={displayName}
+              width={96}
+              height={96}
+              className="w-full h-full object-cover"
+            />
           ) : (
             <span className="text-2xl font-bold" style={{ color: "var(--cr-brand-400)" }}>{displayName[0]?.toUpperCase()}</span>
           )}

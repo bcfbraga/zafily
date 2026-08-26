@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { getLive, countProducts, addProduct, getAccountStatus } from "@/lib/lives-store";
+import { getLive, countProducts, addProduct, getAccountStatus, nextProductPosition } from "@/lib/lives-store";
 import { fetchUrlMetadata } from "@/lib/metadata";
+import { shortCategory } from "@/lib/utils";
 
 const MAX_PRODUCTS = 100;
 const FREE_TIER_MAX_PRODUCTS = 5;
@@ -45,10 +46,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   const toProcess = items.slice(0, slots);
+
+  // Busca os metadados de todos antes de gravar: só dá para agrupar por
+  // categoria depois de saber a categoria de cada link.
+  const enriched = await Promise.all(
+    toProcess.map(async (item, i) => ({ item, meta: await fetchUrlMetadata(item.url), ordemEnvio: i }))
+  );
+
+  // Agrupa por categoria em ordem alfabética, ignorando a ordem em que os links
+  // foram colados. Dentro de uma mesma categoria a ordem de envio é mantida, e
+  // produtos sem categoria vão para o fim.
+  const sorted = enriched.sort((a, b) => {
+    const ca = shortCategory(a.meta.category)?.toLocaleLowerCase("pt-BR");
+    const cb = shortCategory(b.meta.category)?.toLocaleLowerCase("pt-BR");
+    if (ca !== cb) {
+      if (!ca) return 1;
+      if (!cb) return -1;
+      return ca.localeCompare(cb, "pt-BR");
+    }
+    return a.ordemEnvio - b.ordemEnvio;
+  });
+
+  // Sempre no fim da lista, para não embaralhar o que a usuária já ordenou.
+  const startPosition = await nextProductPosition(id);
+
   const results = await Promise.all(
-    toProcess.map(async (item, i) => {
-      const meta = await fetchUrlMetadata(item.url);
-      return addProduct(id, {
+    sorted.map(({ item, meta }, i) =>
+      addProduct(id, {
         url: item.url,
         name: meta.name,
         imageUrl: meta.imageUrl,
@@ -56,9 +80,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         category: meta.category,
         productUrl: meta.productUrl,
         size: item.size ?? null,
-        position: current + i,
-      });
-    })
+        position: startPosition + i,
+      })
+    )
   );
 
   return NextResponse.json({ products: results, skipped: items.length - toProcess.length });

@@ -5,6 +5,7 @@ import { resolveCurrentUsername } from "@/lib/lives-store";
 import { PublicProfileHeader } from "@/components/zafily/PublicProfileHeader";
 import { PublicProfileTabs } from "@/components/zafily/PublicProfileTabs";
 import { BentoLinksGrid } from "@/components/zafily/BentoLinksGrid";
+import { titleCase } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
-  return { title: `Zafily - @${username}` };
+  return { title: `${titleCase(username)} - Feito por Zafily` };
 }
 
 export default async function CreatorProfilePage({ params }: Props) {

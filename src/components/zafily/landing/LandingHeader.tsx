@@ -29,7 +29,7 @@ export function LandingHeader() {
     >
       <div className="max-w-[1200px] mx-auto px-6 h-full flex items-center justify-between">
         <Link href="/" className="shrink-0" aria-label="Zafily">
-          <ZafilyLogo size={scrolled ? 24 : 28} />
+          <ZafilyLogo tone="light" size={scrolled ? 24 : 28} />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 text-sm text-[#B8B4E8]" aria-label="Navegação principal">

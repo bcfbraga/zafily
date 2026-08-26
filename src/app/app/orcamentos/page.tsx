@@ -32,7 +32,7 @@ function StatusBadge({ status }: { status: "draft" | "published" }) {
       <CheckCircle2 className="w-3 h-3" /> Publicado
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#F1F0F7] text-[#4B4768] border border-black/[0.12]">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] border border-black/[0.12]">
       <FileText className="w-3 h-3" /> Rascunho
     </span>
   );
@@ -72,11 +72,11 @@ export default function OrcamentosPage() {
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 
   return (
-    <div className="min-h-screen bg-[#F6F6FB] text-[#16162B]">
+    <div className="min-h-screen bg-[var(--cr-background)] text-[var(--cr-text-primary)]">
       <Topbar title="Propostas comerciais" action={
         <Link
           href="/app/orcamentos/novo"
-          className="flex items-center gap-1.5 h-8 px-4 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-xs font-semibold rounded-lg transition-colors"
+          className="flex items-center gap-1.5 h-8 px-4 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] text-white text-xs font-semibold rounded-lg transition-colors"
         >
           <Plus className="w-3.5 h-3.5" /> Nova proposta
         </Link>
@@ -92,16 +92,16 @@ export default function OrcamentosPage() {
           </div>
         ) : budgets.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[#6C63FF]/20 flex items-center justify-center">
-              <Receipt className="w-6 h-6 text-[#6C63FF]" />
+            <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-500)]/20 flex items-center justify-center">
+              <Receipt className="w-6 h-6 text-[var(--cr-brand-500)]" />
             </div>
             <div>
-              <p className="text-[#16162B] font-semibold text-lg">Nenhuma proposta ainda</p>
-              <p className="text-[#4B4768] text-sm mt-1">Crie sua primeira proposta e envie o link para o cliente.</p>
+              <p className="text-[var(--cr-text-primary)] font-semibold text-lg">Nenhuma proposta ainda</p>
+              <p className="text-[var(--cr-text-secondary)] text-sm mt-1">Crie sua primeira proposta e envie o link para o cliente.</p>
             </div>
             <Link
               href="/app/orcamentos/novo"
-              className="flex items-center gap-1.5 h-10 px-5 bg-[#6C63FF] hover:bg-[#5851E0] text-white text-sm font-semibold rounded-lg transition-colors"
+              className="flex items-center gap-1.5 h-10 px-5 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] text-white text-sm font-semibold rounded-lg transition-colors"
             >
               <Plus className="w-4 h-4" /> Criar primeira proposta
             </Link>
@@ -110,7 +110,7 @@ export default function OrcamentosPage() {
           <div className="rounded-xl border border-black/[0.08] overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-white text-left text-[11px] font-semibold text-[#716C8C] uppercase tracking-wider">
+                <tr className="bg-white text-left text-[11px] font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">
                   <th className="px-5 py-3 font-semibold">Proposta</th>
                   <th className="px-5 py-3 font-semibold">Cliente</th>
                   <th className="px-5 py-3 font-semibold">Criado em</th>
@@ -127,29 +127,29 @@ export default function OrcamentosPage() {
                     className="border-t border-black/[0.06] hover:bg-white cursor-pointer transition-colors"
                   >
                     <td className="px-5 py-4 min-w-0">
-                      <p className="font-medium text-[#16162B] truncate">{budget.title}</p>
+                      <p className="font-medium text-[var(--cr-text-primary)] truncate">{budget.title}</p>
                       {budget.status === "published" && profile && (
                         <a
                           href={`${baseUrl}/${profile.username}/proposta/${budget.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={e => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 text-xs text-[#6C63FF] hover:text-[#5851E0] mt-0.5 transition-colors"
+                          className="inline-flex items-center gap-1 text-xs text-[var(--cr-brand-500)] hover:text-[var(--cr-brand-700)] mt-0.5 transition-colors"
                         >
                           <ExternalLink className="w-3 h-3" />
                           {`/${profile.username}/proposta/${budget.slug}`}
                         </a>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-[#4B4768]">{budget.clientName || "—"}</td>
-                    <td className="px-5 py-4 text-[#4B4768] whitespace-nowrap">
+                    <td className="px-5 py-4 text-[var(--cr-text-secondary)]">{budget.clientName || "—"}</td>
+                    <td className="px-5 py-4 text-[var(--cr-text-secondary)] whitespace-nowrap">
                       {new Date(budget.createdAt).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap">
                       {budget.finalValue != null ? (
-                        <span className="font-semibold text-[#6C63FF]">{formatBRL(budget.finalValue)}</span>
+                        <span className="font-semibold text-[var(--cr-brand-500)]">{formatBRL(budget.finalValue)}</span>
                       ) : (
-                        <span className="text-[#716C8C]">—</span>
+                        <span className="text-[var(--cr-text-tertiary)]">—</span>
                       )}
                     </td>
                     <td className="px-5 py-4">
@@ -158,7 +158,7 @@ export default function OrcamentosPage() {
                     <td className="px-5 py-4" onClick={e => e.stopPropagation()}>
                       <button
                         onClick={() => setConfirmId(budget.id)}
-                        className="w-8 h-8 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--cr-text-tertiary)] hover:text-red-600 hover:bg-red-50 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -173,8 +173,8 @@ export default function OrcamentosPage() {
 
       {/* Confirm delete dialog */}
       <Modal open={!!confirmId} onClose={() => setConfirmId(null)} maxWidth="max-w-sm">
-        <h3 className="font-semibold text-[#16162B] mb-2">Excluir proposta?</h3>
-        <p className="text-sm text-[#4B4768] mb-5">
+        <h3 className="font-semibold text-[var(--cr-text-primary)] mb-2">Excluir proposta?</h3>
+        <p className="text-sm text-[var(--cr-text-secondary)] mb-5">
           Esta ação remove a proposta e todos os itens vinculados permanentemente. Não poderá ser desfeito.
         </p>
         <div className="flex gap-3">
@@ -187,7 +187,7 @@ export default function OrcamentosPage() {
           </button>
           <button
             onClick={() => setConfirmId(null)}
-            className="flex-1 h-10 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm font-medium rounded-lg hover:border-black/[0.20] transition-colors"
+            className="flex-1 h-10 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] text-sm font-medium rounded-lg hover:border-black/[0.20] transition-colors"
           >
             Cancelar
           </button>

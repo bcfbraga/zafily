@@ -9,7 +9,7 @@ export function LandingFooter() {
       <div className="max-w-[1100px] mx-auto">
         <div className="flex flex-col sm:flex-row justify-between gap-8 mb-8">
           <div className="max-w-[320px]">
-            <ZafilyLogo size={24} />
+            <ZafilyLogo tone="light" size={24} />
             <p className="text-xs text-[#7E78B8] mt-4 leading-relaxed">{footer.description}</p>
           </div>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#B8B4E8]" aria-label="Links do rodapé">

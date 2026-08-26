@@ -12,8 +12,8 @@ const variants: Record<BadgeVariant, string> = {
   success: "bg-[rgba(0,212,170,0.14)] text-[#00806A]",
   warning: "bg-[rgba(255,200,87,0.20)] text-[#8A6A1B]",
   error: "bg-[rgba(225,29,72,0.10)] text-[#E11D48]",
-  info: "bg-[rgba(108,99,255,0.14)] text-[#4338CA]",
-  neutral: "bg-black/[0.05] text-[#4B4768]",
+  info: "bg-[rgba(247, 89, 173,0.14)] text-[var(--cr-brand-700)]",
+  neutral: "bg-black/[0.05] text-[var(--cr-text-secondary)]",
 };
 
 export function ZafilyBadge({ variant = "neutral", children, className }: BadgeProps) {

@@ -60,7 +60,7 @@ function StatusBadge({ status }: { status: "draft" | "published" }) {
       <CheckCircle2 className="w-3 h-3" /> Publicado
     </span>
   ) : (
-    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#F1F0F7] text-[#4B4768] border border-black/[0.12]">
+    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] border border-black/[0.12]">
       <FileText className="w-3 h-3" /> Rascunho
     </span>
   );
@@ -73,20 +73,20 @@ function formatBRL(value: number): string {
 // ── Quantity stepper ─────────────────────────────────────────────────────────
 function QuantityStepper({ value, onChange }: { value: number; onChange: (next: number) => void }) {
   return (
-    <div className="flex items-center gap-1 bg-[#F1F0F7] border border-black/[0.12] rounded-full p-0.5 shrink-0">
+    <div className="flex items-center gap-1 bg-[var(--cr-surface-soft)] border border-black/[0.12] rounded-full p-0.5 shrink-0">
       <button
         type="button"
         onClick={() => onChange(Math.max(0, value - 1))}
         disabled={value <= 0}
-        className="w-6 h-6 flex items-center justify-center rounded-full text-[#4B4768] hover:text-[#16162B] hover:bg-black/[0.06] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+        className="w-6 h-6 flex items-center justify-center rounded-full text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.06] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
       >
         <Minus className="w-3 h-3" />
       </button>
-      <span className="w-6 text-center text-xs font-semibold text-[#16162B] tabular-nums">{value}</span>
+      <span className="w-6 text-center text-xs font-semibold text-[var(--cr-text-primary)] tabular-nums">{value}</span>
       <button
         type="button"
         onClick={() => onChange(value + 1)}
-        className="w-6 h-6 flex items-center justify-center rounded-full text-[#4B4768] hover:text-[#16162B] hover:bg-black/[0.06] transition-colors"
+        className="w-6 h-6 flex items-center justify-center rounded-full text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.06] transition-colors"
       >
         <Plus className="w-3 h-3" />
       </button>
@@ -319,15 +319,15 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
   if (loading) {
     return (
-      <div className="h-full bg-[#F6F6FB] flex items-center justify-center">
-        <Loader2 className="w-6 h-6 text-[#6C63FF] animate-spin" />
+      <div className="h-full bg-[var(--cr-background)] flex items-center justify-center">
+        <Loader2 className="w-6 h-6 text-[var(--cr-brand-500)] animate-spin" />
       </div>
     );
   }
 
   if (!budget) {
     return (
-      <div className="h-full bg-[#F6F6FB] flex items-center justify-center text-[#4B4768]">
+      <div className="h-full bg-[var(--cr-background)] flex items-center justify-center text-[var(--cr-text-secondary)]">
         Proposta não encontrada.
       </div>
     );
@@ -384,24 +384,24 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
             <button
               onClick={() => setShowEditModal(true)}
               title="Editar dados"
-              className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-md text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors"
+              className="absolute top-2.5 right-2.5 w-7 h-7 flex items-center justify-center rounded-md text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors"
             >
               <Pencil className="w-3.5 h-3.5" />
             </button>
             <div className="flex items-center gap-3 pr-8">
-              <div className="w-10 h-10 rounded-xl bg-[#F1F0F7] overflow-hidden shrink-0 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-[var(--cr-surface-soft)] overflow-hidden shrink-0 flex items-center justify-center">
                 {budget.clientLogoUrl ? (
                   <img src={budget.clientLogoUrl} alt={budget.clientName ?? ""} className="w-full h-full object-contain" />
                 ) : (
-                  <Package className="w-4 h-4 text-[#716C8C]" />
+                  <Package className="w-4 h-4 text-[var(--cr-text-tertiary)]" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[#16162B] text-sm truncate">{budget.title}</p>
-                <div className="flex items-center gap-2 text-xs text-[#4B4768] mt-0.5 flex-wrap">
+                <p className="font-semibold text-[var(--cr-text-primary)] text-sm truncate">{budget.title}</p>
+                <div className="flex items-center gap-2 text-xs text-[var(--cr-text-secondary)] mt-0.5 flex-wrap">
                   {budget.clientName && <span>{budget.clientName}</span>}
                   {budget.finalValue != null && (
-                    <span className="px-1.5 py-0.5 rounded-full bg-[#6C63FF]/20 text-[#6C63FF] text-[10px] font-bold">
+                    <span className="px-1.5 py-0.5 rounded-full bg-[var(--cr-brand-500)]/20 text-[var(--cr-brand-500)] text-[10px] font-bold">
                       {formatBRL(budget.finalValue)}
                     </span>
                   )}
@@ -410,14 +410,14 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
             </div>
             <div className="grid grid-cols-2 gap-2 pt-2.5 border-t border-black/[0.06]">
               <div>
-                <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider">Valor do investimento</p>
-                <p className="text-sm font-semibold text-[#16162B] mt-0.5">
+                <p className="text-[10px] font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">Valor do investimento</p>
+                <p className="text-sm font-semibold text-[var(--cr-text-primary)] mt-0.5">
                   {budget.finalValue != null ? formatBRL(budget.finalValue) : "—"}
                 </p>
               </div>
               <div>
-                <p className="text-[10px] font-semibold text-[#716C8C] uppercase tracking-wider">Validade da proposta</p>
-                <p className="text-sm font-semibold text-[#16162B] mt-0.5">
+                <p className="text-[10px] font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">Validade da proposta</p>
+                <p className="text-sm font-semibold text-[var(--cr-text-primary)] mt-0.5">
                   {budget.expiresAt ? formatDateBR(budget.expiresAt) : "—"}
                 </p>
               </div>
@@ -426,8 +426,8 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
           {/* Scope items */}
           <div className="space-y-2">
-            <p className="text-xs font-semibold text-[#716C8C] uppercase tracking-wider">Escopo</p>
-            <p className="text-[10px] text-[#716C8C] -mt-1">Arraste para reordenar. A lixeira remove da proposta.</p>
+            <p className="text-xs font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">Escopo</p>
+            <p className="text-[10px] text-[var(--cr-text-tertiary)] -mt-1">Arraste para reordenar. A lixeira remove da proposta.</p>
 
             {activeScopeItems.length > 0 && (
               <div className="space-y-1">
@@ -438,21 +438,21 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
                     onDragStart={() => setDragItemId(item.id)}
                     onDragOver={e => e.preventDefault()}
                     onDrop={() => handleScopeDrop(activeScopeItems, item.id)}
-                    className={`px-2.5 py-1.5 rounded-lg border bg-white transition-colors ${dragItemId === item.id ? "border-[#6C63FF]/40 opacity-60" : "border-black/[0.06]"}`}
+                    className={`px-2.5 py-1.5 rounded-lg border bg-white transition-colors ${dragItemId === item.id ? "border-[var(--cr-brand-500)]/40 opacity-60" : "border-black/[0.06]"}`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="shrink-0 text-[#B7B3C8] cursor-grab active:cursor-grabbing">
+                      <span className="shrink-0 text-[var(--cr-text-tertiary)] cursor-grab active:cursor-grabbing">
                         <GripVertical className="w-3.5 h-3.5" />
                       </span>
                       <div className="flex-1 min-w-0 leading-tight">
-                        <p className="text-xs text-[#16162B] truncate">{item.description}</p>
-                        {item.description === HOURS_ITEM && <p className="text-[10px] text-[#716C8C] leading-tight">quantidade em horas</p>}
+                        <p className="text-xs text-[var(--cr-text-primary)] truncate">{item.description}</p>
+                        {item.description === HOURS_ITEM && <p className="text-[10px] text-[var(--cr-text-tertiary)] leading-tight">quantidade em horas</p>}
                       </div>
                       <QuantityStepper value={item.quantity ?? 0} onChange={next => setPresetQuantity(item.description, next)} />
                       <button
                         onClick={() => deleteScopeItem(item.id)}
                         title="Remover"
-                        className="w-6 h-6 shrink-0 flex items-center justify-center rounded-md text-[#B7B3C8] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.08)] transition-colors"
+                        className="w-6 h-6 shrink-0 flex items-center justify-center rounded-md text-[var(--cr-text-tertiary)] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.08)] transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -463,7 +463,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
                       onChange={e => setPresetNotesLocal(item.id, e.target.value)}
                       onBlur={e => savePresetNotes(item.id, e.target.value)}
                       placeholder="Descrição do que será feito (opcional)"
-                      className="mt-1 w-full h-6 bg-[#F1F0F7] border border-black/[0.08] text-[#16162B] placeholder:text-[#716C8C] rounded-md px-1.5 text-[11px] focus:outline-none focus:border-[#6C63FF] transition-all"
+                      className="mt-1 w-full h-6 bg-[var(--cr-surface-soft)] border border-black/[0.08] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-md px-1.5 text-[11px] focus:outline-none focus:border-[var(--cr-brand-500)] transition-all"
                     />
                   </div>
                 ))}
@@ -476,7 +476,7 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
                   <button
                     key={preset.key}
                     onClick={() => setPresetQuantity(preset.key, 1)}
-                    className="h-7 px-2.5 flex items-center gap-1 rounded-full border border-dashed border-black/[0.15] text-[#4B4768] hover:border-[#6C63FF] hover:text-[#6C63FF] text-[11px] transition-colors"
+                    className="h-7 px-2.5 flex items-center gap-1 rounded-full border border-dashed border-black/[0.15] text-[var(--cr-text-secondary)] hover:border-[var(--cr-brand-500)] hover:text-[var(--cr-brand-500)] text-[11px] transition-colors"
                   >
                     <Plus className="w-3 h-3" /> {preset.key}
                   </button>
@@ -497,12 +497,12 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
                   }
                 }}
                 placeholder="Item personalizado..."
-                className="flex-1 h-8 bg-white border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-lg px-2.5 text-xs focus:outline-none focus:border-[#6C63FF] transition-all"
+                className="flex-1 h-8 bg-white border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-lg px-2.5 text-xs focus:outline-none focus:border-[var(--cr-brand-500)] transition-all"
               />
               <button
                 onClick={() => { addCustomItem(customItemText); setCustomItemText(""); }}
                 disabled={!customItemText.trim()}
-                className="h-8 px-2.5 shrink-0 flex items-center gap-1 rounded-lg bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] hover:text-[#16162B] disabled:opacity-40 transition-colors text-xs font-medium"
+                className="h-8 px-2.5 shrink-0 flex items-center gap-1 rounded-lg bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] disabled:opacity-40 transition-colors text-xs font-medium"
               >
                 <PlusCircle className="w-3.5 h-3.5" /> Adicionar
               </button>
@@ -511,28 +511,28 @@ export default function EditBudgetPage({ params }: { params: Promise<{ id: strin
 
           {/* Optional content blocks */}
           <div className={`w-full flex items-center justify-between px-3 h-10 rounded-lg border bg-white transition-colors ${budget.valueHidden ? "border-black/[0.08] opacity-50" : "border-black/[0.08]"}`}>
-            <span className="text-xs font-semibold text-[#4B4768] uppercase tracking-wider">Valor Gerado</span>
+            <span className="text-xs font-semibold text-[var(--cr-text-secondary)] uppercase tracking-wider">Valor Gerado</span>
             <div className="flex items-center gap-1">
               <button onClick={() => toggleSectionVisibility("valueHidden")} title={budget.valueHidden ? "Mostrar na proposta" : "Ocultar da proposta"}
-                className="w-7 h-7 flex items-center justify-center rounded-md text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors">
+                className="w-7 h-7 flex items-center justify-center rounded-md text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors">
                 {budget.valueHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
               <button onClick={() => setShowValueModal(true)} title="Editar"
-                className="w-7 h-7 flex items-center justify-center rounded-md text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors">
+                className="w-7 h-7 flex items-center justify-center rounded-md text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors">
                 <Pencil className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
 
           <div className={`w-full flex items-center justify-between px-3 h-10 rounded-lg border bg-white transition-colors ${budget.conditionsHidden ? "border-black/[0.08] opacity-50" : "border-black/[0.08]"}`}>
-            <span className="text-xs font-semibold text-[#4B4768] uppercase tracking-wider">Condições</span>
+            <span className="text-xs font-semibold text-[var(--cr-text-secondary)] uppercase tracking-wider">Condições</span>
             <div className="flex items-center gap-1">
               <button onClick={() => toggleSectionVisibility("conditionsHidden")} title={budget.conditionsHidden ? "Mostrar na proposta" : "Ocultar da proposta"}
-                className="w-7 h-7 flex items-center justify-center rounded-md text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors">
+                className="w-7 h-7 flex items-center justify-center rounded-md text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors">
                 {budget.conditionsHidden ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
               <button onClick={() => setShowConditionsModal(true)} title="Editar"
-                className="w-7 h-7 flex items-center justify-center rounded-md text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.04] transition-colors">
+                className="w-7 h-7 flex items-center justify-center rounded-md text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.04] transition-colors">
                 <Pencil className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -678,44 +678,44 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
     <Modal open onClose={onClose} title="Editar dados da proposta" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Título interno</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Título interno</label>
             <input type="text" value={title} onChange={e => setTitle(e.target.value)} required
-              className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+              className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Nome do cliente</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Nome do cliente</label>
               <input type="text" value={clientName} onChange={e => setClientName(e.target.value)}
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Telefone</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Telefone</label>
               <input type="text" value={clientPhone} onChange={e => setClientPhone(e.target.value)}
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Valor do investimento</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Valor do investimento</label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#716C8C]">R$</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[var(--cr-text-tertiary)]">R$</span>
                 <CurrencyInput
                   defaultValue={budget.finalValue}
                   onChange={setFinalValue}
-                  className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] placeholder:text-[#716C8C] rounded-xl pl-9 pr-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                  className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl pl-9 pr-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#4B4768]">Validade da proposta</label>
+              <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Validade da proposta</label>
               <input type="date" value={expiresAt} onChange={e => setExpiresAt(e.target.value)}
-                className="w-full h-11 bg-[#F1F0F7] border border-black/[0.12] text-[#16162B] rounded-xl px-4 text-sm focus:outline-none focus:border-[#6C63FF] focus:ring-2 focus:ring-[#6C63FF]/20 transition-all" />
+                className="w-full h-11 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] rounded-xl px-4 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] focus:ring-2 focus:ring-[var(--cr-brand-500)]/20 transition-all" />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Logo do cliente</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Logo do cliente</label>
             <label className="block cursor-pointer">
               <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleLogoChange} className="hidden" />
               {logoPreview ? (
@@ -726,8 +726,8 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
                 </div>
               ) : (
                 <div className="w-full h-24 rounded-xl border-2 border-dashed border-black/[0.12] hover:border-violet-500 flex items-center justify-center gap-2 transition-colors">
-                  <Upload className="w-5 h-5 text-[#716C8C]" />
-                  <span className="text-sm text-[#716C8C]">Upload de logo</span>
+                  <Upload className="w-5 h-5 text-[var(--cr-text-tertiary)]" />
+                  <span className="text-sm text-[var(--cr-text-tertiary)]">Upload de logo</span>
                 </div>
               )}
             </label>
@@ -735,11 +735,11 @@ function EditModal({ budget, budgetId, onClose, onSave }: EditModalProps) {
           {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving || uploading}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="flex-1 h-10 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar alterações"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
+              className="h-10 px-4 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>
@@ -791,36 +791,36 @@ function ValueModal({ budget, budgetId, onClose, onSave }: ValueModalProps) {
     <Modal open onClose={onClose} title="Valor Gerado" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Introdução <span className="text-[#716C8C] font-normal">(opcional)</span></label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Introdução <span className="text-[var(--cr-text-tertiary)] font-normal">(opcional)</span></label>
             <textarea
               value={valueIntro} onChange={e => setValueIntro(e.target.value)}
               placeholder="Introdução da seção"
               rows={2}
-              className="w-full bg-[#F1F0F7] border border-black/[0.08] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#6C63FF] transition-all resize-none"
+              className="w-full bg-[var(--cr-surface-soft)] border border-black/[0.08] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all resize-none"
             />
           </div>
           {points.map((p, i) => (
-            <div key={i} className="p-3 rounded-xl border border-black/[0.08] bg-[#F1F0F7] space-y-2">
+            <div key={i} className="p-3 rounded-xl border border-black/[0.08] bg-[var(--cr-surface-soft)] space-y-2">
               <input
                 type="text" value={p.title} onChange={e => updatePoint(i, "title", e.target.value)}
                 placeholder={`Título do ponto ${i + 1}`}
-                className="w-full h-9 bg-white border border-black/[0.10] text-[#16162B] placeholder:text-[#716C8C] rounded-lg px-3 text-sm focus:outline-none focus:border-[#6C63FF] transition-all"
+                className="w-full h-9 bg-white border border-black/[0.10] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-lg px-3 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all"
               />
               <textarea
                 value={p.body} onChange={e => updatePoint(i, "body", e.target.value)}
                 placeholder="Descrição (opcional)"
                 rows={2}
-                className="w-full bg-white border border-black/[0.10] text-[#16162B] placeholder:text-[#716C8C] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[#6C63FF] transition-all resize-none"
+                className="w-full bg-white border border-black/[0.10] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all resize-none"
               />
             </div>
           ))}
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="flex-1 h-10 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
+              className="h-10 px-4 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>
@@ -860,21 +860,21 @@ function ConditionsModal({ budget, budgetId, onClose, onSave }: ConditionsModalP
     <Modal open onClose={onClose} title="Condições" maxWidth="max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-[#4B4768]">Uma condição por linha</label>
+            <label className="text-sm font-medium text-[var(--cr-text-secondary)]">Uma condição por linha</label>
             <textarea
               value={conditions} onChange={e => setConditions(e.target.value)}
               placeholder={"Prazo de produção definido após aprovação do briefing\nInclui 1 rodada de ajustes antes da publicação"}
               rows={6}
-              className="w-full bg-[#F1F0F7] border border-black/[0.08] text-[#16162B] placeholder:text-[#716C8C] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#6C63FF] transition-all resize-none"
+              className="w-full bg-[var(--cr-surface-soft)] border border-black/[0.08] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[var(--cr-brand-500)] transition-all resize-none"
             />
           </div>
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving}
-              className="flex-1 h-10 bg-[#6C63FF] hover:bg-[#5851E0] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+              className="flex-1 h-10 bg-[var(--cr-brand-500)] hover:bg-[var(--cr-brand-700)] disabled:opacity-50 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
               {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : "Salvar"}
             </button>
             <button type="button" onClick={onClose}
-              className="h-10 px-4 bg-[#F1F0F7] border border-black/[0.12] text-[#4B4768] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
+              className="h-10 px-4 bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-secondary)] text-sm rounded-xl hover:border-black/[0.20] transition-colors">
               Cancelar
             </button>
           </div>

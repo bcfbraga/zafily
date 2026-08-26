@@ -31,19 +31,19 @@ export default function IntegrationsPage() {
         <div className="max-w-[720px] mx-auto space-y-6">
 
           {/* Info banner */}
-          <div className="flex items-start gap-3 bg-[rgba(108,99,255,0.08)] border border-[rgba(108,99,255,0.20)] rounded-[14px] p-4">
-            <Info className="w-4 h-4 text-[#6C63FF] shrink-0 mt-0.5" />
-            <p className="text-sm text-[#4B4768] leading-relaxed">
+          <div className="flex items-start gap-3 bg-[rgba(247, 89, 173,0.08)] border border-[rgba(247, 89, 173,0.20)] rounded-[4px] p-4">
+            <Info className="w-4 h-4 text-[var(--cr-brand-500)] shrink-0 mt-0.5" />
+            <p className="text-sm text-[var(--cr-text-secondary)] leading-relaxed">
               Conecte sua conta de afiliada para que todos os links gerados no Zafily
-              fiquem vinculados ao <span className="text-[#16162B] font-medium">seu ID</span>, não ao da plataforma.
+              fiquem vinculados ao <span className="text-[var(--cr-text-primary)] font-medium">seu ID</span>, não ao da plataforma.
               Cada integração é validada diretamente com a rede.
             </p>
           </div>
 
           {/* Section */}
           <div>
-            <h2 className="font-heading font-semibold text-[#16162B] mb-1">Redes disponíveis</h2>
-            <p className="text-xs text-[#716C8C] mb-4">
+            <h2 className="font-heading font-semibold text-[var(--cr-text-primary)] mb-1">Redes disponíveis</h2>
+            <p className="text-xs text-[var(--cr-text-tertiary)] mb-4">
               Mais redes serão adicionadas em breve.
             </p>
             {profile && (

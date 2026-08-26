@@ -65,7 +65,7 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
           </Link>
           <button
             onClick={onClose}
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.05] transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.05] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -79,11 +79,11 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
                 key={href}
                 href={href}
                 className={cn(
-                  "flex items-center gap-3 h-11 px-3 rounded-[10px] text-sm font-medium transition-colors",
-                  active ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]" : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+                  "flex items-center gap-3 h-11 px-3 rounded-[4px] text-sm font-medium transition-colors",
+                  active ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]" : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
                 )}
               >
-                <Icon className={cn("w-4 h-4 shrink-0", active ? "text-[#6C63FF]" : "")} />
+                <Icon className={cn("w-4 h-4 shrink-0", active ? "text-[var(--cr-brand-500)]" : "")} />
                 {label}
               </Link>
             );
@@ -94,37 +94,37 @@ export function MobileNavDrawer({ open, onClose }: MobileNavDrawerProps) {
           <Link
             href="/app/integrations"
             className={cn(
-              "flex items-center gap-3 h-11 px-3 rounded-[10px] text-sm font-medium transition-colors",
-              pathname === "/app/integrations" ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]" : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+              "flex items-center gap-3 h-11 px-3 rounded-[4px] text-sm font-medium transition-colors",
+              pathname === "/app/integrations" ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]" : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
             )}
           >
-            <Plug className={cn("w-4 h-4 shrink-0", pathname === "/app/integrations" ? "text-[#6C63FF]" : "")} />
+            <Plug className={cn("w-4 h-4 shrink-0", pathname === "/app/integrations" ? "text-[var(--cr-brand-500)]" : "")} />
             Integrações
           </Link>
           <Link
             href="/app/settings"
             className={cn(
-              "flex items-center gap-3 h-11 px-3 rounded-[10px] text-sm font-medium transition-colors",
-              pathname === "/app/settings" ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]" : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+              "flex items-center gap-3 h-11 px-3 rounded-[4px] text-sm font-medium transition-colors",
+              pathname === "/app/settings" ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]" : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
             )}
           >
-            <Settings className={cn("w-4 h-4 shrink-0", pathname === "/app/settings" ? "text-[#6C63FF]" : "")} />
+            <Settings className={cn("w-4 h-4 shrink-0", pathname === "/app/settings" ? "text-[var(--cr-brand-500)]" : "")} />
             Configurações
           </Link>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 h-11 px-3 rounded-[10px] text-sm font-medium text-[#716C8C] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors"
+            className="w-full flex items-center gap-3 h-11 px-3 rounded-[4px] text-sm font-medium text-[var(--cr-text-tertiary)] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors"
           >
             <LogOut className="w-4 h-4 shrink-0" />
             Sair
           </button>
-          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-black/[0.03]">
-            <div className="w-7 h-7 rounded-full bg-[#6C63FF] flex items-center justify-center text-xs font-semibold text-white shrink-0">
+          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[4px] bg-black/[0.03]">
+            <div className="w-7 h-7 rounded-full bg-[var(--cr-brand-500)] flex items-center justify-center text-xs font-semibold text-white shrink-0">
               {initial}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-[#16162B] truncate">{displayName || "..."}</p>
-              <p className="text-[10px] text-[#716C8C] truncate">{email}</p>
+              <p className="text-xs font-medium text-[var(--cr-text-primary)] truncate">{displayName || "..."}</p>
+              <p className="text-[10px] text-[var(--cr-text-tertiary)] truncate">{email}</p>
             </div>
           </div>
         </div>

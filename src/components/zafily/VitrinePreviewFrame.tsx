@@ -59,9 +59,11 @@ export function VitrinePreviewFrame({ profile, sections, lives }: {
 
   const displayName = profile?.displayName || profile?.username || "Sua vitrine";
 
+  // zf-public devolve os tokens públicos aqui dentro: o preview precisa mostrar
+  // o que o visitante vê, não a marca do dashboard.
   return (
     <div
-      className="w-[300px] h-[620px] rounded-[32px] border overflow-hidden flex flex-col"
+      className="zf-public w-[300px] h-[620px] rounded-[32px] border overflow-hidden flex flex-col"
       style={{
         background: "var(--cr-background)",
         borderColor: "var(--cr-border)",

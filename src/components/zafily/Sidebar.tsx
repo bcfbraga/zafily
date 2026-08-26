@@ -79,7 +79,7 @@ export function Sidebar() {
           onClick={toggle}
           title={collapsed ? "Expandir menu" : "Recolher menu"}
           className={cn(
-            "w-8 h-8 rounded-lg flex items-center justify-center text-[#716C8C] hover:text-[#16162B] hover:bg-black/[0.05] transition-colors shrink-0",
+            "w-8 h-8 rounded-lg flex items-center justify-center text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.05] transition-colors shrink-0",
             collapsed && "mx-auto"
           )}
         >
@@ -100,18 +100,18 @@ export function Sidebar() {
               href={href}
               title={collapsed ? label : undefined}
               className={cn(
-                "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors duration-150",
+                "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors duration-150",
                 collapsed ? "justify-center px-0" : "px-3",
                 active
-                  ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
-                  : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+                  ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+                  : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
               )}
             >
-              <Icon className={cn("w-4 h-4 shrink-0", active ? "text-[#6C63FF]" : "")} />
+              <Icon className={cn("w-4 h-4 shrink-0", active ? "text-[var(--cr-brand-500)]" : "")} />
               {!collapsed && (
                 <>
                   <span className="flex-1">{label}</span>
-                  {active && <ChevronRight className="w-3 h-3 text-[#6C63FF]" />}
+                  {active && <ChevronRight className="w-3 h-3 text-[var(--cr-brand-500)]" />}
                 </>
               )}
             </Link>
@@ -132,28 +132,28 @@ export function Sidebar() {
               href="/app/admin/access-requests"
               title={collapsed ? "Pedidos de acesso" : undefined}
               className={cn(
-                "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
+                "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
                 collapsed ? "justify-center px-0" : "px-3",
                 pathname === "/app/admin/access-requests"
-                  ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
-                  : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+                  ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+                  : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
               )}
             >
-              <ShieldCheck className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/access-requests" ? "text-[#6C63FF]" : "")} />
+              <ShieldCheck className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/access-requests" ? "text-[var(--cr-brand-500)]" : "")} />
               {!collapsed && "Pedidos de acesso"}
             </Link>
             <Link
               href="/app/admin/users"
               title={collapsed ? "Usuários" : undefined}
               className={cn(
-                "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
+                "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
                 collapsed ? "justify-center px-0" : "px-3",
                 pathname === "/app/admin/users"
-                  ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
-                  : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+                  ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+                  : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
               )}
             >
-              <Users className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/users" ? "text-[#6C63FF]" : "")} />
+              <Users className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/users" ? "text-[var(--cr-brand-500)]" : "")} />
               {!collapsed && "Usuários"}
             </Link>
           </>
@@ -163,14 +163,14 @@ export function Sidebar() {
           href="/app/integrations"
           title={collapsed ? "Integrações" : undefined}
           className={cn(
-            "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
+            "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
             collapsed ? "justify-center px-0" : "px-3",
             pathname === "/app/integrations"
-              ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
-              : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+              ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+              : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
           )}
         >
-          <Plug className={cn("w-4 h-4 shrink-0", pathname === "/app/integrations" ? "text-[#6C63FF]" : "")} />
+          <Plug className={cn("w-4 h-4 shrink-0", pathname === "/app/integrations" ? "text-[var(--cr-brand-500)]" : "")} />
           {!collapsed && "Integrações"}
         </Link>
 
@@ -178,14 +178,14 @@ export function Sidebar() {
           href="/app/settings"
           title={collapsed ? "Configurações" : undefined}
           className={cn(
-            "flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium transition-colors",
+            "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
             collapsed ? "justify-center px-0" : "px-3",
             pathname === "/app/settings"
-              ? "bg-[rgba(108,99,255,0.12)] text-[#4338CA]"
-              : "text-[#716C8C] hover:text-[#4B4768] hover:bg-black/[0.04]"
+              ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+              : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
           )}
         >
-          <Settings className={cn("w-4 h-4 shrink-0", pathname === "/app/settings" ? "text-[#6C63FF]" : "")} />
+          <Settings className={cn("w-4 h-4 shrink-0", pathname === "/app/settings" ? "text-[var(--cr-brand-500)]" : "")} />
           {!collapsed && "Configurações"}
         </Link>
 
@@ -193,7 +193,7 @@ export function Sidebar() {
           onClick={handleLogout}
           title={collapsed ? "Sair" : undefined}
           className={cn(
-            "w-full flex items-center gap-3 h-10 rounded-[10px] text-sm font-medium text-[#716C8C] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors",
+            "w-full flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium text-[var(--cr-text-tertiary)] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors",
             collapsed ? "justify-center px-0" : "px-3"
           )}
         >
@@ -202,19 +202,19 @@ export function Sidebar() {
         </button>
 
         {!collapsed && (
-          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[10px] bg-black/[0.03]">
-            <div className="w-7 h-7 rounded-full bg-[#6C63FF] flex items-center justify-center text-xs font-semibold text-white shrink-0">
+          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[4px] bg-black/[0.03]">
+            <div className="w-7 h-7 rounded-full bg-[var(--cr-brand-500)] flex items-center justify-center text-xs font-semibold text-white shrink-0">
               {initial}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-medium text-[#16162B] truncate">{displayName || "..."}</p>
-              <p className="text-[10px] text-[#716C8C] truncate">{email}</p>
+              <p className="text-xs font-medium text-[var(--cr-text-primary)] truncate">{displayName || "..."}</p>
+              <p className="text-[10px] text-[var(--cr-text-tertiary)] truncate">{email}</p>
             </div>
           </div>
         )}
         {collapsed && (
           <div className="flex justify-center mt-1">
-            <div className="w-7 h-7 rounded-full bg-[#6C63FF] flex items-center justify-center text-xs font-semibold text-white">
+            <div className="w-7 h-7 rounded-full bg-[var(--cr-brand-500)] flex items-center justify-center text-xs font-semibold text-white">
               {initial}
             </div>
           </div>

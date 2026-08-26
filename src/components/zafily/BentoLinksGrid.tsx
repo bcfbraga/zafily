@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Link2 } from "lucide-react";
 import type { LinkTile, TileSize } from "@/lib/links-store";
 
@@ -16,10 +17,13 @@ function hostname(url: string): string {
   }
 }
 
+// Um tile ocupa metade da largura no mobile e no máximo ~200px no desktop,
+// então nunca vale a pena baixar o original.
+const TILE_SIZES = "(max-width: 640px) 50vw, 200px";
+
 function TileIcon({ link, className }: { link: LinkTile; className: string }) {
   return link.imageUrl ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={link.imageUrl} alt="" className={`${className} object-cover`} />
+    <Image src={link.imageUrl} alt="" fill sizes={TILE_SIZES} className="object-cover" />
   ) : (
     <div className={`${className} flex items-center justify-center`} style={{ background: "var(--cr-brand-100)" }}>
       <Link2 className="w-1/3 h-1/3" style={{ color: "var(--cr-brand-600)" }} />
@@ -32,7 +36,7 @@ function Tile({ link }: { link: LinkTile }) {
 
   if (link.tileSize === "1x1") {
     return (
-      <a href={href} className={`${SPAN["1x1"]} rounded-2xl overflow-hidden transition-transform hover:scale-[1.03]`}>
+      <a href={href} className={`${SPAN["1x1"]} relative rounded-2xl overflow-hidden transition-transform hover:scale-[1.03]`}>
         <TileIcon link={link} className="w-full h-full" />
       </a>
     );
