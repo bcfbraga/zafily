@@ -1,36 +1,41 @@
-import { Radio, Shirt, Sparkles, Megaphone, Star, Clock } from "lucide-react";
 import { useCases } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { SectionGrid, Col, FeatureCard, Surface } from "@/components/zafily/ds";
 
-const ICONS = [Radio, Shirt, Sparkles, Megaphone, Star, Clock];
+/**
+ * Bento editorial, não seis cards iguais com ícone. Os tamanhos variam para
+ * criar hierarquia: o primeiro caso é o principal e ancora a composição.
+ */
+const LAYOUT: Array<{ span: 3 | 4 | 6; tone: "dark" | "primary" | "brand"; size: "sm" | "md" | "lg" }> = [
+  { span: 6, tone: "dark", size: "lg" },
+  { span: 3, tone: "primary", size: "md" },
+  { span: 3, tone: "brand", size: "md" },
+  { span: 4, tone: "primary", size: "md" },
+  { span: 4, tone: "primary", size: "md" },
+  { span: 4, tone: "primary", size: "md" },
+];
 
 export function UseCases() {
   return (
-    <section className="py-24 px-6 bg-[#1A1A2E]">
-      <div className="max-w-[1100px] mx-auto">
-        <Reveal className="text-center mb-14">
-          <h2 className="font-heading font-bold text-[32px] sm:text-[40px] leading-[1.15] sm:leading-[48px] tracking-tight">
-            {useCases.headline}
-          </h2>
-        </Reveal>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {useCases.cards.map((card, i) => {
-            const Icon = ICONS[i];
-            return (
-              <Reveal key={card.title} delay={(i % 3) * 100}>
-                <div className="bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-6 h-full hover:border-[rgba(108,99,255,0.25)] transition-colors">
-                  <div className="w-10 h-10 rounded-[12px] bg-[rgba(108,99,255,0.16)] flex items-center justify-center mb-5">
-                    <Icon className="w-5 h-5 text-[#6C63FF]" />
-                  </div>
-                  <h3 className="font-heading font-semibold text-lg text-white mb-2">{card.title}</h3>
-                  <p className="text-sm text-[#B8B4E8] leading-relaxed">{card.text}</p>
-                </div>
-              </Reveal>
-            );
-          })}
-        </div>
+    <Surface tone="bare" size="flush">
+      <div className="mb-6">
+        <h2
+          className="font-bold leading-[1.08] tracking-[-0.025em]"
+          style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 3.4vw, 46px)" }}
+        >
+          {useCases.headline}
+        </h2>
       </div>
-    </section>
+
+      <SectionGrid>
+        {useCases.cards.map((card, i) => {
+          const l = LAYOUT[i] ?? LAYOUT[3];
+          return (
+            <Col key={card.title} span={l.span}>
+              <FeatureCard title={card.title} body={card.text} tone={l.tone} size={l.size} />
+            </Col>
+          );
+        })}
+      </SectionGrid>
+    </Surface>
   );
 }

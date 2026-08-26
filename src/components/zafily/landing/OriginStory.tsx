@@ -1,31 +1,48 @@
 import { originStory } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { Surface, SectionGrid, Col, SectionLabel } from "@/components/zafily/ds";
 
+/**
+ * Narrativa: 5/7 com o texto em coluna estreita. Duas frases curtas do meio
+ * ganham escala e viram o ponto de virada da história.
+ */
 export function OriginStory() {
+  const [opening, pivotA, pivotB, ...rest] = originStory.paragraphs;
+
   return (
-    <section className="py-24 px-6 bg-[#1A1A2E]">
-      <div className="max-w-[760px] mx-auto">
-        <Reveal className="text-center mb-10">
-          <p className="text-xs font-semibold tracking-wide uppercase text-[#8B84FF] mb-4">{originStory.eyebrow}</p>
-          <h2 className="font-heading font-bold text-[32px] sm:text-[40px] leading-[1.15] sm:leading-[48px] tracking-tight">
+    <Surface tone="brand" size="lg">
+      <div className="mb-4">
+        <SectionLabel>{originStory.eyebrow}</SectionLabel>
+      </div>
+
+      <SectionGrid>
+        <Col span={5}>
+          <h2
+            className="font-bold leading-[1.08] tracking-[-0.025em]"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 3.2vw, 44px)" }}
+          >
             {originStory.headline}
           </h2>
-        </Reveal>
+        </Col>
 
-        <Reveal delay={100} className="border-l-2 border-[rgba(108,99,255,0.35)] pl-6 sm:pl-8 space-y-5">
-          {originStory.paragraphs.map((p, i) => {
-            const isShort = p.length < 60;
-            return (
-              <p
-                key={i}
-                className={isShort ? "font-heading font-semibold text-lg sm:text-xl text-white" : "text-[#B8B4E8] text-base sm:text-lg leading-relaxed"}
-              >
-                {p}
-              </p>
-            );
-          })}
-        </Reveal>
-      </div>
-    </section>
+        <Col span={7}>
+          <p className="text-[15px] leading-[1.7]" style={{ color: "var(--cr-text-secondary)" }}>{opening}</p>
+
+          <p
+            className="my-8 font-bold leading-[1.16] tracking-[-0.02em]"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(20px, 2.2vw, 30px)" }}
+          >
+            {pivotA}
+            <br />
+            <span style={{ color: "var(--cr-brand-600)" }}>{pivotB}</span>
+          </p>
+
+          <div className="flex flex-col gap-4">
+            {rest.map(p => (
+              <p key={p} className="text-[15px] leading-[1.7]" style={{ color: "var(--cr-text-secondary)" }}>{p}</p>
+            ))}
+          </div>
+        </Col>
+      </SectionGrid>
+    </Surface>
   );
 }

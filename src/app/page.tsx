@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PageCanvas, CanvasSection } from "@/components/zafily/ds";
 import { LandingHeader } from "@/components/zafily/landing/LandingHeader";
 import { Hero } from "@/components/zafily/landing/Hero";
 import { PositioningBand } from "@/components/zafily/landing/PositioningBand";
@@ -41,25 +42,37 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * A página é um canvas contínuo. Cada módulo é uma superfície arredondada
+ * flutuando sobre ele, e o espaço entre as superfícies — onde o canvas fica
+ * visível — é o que amarra tudo como um ambiente só em vez de uma pilha de
+ * seções independentes.
+ */
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#111126] text-white">
+    <PageCanvas>
       <LandingHeader />
-      <Hero />
-      <PositioningBand />
-      <ProblemComparison />
-      <HowItWorks />
-      <ProductDemo />
-      <UseCases />
-      <Specialization />
-      <OriginStory />
-      <SocialProof />
-      <Vision />
-      <AudienceFit />
-      <AccessSection />
-      <FAQSection />
-      <FinalCTA />
+
+      <CanvasSection>
+        <div className="flex flex-col gap-4 sm:gap-6 pb-6 sm:pb-8">
+          <Hero />
+          <PositioningBand />
+          <ProblemComparison />
+          <HowItWorks />
+          <ProductDemo />
+          <UseCases />
+          <Specialization />
+          <OriginStory />
+          <SocialProof />
+          <Vision />
+          <AudienceFit />
+          <AccessSection />
+          <FAQSection />
+          <FinalCTA />
+        </div>
+      </CanvasSection>
+
       <LandingFooter />
-    </div>
+    </PageCanvas>
   );
 }

@@ -64,9 +64,12 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "hidden lg:flex shrink-0 h-dvh bg-white border-r border-black/[0.08] flex-col transition-[width] duration-200 overflow-hidden",
-        collapsed ? "w-[60px]" : "w-[260px]"
+        // Superfície própria sobre o canvas, não uma coluna colada na borda.
+        // Sem borda: a separação vem do tom, como na referência.
+        "hidden lg:flex shrink-0 h-full flex-col transition-[width] duration-200 overflow-hidden rounded-[var(--radius-xl)]",
+        collapsed ? "w-[72px]" : "w-[248px]"
       )}
+      style={{ background: "var(--surface-primary)" }}
     >
       {/* Logo + collapse button */}
       <div className="h-[72px] flex items-center border-b border-black/[0.06] shrink-0 px-3 gap-2">

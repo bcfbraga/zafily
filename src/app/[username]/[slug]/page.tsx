@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug, recordImpressions } from "@/lib/lives-store";
+import { PublicFooter } from "@/components/zafily/PublicFooter";
 import { ShareButtons } from "./ShareButtons";
 import { ProductGrid } from "./ProductGrid";
 import { Calendar, Clock } from "lucide-react";
@@ -126,13 +127,7 @@ export default async function VitrinePage({ params }: Props) {
           <ShareButtons title={live.title} username={profile.username} slug={live.slug} />
         </div>
       </div>
-
-      {/* ── Footer ──────────────────────────────────────────────── */}
-      <div className="py-6 text-center" style={{ borderTop: "1px solid var(--cr-border)" }}>
-        <p className="text-xs" style={{ color: "var(--cr-text-tertiary)" }}>
-          Criado com <span className="font-medium" style={{ color: "var(--cr-text-secondary)" }}>Zafily</span>
-        </p>
-      </div>
+      <PublicFooter />
     </div>
   );
 }

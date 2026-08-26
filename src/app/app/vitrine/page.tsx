@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Plus, Pencil, Trash2, Globe, Calendar,
-  CheckCircle2, FileText, Radio, Layers,
-  X, Settings2, GripVertical, Share2, Check, Package, ExternalLink, BarChart2
+  Plus, Pencil, Trash2, Globe, CheckCircle2, FileText, Radio, Layers, X, GripVertical, Share2, Check, Package, ExternalLink
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
@@ -64,94 +62,73 @@ function formatCount(n: number): string {
   return String(n);
 }
 
-function StatusBadge({ status }: { status: "draft" | "published" }) {
-  return status === "published" ? (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[#e7f7ef] text-[#287451] border border-[#c5ead9]">
-      <CheckCircle2 className="w-3 h-3" /> Publicada
-    </span>
-  ) : (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] border border-[var(--cr-border)]">
-      <FileText className="w-3 h-3" /> Rascunho
-    </span>
-  );
-}
 
+/**
+ * Fileira de seção: cabeçalho com o nome e a contagem, e abaixo uma grade de
+ * cards quadrados. Substitui a lista vertical de linhas largas — a grade deixa
+ * a vitrine ser reconhecida pela imagem, não pelo texto.
+ */
 function GroupSection({ title, icon, count, children }: { title: string; icon?: React.ReactNode; count: number; children: React.ReactNode }) {
   return (
-    <div>
-      <div className="flex items-center gap-2 mb-3">
+    <section>
+      <div className="flex items-center gap-2 mb-4">
         {icon}
         <h2 className="text-sm font-semibold text-[var(--cr-text-primary)]">{title}</h2>
         <span className="text-xs text-[var(--cr-text-tertiary)]">({count})</span>
       </div>
-      <div className="space-y-2">{children}</div>
-    </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {children}
+      </div>
+    </section>
   );
 }
 
-function QuickAction({ icon, label, href, external, onClick }: { icon: React.ReactNode; label: string; href?: string; external?: boolean; onClick?: () => void }) {
+/**
+ * Ação da barra de ferramentas: pill escuro para a ação primária, cinza para as
+ * demais.
+ *
+ * Antes eram cinco círculos rosa idênticos ocupando uma faixa inteira — "Ver
+ * página" pesava o mesmo que "Nova vitrine" e a cor da marca era gasta sem
+ * hierarquia. Em linha única a barra ocupa ~44px em vez de ~110px, e o rosa
+ * fica livre para marcar o que é de fato da marca.
+ */
+function QuickAction({
+  icon, label, href, external, onClick, primary,
+}: { icon: React.ReactNode; label: string; href?: string; external?: boolean; onClick?: () => void; primary?: boolean }) {
   const content = (
     <>
-      <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-100)] group-hover:bg-[var(--cr-brand-200)] flex items-center justify-center text-[var(--cr-brand-700)] transition-colors">
-        {icon}
-      </div>
-      <span className="text-xs font-medium text-[var(--cr-text-secondary)]">{label}</span>
+      <span className="shrink-0">{icon}</span>
+      <span className="whitespace-nowrap">{label}</span>
     </>
   );
+
+  const cls = `inline-flex items-center gap-2 h-11 px-4 text-sm font-medium rounded-[var(--radius-md)] transition-colors ${
+    primary
+      ? "bg-[var(--surface-dark)] text-white hover:opacity-90"
+      : "bg-[var(--surface-secondary)] text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)]"
+  }`;
+
   if (href && external) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="group flex flex-col items-center gap-2 w-20">
+      <a href={href} target="_blank" rel="noopener noreferrer" className={cls}>
         {content}
       </a>
     );
   }
   if (href) {
     return (
-      <Link href={href} className="group flex flex-col items-center gap-2 w-20">
+      <Link href={href} className={cls}>
         {content}
       </Link>
     );
   }
   return (
-    <button type="button" onClick={onClick} className="group flex flex-col items-center gap-2 w-20">
+    <button type="button" onClick={onClick} className={cls}>
       {content}
     </button>
   );
 }
 
-function ThumbRow({ thumbnails, productCount }: { thumbnails?: string[]; productCount?: number }) {
-  const imgs = (thumbnails ?? []).slice(0, 4);
-  if (imgs.length === 0) {
-    return (
-      <div className="w-9 h-9 rounded-full bg-[var(--cr-brand-100)] flex items-center justify-center shrink-0">
-        <Package className="w-4 h-4 text-[var(--cr-text-tertiary)]" />
-      </div>
-    );
-  }
-  const remaining = (productCount ?? imgs.length) - imgs.length;
-  return (
-    <div className="flex items-center -space-x-2">
-      {imgs.map((url, i) => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          key={i}
-          src={url}
-          alt=""
-          className="w-9 h-9 rounded-full object-cover bg-[var(--cr-brand-100)] border-2 border-white shrink-0"
-          style={{ zIndex: imgs.length - i }}
-        />
-      ))}
-      {remaining > 0 && (
-        <div
-          className="w-9 h-9 rounded-full bg-[var(--cr-brand-100)] border-2 border-white flex items-center justify-center text-[10px] font-semibold text-[var(--cr-text-secondary)] shrink-0"
-          style={{ zIndex: 0 }}
-        >
-          +{remaining}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function VitrinePage() {
   const router = useRouter();
@@ -277,6 +254,10 @@ export default function VitrinePage() {
     // vários produtos), então a razão passa de 100% legitimamente e o rótulo
     // enganava. Dois números concretos dizem mais.
     const impressions = live.views ?? 0;
+    const thumbs = (live.thumbnails ?? []).slice(0, 4);
+    const dragging = dragLiveId === live.id;
+    const over = overLiveId === live.id && !dragging;
+
     return (
       <div
         key={live.id}
@@ -286,102 +267,96 @@ export default function VitrinePage() {
         onDrop={handleDropLive}
         onDragEnd={() => { setDragLiveId(null); setOverLiveId(null); }}
         onClick={() => router.push(`/app/vitrine/${live.id}`)}
-        className={`group relative flex items-start bg-white border rounded-2xl p-4 transition-colors cursor-pointer ${
-          overLiveId === live.id && dragLiveId !== live.id
-            ? "border-[var(--cr-brand-600)]"
-            : dragLiveId === live.id
-              ? "border-[var(--cr-border)] opacity-40"
-              : "border-[var(--cr-border)] hover:border-[var(--cr-border-strong)] hover:bg-[var(--cr-background)]"
-        }`}
+        className={`group cursor-pointer transition-opacity ${dragging ? "opacity-40" : ""}`}
       >
-        <GripVertical className="absolute left-1.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--cr-text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" />
+        {/* Miniatura quadrada — o card é a imagem; nome e dados ficam fora,
+            abaixo, como na referência. */}
+        <div
+          className={`relative aspect-square rounded-[var(--radius-lg)] overflow-hidden transition-shadow ${
+            over ? "ring-2 ring-[var(--cr-brand-500)]" : ""
+          }`}
+          style={{ background: "var(--surface-secondary)" }}
+        >
+          {thumbs.length > 0 ? (
+            <div className={`w-full h-full grid gap-px ${thumbs.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+              {thumbs.map((url, i) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  key={i}
+                  src={url}
+                  alt=""
+                  className={`w-full h-full object-cover ${thumbs.length === 3 && i === 0 ? "row-span-2" : ""}`}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Package className="w-7 h-7" style={{ color: "var(--cr-text-tertiary)" }} />
+            </div>
+          )}
 
-        <div className="flex-1 min-w-0">
-          <ThumbRow thumbnails={live.thumbnails} productCount={live.productCount} />
+          {/* Rascunho precisa ser reconhecível na grade sem abrir a vitrine */}
+          {live.status !== "published" && (
+            <span
+              className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold"
+              style={{ background: "rgba(255,255,255,0.92)", color: "var(--cr-text-secondary)" }}
+            >
+              <FileText className="w-3 h-3" /> Rascunho
+            </span>
+          )}
 
-          <div className="flex items-center gap-2 flex-wrap mt-3 mb-2">
-            <h3 className="font-semibold text-[var(--cr-text-primary)] text-sm truncate">{live.title}</h3>
-            <StatusBadge status={live.status} />
-            {live.liveDate && (
-              <span className="flex items-center gap-1 text-xs text-[var(--cr-text-secondary)]">
-                <Calendar className="w-3 h-3" />
-                {new Date(live.liveDate + "T00:00:00").toLocaleDateString("pt-BR")}
-              </span>
+          {/* Ações só no hover, para a grade ficar limpa em repouso */}
+          <div
+            className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={e => e.stopPropagation()}
+          >
+            {live.status === "published" && (
+              <button
+                onClick={() => copyLink(live)}
+                title="Copiar link"
+                className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
+                style={{ background: "rgba(255,255,255,0.92)", color: "var(--cr-text-secondary)" }}
+              >
+                {copiedId === live.id ? <Check className="w-3.5 h-3.5" /> : <Share2 className="w-3.5 h-3.5" />}
+              </button>
             )}
-          </div>
-
-          <div className="flex items-center justify-between gap-3 flex-wrap">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs text-[var(--cr-text-secondary)]">{live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}</span>
-              {(live.clicks ?? 0) > 0 && (
-                <span className="px-2.5 py-1 rounded-full bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] text-xs font-medium">
-                  {formatCount(live.clicks!)} clique{live.clicks !== 1 ? "s" : ""}
-                </span>
-              )}
-              {impressions > 0 && (
-                <span className="px-2.5 py-1 rounded-full bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] text-xs font-medium">
-                  {formatCount(impressions)} exibiç{impressions !== 1 ? "ões" : "ão"}
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-1.5 shrink-0" onClick={e => e.stopPropagation()}>
-              {live.status === "published" && (
-                <button
-                  onClick={() => copyLink(live)}
-                  title="Copiar link"
-                  className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-[var(--cr-surface-hover)] transition-colors"
-                >
-                  {copiedId === live.id ? <Check className="w-3.5 h-3.5 text-[var(--cr-success)]" /> : <Share2 className="w-3.5 h-3.5" />}
-                </button>
-              )}
-              <button
-                onClick={() => toggleStatus(live)}
-                title={live.status === "published" ? "Despublicar" : "Publicar"}
-                className={`w-9 h-5 rounded-full relative transition-colors shrink-0 ${live.status === "published" ? "bg-[var(--cr-success)]" : "bg-[var(--cr-border-strong)]"}`}
-              >
-                <span className={`absolute left-0.5 top-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${live.status === "published" ? "translate-x-4" : "translate-x-0"}`} />
-              </button>
-              <button
-                onClick={() => setConfirmId(live.id)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--cr-text-tertiary)] hover:text-[var(--cr-danger)] hover:bg-red-50 transition-colors"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
+            <button
+              onClick={() => toggleStatus(live)}
+              title={live.status === "published" ? "Despublicar" : "Publicar"}
+              className="w-7 h-7 flex items-center justify-center rounded-full transition-colors"
+              style={{ background: "rgba(255,255,255,0.92)", color: "var(--cr-text-secondary)" }}
+            >
+              {live.status === "published" ? <Globe className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+            </button>
+            <button
+              onClick={() => setConfirmId(live.id)}
+              title="Excluir"
+              className="w-7 h-7 flex items-center justify-center rounded-full transition-colors hover:text-[var(--cr-danger)]"
+              style={{ background: "rgba(255,255,255,0.92)", color: "var(--cr-text-secondary)" }}
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
+
+        {/* Metadados fora do card */}
+        <p className="mt-2.5 text-sm font-medium truncate" style={{ color: "var(--cr-text-primary)" }}>
+          {live.title}
+        </p>
+        <p className="mt-0.5 text-xs truncate" style={{ color: "var(--cr-text-tertiary)" }}>
+          {live.productCount ?? 0} produto{live.productCount !== 1 ? "s" : ""}
+          {(live.clicks ?? 0) > 0 && ` · ${formatCount(live.clicks!)} clique${live.clicks !== 1 ? "s" : ""}`}
+          {impressions > 0 && ` · ${formatCount(impressions)} exibiç${impressions !== 1 ? "ões" : "ão"}`}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="h-full flex flex-col bg-[var(--cr-background)] text-[var(--cr-text-primary)] overflow-hidden">
-      <Topbar title="Minha Vitrine" action={
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setManagingSections(true)}
-            title="Seções"
-            className="w-8 h-8 flex items-center justify-center bg-white border border-[var(--cr-border)] hover:border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] rounded-full transition-colors"
-          >
-            <Settings2 className="w-3.5 h-3.5" />
-          </button>
-          <a
-            href={profile ? `/${profile.username}` : "#"}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1.5 h-8 px-4 bg-white border border-[var(--cr-border)] hover:border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-xs font-semibold rounded-full transition-colors"
-          >
-            <ExternalLink className="w-3.5 h-3.5" /> Ver página
-          </a>
-          <Link
-            href="/app/performance"
-            className="flex items-center gap-1.5 h-8 px-4 bg-white border border-[var(--cr-border)] hover:border-[var(--cr-border-strong)] text-[var(--cr-text-secondary)] text-xs font-semibold rounded-full transition-colors"
-          >
-            <BarChart2 className="w-3.5 h-3.5" /> Performance
-          </Link>
-        </div>
-      } />
+      {/* Sem ações no topo: "Seções" e "Ver página" já estão na barra abaixo,
+          junto das demais — repetir aqui só dobrava os mesmos atalhos. */}
+      <Topbar title="Minha Vitrine" />
 
       <VitrineTabs />
 
@@ -414,12 +389,14 @@ export default function VitrinePage() {
             <>
               <ProfileHeader profile={profile} onEdit={() => setEditingProfile(true)} />
 
-              <div className="flex items-start justify-start gap-10 mb-8 py-2">
-                <QuickAction icon={<Plus className="w-5 h-5" />} label="Nova vitrine" onClick={handleNewVitrine} />
-                <QuickAction icon={<BarChart2 className="w-5 h-5" />} label="Performance" href="/app/performance" />
-                <QuickAction icon={<Pencil className="w-5 h-5" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
-                <QuickAction icon={<ExternalLink className="w-5 h-5" />} label="Ver página" href={profile ? `/${profile.username}` : "#"} external />
-                <QuickAction icon={<Layers className="w-5 h-5" />} label="Editar Seções" onClick={() => setManagingSections(true)} />
+              {/* Barra de ações: a primária destacada, as demais agrupadas.
+                  Rola no mobile em vez de quebrar em duas linhas. */}
+              <div className="flex items-center gap-2 mb-8 overflow-x-auto scrollbar-hidden">
+                <QuickAction icon={<Plus className="w-4 h-4" />} label="Nova vitrine" onClick={handleNewVitrine} primary />
+                <div className="w-px h-6 shrink-0 mx-1" style={{ background: "var(--border-subtle)" }} />
+                <QuickAction icon={<Pencil className="w-4 h-4" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
+                <QuickAction icon={<ExternalLink className="w-4 h-4" />} label="Ver página" href={profile ? `/${profile.username}` : "#"} external />
+                <QuickAction icon={<Layers className="w-4 h-4" />} label="Editar Seções" onClick={() => setManagingSections(true)} />
               </div>
 
               {lives.length === 0 ? (

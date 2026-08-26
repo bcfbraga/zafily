@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublicLinks } from "@/lib/links-store";
 import { resolveCurrentUsername } from "@/lib/lives-store";
+import { PublicFooter } from "@/components/zafily/PublicFooter";
 import { PublicProfileHeader } from "@/components/zafily/PublicProfileHeader";
 import { PublicProfileTabs } from "@/components/zafily/PublicProfileTabs";
 import { BentoLinksGrid } from "@/components/zafily/BentoLinksGrid";
@@ -41,13 +42,7 @@ export default async function CreatorProfilePage({ params }: Props) {
       <div className="max-w-2xl mx-auto px-5 pb-20">
         <BentoLinksGrid links={links} />
       </div>
-
-      {/* ── Footer ──────────────────────────────────────────────── */}
-      <div className="py-6 text-center" style={{ borderTop: "1px solid var(--cr-border)" }}>
-        <p className="text-xs" style={{ color: "var(--cr-text-tertiary)" }}>
-          Criado com <span className="font-medium" style={{ color: "var(--cr-text-secondary)" }}>Zafily</span>
-        </p>
-      </div>
+      <PublicFooter />
     </div>
   );
 }

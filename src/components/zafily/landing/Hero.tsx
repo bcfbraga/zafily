@@ -1,56 +1,37 @@
-import { ArrowRight, MessageCircle, ShoppingBag } from "lucide-react";
+import { ArrowRight, Package } from "lucide-react";
 import { hero } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { Surface, SectionGrid, Col, SectionLabel, CTA } from "@/components/zafily/ds";
 
-function MessageToVitrineDemo() {
+/**
+ * Vitrine em miniatura — a interface entra como elemento da composição, não
+ * como screenshot solto embaixo do texto.
+ */
+function VitrinePreview() {
   return (
-    <div className="max-w-[1000px] mx-auto mt-16 grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-6 md:gap-4">
-      {/* Chat bubble */}
-      <div className="flex justify-center md:justify-end">
-        <div className="w-full max-w-[300px] bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] rounded-br-[6px] p-5 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
-          <div className="flex items-center gap-2 mb-3 text-[#7E78B8]">
-            <MessageCircle className="w-4 h-4" />
-            <span className="text-xs font-medium">Direct</span>
-          </div>
-          <p className="text-sm text-white leading-relaxed mb-3">{hero.demoMessage}</p>
-          <div className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-[rgba(108,99,255,0.16)] border border-[rgba(108,99,255,0.30)] text-xs font-medium text-[#8B84FF] break-all">
-            {hero.demoUrl}
-          </div>
-        </div>
+    <div
+      className="w-full h-full min-h-[320px] flex flex-col"
+      style={{ background: "#FFFFFF", borderRadius: "var(--radius-lg)", overflow: "hidden" }}
+    >
+      {/* Cabeçalho do perfil */}
+      <div className="px-5 pt-6 pb-4 flex flex-col items-center text-center" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+        <div className="w-12 h-12 rounded-full mb-2" style={{ background: "var(--surface-brand)" }} />
+        <div className="w-24 h-2.5 rounded-full mb-1.5" style={{ background: "#E7E2E5" }} />
+        <div className="w-16 h-2 rounded-full" style={{ background: "#F0EBEE" }} />
       </div>
 
-      {/* Connector */}
-      <div className="hidden md:flex items-center justify-center text-[#4A4470]" aria-hidden="true">
-        <ArrowRight className="w-6 h-6" />
-      </div>
-      <div className="md:hidden flex items-center justify-center text-[#4A4470] rotate-90" aria-hidden="true">
-        <ArrowRight className="w-5 h-5" />
-      </div>
-
-      {/* Phone mockup with vitrine */}
-      <div className="flex justify-center md:justify-start">
-        <div className="w-[240px] rounded-[28px] border border-[rgba(255,255,255,0.10)] bg-[#1A1A2E] p-2 shadow-[0_24px_80px_rgba(0,0,0,0.5)]">
-          <div className="rounded-[20px] overflow-hidden bg-[#111126]">
-            <div className="pt-5 pb-4 px-4 flex flex-col items-center text-center border-b border-[rgba(255,255,255,0.06)]">
-              <div className="w-12 h-12 rounded-full bg-[rgba(108,99,255,0.20)] mb-2" />
-              <div className="w-20 h-2.5 rounded-full bg-[rgba(255,255,255,0.14)] mb-1.5" />
-              <div className="w-14 h-2 rounded-full bg-[rgba(255,255,255,0.08)]" />
+      {/* Produtos */}
+      <div className="p-4 grid grid-cols-2 gap-3 flex-1">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} style={{ background: "var(--surface-secondary)", borderRadius: "var(--radius-md)", overflow: "hidden" }}>
+            <div className="aspect-square flex items-center justify-center" style={{ background: i % 2 === 0 ? "var(--surface-brand)" : "#F0EBEE" }}>
+              <Package className="w-5 h-5" style={{ color: "var(--cr-brand-300)" }} />
             </div>
-            <div className="p-3 grid grid-cols-2 gap-2">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="rounded-[12px] bg-[#20203A] border border-[rgba(255,255,255,0.06)] overflow-hidden">
-                  <div className="aspect-square bg-[rgba(108,99,255,0.10)] flex items-center justify-center">
-                    <ShoppingBag className="w-5 h-5 text-[rgba(108,99,255,0.5)]" />
-                  </div>
-                  <div className="p-2">
-                    <div className="w-full h-1.5 rounded-full bg-[rgba(255,255,255,0.12)] mb-1.5" />
-                    <div className="w-2/3 h-1.5 rounded-full bg-[rgba(255,255,255,0.08)]" />
-                  </div>
-                </div>
-              ))}
+            <div className="p-2.5">
+              <div className="w-full h-1.5 rounded-full mb-1.5" style={{ background: "#E7E2E5" }} />
+              <div className="w-2/3 h-1.5 rounded-full" style={{ background: "#F0EBEE" }} />
             </div>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
@@ -58,45 +39,50 @@ function MessageToVitrineDemo() {
 
 export function Hero() {
   return (
-    <section className="pt-40 pb-24 px-6">
-      <Reveal className="max-w-[900px] mx-auto text-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[rgba(108,99,255,0.14)] border border-[rgba(108,99,255,0.30)] text-xs font-semibold text-[#8B84FF] mb-8">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00D4AA]" />
-          {hero.eyebrow}
-        </div>
+    <Surface tone="dark" size="lg" className="pt-28 sm:pt-32">
+      <SectionGrid className="items-center">
+        {/* 7 / 5 — assimetria intencional, o texto pesa mais que o visual */}
+        <Col span={7}>
+          <div className="mb-6">
+            <SectionLabel tone="on-dark">{hero.eyebrow}</SectionLabel>
+          </div>
 
-        <h1 className="font-heading font-bold text-[40px] sm:text-[52px] leading-[1.1] sm:leading-[60px] tracking-tight mb-6">
-          {hero.headline[0]}
-          <br />
-          <span className="text-[#6C63FF]">{hero.headline[1]}</span>
-        </h1>
-
-        <p className="text-lg text-[#B8B4E8] max-w-[560px] mx-auto leading-relaxed mb-10">
-          {hero.subheadline}
-        </p>
-
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a
-            href="#acesso"
-            className="flex items-center gap-2 h-12 px-7 bg-[#6C63FF] hover:bg-[#7C75FF] text-white font-semibold rounded-[12px] transition-colors shadow-[0_0_32px_rgba(108,99,255,0.28)] w-full sm:w-auto justify-center"
+          <h1
+            className="font-bold text-white leading-[1.02] tracking-[-0.03em]"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(40px, 5.6vw, 76px)" }}
           >
-            {hero.ctaPrimary}
-            <ArrowRight className="w-4 h-4" />
-          </a>
-          <a
-            href="#como-funciona"
-            className="flex items-center gap-2 h-12 px-7 bg-[rgba(255,255,255,0.06)] border border-[rgba(255,255,255,0.10)] text-[#B8B4E8] font-medium rounded-[12px] hover:bg-[rgba(255,255,255,0.09)] transition-colors w-full sm:w-auto justify-center"
+            {hero.headline[0]}
+            <br />
+            <span style={{ color: "var(--cr-brand-500)" }}>{hero.headline[1]}</span>
+          </h1>
+
+          <p className="mt-6 text-[17px] leading-[1.6] max-w-[52ch]" style={{ color: "rgba(255,255,255,0.66)" }}>
+            {hero.subheadline}
+          </p>
+
+          <div className="mt-10 flex flex-col sm:flex-row sm:items-center gap-3">
+            <CTA href="#acesso" variant="primary">
+              {hero.ctaPrimary} <ArrowRight className="w-4 h-4" />
+            </CTA>
+            <CTA href="#como-funciona" variant="ghost" className="!text-white/70 !border-white/15">
+              {hero.ctaSecondary}
+            </CTA>
+          </div>
+
+          <p className="mt-5 text-xs" style={{ color: "rgba(255,255,255,0.42)" }}>{hero.microcopy}</p>
+        </Col>
+
+        <Col span={5} className="mt-10 lg:mt-0">
+          <VitrinePreview />
+          {/* O link é o produto: fica logo abaixo da vitrine, como legenda */}
+          <p
+            className="mt-4 text-[13px] text-center truncate"
+            style={{ fontFamily: "var(--font-data)", color: "rgba(255,255,255,0.5)" }}
           >
-            {hero.ctaSecondary}
-          </a>
-        </div>
-
-        <p className="text-xs text-[#7E78B8] mt-5">{hero.microcopy}</p>
-      </Reveal>
-
-      <Reveal delay={150}>
-        <MessageToVitrineDemo />
-      </Reveal>
-    </section>
+            {hero.demoUrl}
+          </p>
+        </Col>
+      </SectionGrid>
+    </Surface>
   );
 }

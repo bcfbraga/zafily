@@ -1,15 +1,28 @@
 import { positioningBand } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { Surface, SectionGrid, Col } from "@/components/zafily/ds";
 
+/**
+ * Faixa de posicionamento: tipografia como elemento gráfico principal, 8/4 —
+ * a manchete domina e o complemento entra como metadado.
+ */
 export function PositioningBand() {
   return (
-    <section className="py-16 px-6 border-y border-[rgba(255,255,255,0.06)] bg-[#15152A]">
-      <Reveal className="max-w-[760px] mx-auto text-center">
-        <p className="font-heading font-semibold text-2xl sm:text-3xl leading-snug text-white mb-3">
-          {positioningBand.headline}
-        </p>
-        <p className="text-[#8B84FF] text-sm sm:text-base font-medium">{positioningBand.complement}</p>
-      </Reveal>
-    </section>
+    <Surface tone="brand" size="lg">
+      <SectionGrid className="items-end">
+        <Col span={8}>
+          <h2
+            className="font-bold leading-[1.08] tracking-[-0.025em]"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(26px, 3.4vw, 46px)" }}
+          >
+            {positioningBand.headline}
+          </h2>
+        </Col>
+        <Col span={4}>
+          <p className="text-[15px] leading-[1.6] lg:text-right" style={{ color: "var(--cr-text-secondary)" }}>
+            {positioningBand.complement}
+          </p>
+        </Col>
+      </SectionGrid>
+    </Surface>
   );
 }

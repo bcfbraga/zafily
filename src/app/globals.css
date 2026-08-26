@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;0,800;1,700;1,800&display=swap");
-/* Famílias da marca (tokens v1). Aplicadas só dentro de .zf-brand — as fontes
-   acima continuam servindo as páginas públicas. */
+/* Famílias da marca (tokens v1) — display, corpo e dados. Globais desde o
+   redesign; as fontes da linha acima são legado e saem quando os últimos
+   utilitários antigos forem removidos. */
 @import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
 
 @import "tailwindcss";
@@ -39,17 +40,23 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  /* Escala de raio medida na referência: 16px em tudo, do painel de tela cheia
+     ao card pequeno. É mais delicado que os 32–40px do briefing inicial — e é
+     o que mantém painel e card na mesma família em vez de competirem.
+     Os utilitários do Tailwind nascem daqui: fonte única, não redeclarar. */
+  --radius-sm: 8px; /* chips, badges */
+  --radius-md: 12px; /* botões, inputs */
+  --radius-lg: 16px; /* cards */
+  --radius-xl: 16px; /* painéis */
+  --radius-2xl: 16px;
+  --radius-3xl: 16px;
   --radius-full: 999px;
 
   /* Zafily brand tokens */
-  --color-brand: #6C63FF;
-  --color-brand-hover: #7C75FF;
-  --color-mint: #00D4AA;
-  --color-mint-hover: #25E6C0;
+  --color-brand: #F759AD;
+  --color-brand-hover: #E5308F;
+  --color-mint: #F759AD;
+  --color-mint-hover: #E5308F;
   --color-warning: #FFC857;
   --color-error: #FF5F7E;
   --color-bg-primary: #111126;
@@ -60,17 +67,69 @@
   --color-text-secondary: #B8B4E8;
   --color-text-muted: #7E78B8;
   --color-border-subtle: rgba(255, 255, 255, 0.08);
-  --color-border-brand: rgba(108, 99, 255, 0.32);
+  --color-border-brand: rgba(247, 89, 173, 0.28);
   --color-border-strong: rgba(184, 180, 232, 0.24);
   --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.28);
   --shadow-elevated: 0 24px 80px rgba(0, 0, 0, 0.36);
-  --shadow-indigo-glow: 0 0 32px rgba(108, 99, 255, 0.28);
+  --shadow-indigo-glow: 0 0 32px rgba(247, 89, 173, 0.24);
   --shadow-mint-glow: 0 0 28px rgba(0, 212, 170, 0.20);
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   ZAFILY DESIGN SYSTEM
+   Canvas → superfícies modulares → grid editorial.
+
+   Três níveis tonais, sem sombra: o canvas aparece nas bordas, a superfície
+   flutua sobre ele e os cards ficam um tom abaixo dentro da superfície. A
+   separação é tonal + 1px de borda, nunca drop shadow.
+   ────────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: oklch(0.16 0.03 265);
-  --foreground: oklch(1 0 0);
+  /* Superfícies — valores medidos na referência (Magnific).
+     A ordem tonal ABRE para dentro: o canvas é o tom mais fechado, o painel
+     fica um passo acima e os cards são o branco puro. É isso que dá a
+     profundidade sem precisar de sombra. */
+  --page-background: #f5f5f5; /* canvas — neutro, sem tingimento de marca */
+  --surface-panel: #fafafa; /* painel que segura os cards */
+  --surface-primary: #ffffff; /* cards e navegação */
+  --surface-secondary: #f5f5f5; /* card quieto, volta ao tom do canvas */
+  --surface-dark: #2b2b2b; /* off-black: preto puro pesa demais aqui */
+  --surface-brand: #fbf1f6; /* pink-tint — destaque pontual */
+
+  /* Na referência as superfícies não têm borda nem sombra: a separação é só
+     tonal. A borda fica para quando o tom não basta. */
+  --border-subtle: #ececec;
+  --border-on-dark: rgba(255, 255, 255, 0.1);
+
+  /* Folga entre as superfícies e a borda da tela */
+  --canvas-gap: 8px;
+
+  /* Espaçamento — escala fechada, sem valores fora dela */
+  --space-2xs: 8px;
+  --space-xs: 12px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-2xl: 64px;
+  --space-3xl: 80px;
+  --space-4xl: 96px;
+  --space-5xl: 120px;
+
+  /* Respiro interno dos módulos: o briefing pede 40–72px no desktop, bem acima
+     do padrão SaaS de 24px — é o que faz a composição parecer premium. */
+  --surface-padding: 48px;
+  --surface-padding-lg: 64px;
+
+  /* Grid */
+  --content-max-width: 1360px;
+  --grid-gap: 24px;
+}
+
+:root {
+  /* O tema escuro herdado servia a landing antiga. Agora o canvas claro é o
+     padrão e cada superfície declara o próprio fundo. */
+  --background: var(--page-background);
+  --foreground: #0c0c0c;
   --card: oklch(0.20 0.04 265);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.22 0.05 265);
@@ -96,8 +155,12 @@
   --sidebar-accent-foreground: oklch(0.82 0.06 270);
   --sidebar-border: oklch(1 0 0 / 8%);
   --sidebar-ring: oklch(0.60 0.22 270);
-  --font-body: "Inter", system-ui, sans-serif;
-  --font-heading: "Space Grotesk", "Inter", system-ui, sans-serif;
+
+  /* Tipografia da marca, agora global — o redesign cobre o site inteiro, então
+     display/corpo/dados deixam de viver só no escopo do dashboard. */
+  --font-body: "Hanken Grotesk", system-ui, -apple-system, sans-serif;
+  --font-heading: "Bricolage Grotesque", "Hanken Grotesk", system-ui, sans-serif;
+  --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
 }
 
 @layer base {
@@ -130,14 +193,14 @@
 
   .card-highlight {
     background:
-      radial-gradient(circle at top right, rgba(108, 99, 255, 0.20), transparent 42%),
+      radial-gradient(circle at top right, rgba(247, 89, 173, 0.16), transparent 42%),
       var(--color-bg-card);
     border: 1px solid var(--color-border-brand);
   }
 
   .metric-card-bg {
     background:
-      radial-gradient(circle at top right, rgba(108, 99, 255, 0.18), transparent 42%),
+      radial-gradient(circle at top right, rgba(247, 89, 173, 0.14), transparent 42%),
       var(--color-bg-card);
   }
 
@@ -169,16 +232,16 @@
    não mostrar rosa/reto enquanto o visitante vê roxo/arredondado. */
 :root,
 .zf-public {
-  --cr-brand-50: #f7f5ff;
-  --cr-brand-100: #efebff;
-  --cr-brand-200: #dfd7ff;
-  --cr-brand-300: #c8b8ff;
-  --cr-brand-400: #a78bfa;
-  --cr-brand-500: #8259f5;
-  --cr-brand-600: #7047eb;
-  --cr-brand-700: #5d35cf;
-  --cr-brand-800: #4b2ba5;
-  --cr-brand-900: #392171;
+  --cr-brand-50: #FDF2F8;
+  --cr-brand-100: #FCE7F3;
+  --cr-brand-200: #FBCFE8;
+  --cr-brand-300: #F9A8D4;
+  --cr-brand-400: #F87FBF;
+  --cr-brand-500: #F759AD;
+  --cr-brand-600: #E5308F;
+  --cr-brand-700: #C70A6E;
+  --cr-brand-800: #9D0857;
+  --cr-brand-900: #6B0539;
 
   --cr-background: #fbfaff;
   --cr-background-alt: #f5f2ff;
@@ -186,7 +249,7 @@
   --cr-surface-soft: #f7f5fc;
   --cr-surface-hover: #f1edfb;
 
-  --cr-text-primary: #241b35;
+  --cr-text-primary: #0C0C0C;
   --cr-text-secondary: #675f73;
   --cr-text-tertiary: #91899b;
   --cr-text-inverse: #ffffff;
@@ -258,21 +321,16 @@
 
   --cr-accent-pink: #f759ad;
 
-  /* Cantos retos (token: corner_radius_max_px 4). Os utilitários do Tailwind v4
-     leem --radius-*; as classes .cr-* leem --cr-radius-*. Avatares e badges
-     continuam redondos via --*-full. */
-  --radius-sm: 4px;
-  --radius-md: 4px;
-  --radius-lg: 4px;
-  --radius-xl: 4px;
-  --radius-full: 999px;
-
-  --cr-radius-xs: 2px;
-  --cr-radius-sm: 4px;
-  --cr-radius-md: 4px;
-  --cr-radius-lg: 4px;
-  --cr-radius-xl: 4px;
-  --cr-radius-2xl: 4px;
+  /* O redesign substitui os cantos retos que vinham do brand token
+     `corner_radius_max_px: 4` — superfícies arredondadas passaram a ser um dos
+     elementos centrais do sistema. Os utilitários do Tailwind saem do @theme;
+     aqui ficam só as classes .cr-*. */
+  --cr-radius-xs: 8px;
+  --cr-radius-sm: 10px;
+  --cr-radius-md: 16px;
+  --cr-radius-lg: 28px;
+  --cr-radius-xl: 36px;
+  --cr-radius-2xl: 36px;
   --cr-radius-full: 999px;
 
   /* Sombras re-ancoradas no preto ink em vez do roxo antigo */
@@ -287,18 +345,6 @@
   --font-data: "IBM Plex Mono", ui-monospace, "SF Mono", monospace;
 
   font-family: var(--font-body);
-}
-
-/* Cantos retos nos utilitários do Tailwind. O bloco @theme deste projeto usa
-   `inline`, que embute o valor literal (border-radius: 28px) em vez de emitir
-   var(--radius-xl) — então redeclarar a variável não basta e a regra abaixo é
-   necessária. O preview da vitrine (.zf-public) fica de fora para continuar
-   representando fielmente a página pública. */
-.zf-brand
-  :is(.rounded-sm, .rounded-md, .rounded-lg, .rounded-xl, .rounded-2xl, .rounded-3xl):not(
-    :is(.zf-public, .zf-public *)
-  ) {
-  border-radius: 4px;
 }
 
 /* Preços, métricas e percentuais falam em monoespaçada (token: typography.data) */

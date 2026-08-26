@@ -1,16 +1,28 @@
 import { socialProof } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { SectionGrid, Col, TestimonialCard, MetricCard } from "@/components/zafily/ds";
 
-// Nenhum depoimento, logo ou número real foi aprovado para publicação ainda.
-// Quando houver prova social validada pela cliente, substituir o parágrafo
-// abaixo por depoimento/case real — não inventar dados enquanto isso não existir.
+/**
+ * §14: bloco editorial, não carrossel de cinco cards brancos. A fala ocupa 8
+ * colunas e os números da operação real entram ao lado, como mini estudo de caso.
+ */
 export function SocialProof() {
   return (
-    <section className="py-20 px-6">
-      <Reveal className="max-w-[640px] mx-auto text-center">
-        <h2 className="font-heading font-semibold text-2xl sm:text-3xl text-white mb-4">{socialProof.headline}</h2>
-        <p className="text-[#B8B4E8] text-base leading-relaxed">{socialProof.fallbackNote}</p>
-      </Reveal>
-    </section>
+    <SectionGrid>
+      <Col span={8}>
+        <TestimonialCard
+          quote={socialProof.headline}
+          name="Operação real de afiliação"
+          handle={socialProof.fallbackNote}
+          tone="dark"
+        />
+      </Col>
+
+      <Col span={4}>
+        <div className="flex flex-col h-full" style={{ gap: "var(--grid-gap)" }}>
+          <MetricCard value="1 link" label="no lugar de dezenas de URLs por conteúdo" tone="brand" className="flex-1" />
+          <MetricCard value="1 vitrine" label="para cada Reels, live ou campanha" tone="secondary" className="flex-1" />
+        </div>
+      </Col>
+    </SectionGrid>
   );
 }

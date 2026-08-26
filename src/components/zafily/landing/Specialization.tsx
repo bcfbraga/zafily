@@ -1,40 +1,40 @@
-import { ShoppingBag, Layers, Briefcase, Compass } from "lucide-react";
 import { specialization } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
-
-const ICONS = [ShoppingBag, Layers, Briefcase, Compass];
+import { Surface, SectionGrid, Col, SectionLabel } from "@/components/zafily/ds";
 
 export function Specialization() {
   return (
-    <section id="especializacao" className="py-24 px-6 scroll-mt-20">
-      <div className="max-w-[1000px] mx-auto">
-        <Reveal className="text-center mb-14 max-w-[700px] mx-auto">
-          <p className="text-xs font-semibold tracking-wide uppercase text-[#8B84FF] mb-4">{specialization.eyebrow}</p>
-          <h2 className="font-heading font-bold text-[32px] sm:text-[40px] leading-[1.15] sm:leading-[48px] tracking-tight mb-5">
-            {specialization.headline}
-          </h2>
-          <p className="text-[#B8B4E8] text-base sm:text-lg leading-relaxed">{specialization.copy}</p>
-        </Reveal>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          {specialization.pillars.map((pillar, i) => {
-            const Icon = ICONS[i];
-            return (
-              <Reveal key={pillar.title} delay={(i % 2) * 100}>
-                <div className="flex gap-4 bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-6 h-full">
-                  <div className="w-10 h-10 rounded-[12px] bg-[rgba(0,212,170,0.14)] flex items-center justify-center shrink-0">
-                    <Icon className="w-5 h-5 text-[#00D4AA]" />
-                  </div>
-                  <div>
-                    <h3 className="font-heading font-semibold text-lg text-white mb-1.5">{pillar.title}</h3>
-                    <p className="text-sm text-[#B8B4E8] leading-relaxed">{pillar.text}</p>
-                  </div>
-                </div>
-              </Reveal>
-            );
-          })}
+    <div id="especializacao" className="scroll-mt-24">
+      <Surface tone="primary" size="lg">
+        <div className="mb-4">
+          <SectionLabel tone="brand">{specialization.eyebrow}</SectionLabel>
         </div>
-      </div>
-    </section>
+
+        <SectionGrid>
+          <Col span={7}>
+            <h2
+              className="font-bold leading-[1.08] tracking-[-0.025em]"
+              style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 3.6vw, 50px)" }}
+            >
+              {specialization.headline}
+            </h2>
+          </Col>
+          <Col span={5}>
+            <p className="text-[15px] leading-[1.65]" style={{ color: "var(--cr-text-secondary)" }}>
+              {specialization.copy}
+            </p>
+          </Col>
+        </SectionGrid>
+
+        {/* Pilares em 6/6: densidade menor que o bento acima, para variar o ritmo */}
+        <div className="mt-14 grid grid-cols-1 md:grid-cols-2" style={{ gap: "var(--grid-gap)" }}>
+          {specialization.pillars.map(p => (
+            <div key={p.title} style={{ borderTop: "1px solid var(--border-subtle)", paddingTop: "var(--space-md)" }}>
+              <h3 className="font-semibold text-lg mb-2">{p.title}</h3>
+              <p className="text-[15px] leading-[1.6] max-w-[48ch]" style={{ color: "var(--cr-text-secondary)" }}>{p.text}</p>
+            </div>
+          ))}
+        </div>
+      </Surface>
+    </div>
   );
 }

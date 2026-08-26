@@ -1,67 +1,79 @@
-import { Link2, X, Check, ShoppingBag } from "lucide-react";
+import { Link2, Check } from "lucide-react";
 import { problem } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { Surface, SectionGrid, Col, SectionLabel } from "@/components/zafily/ds";
 
+/**
+ * Antes / depois. A assimetria conta a história: o card "antes" é denso e
+ * repetitivo, o "depois" é limpo — a composição comunica antes do texto.
+ */
 export function ProblemComparison() {
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-[900px] mx-auto">
-        <Reveal className="text-center mb-14">
-          <p className="text-xs font-semibold tracking-wide uppercase text-[#8B84FF] mb-4">{problem.eyebrow}</p>
-          <h2 className="font-heading font-bold text-[32px] sm:text-[40px] leading-[1.15] sm:leading-[48px] tracking-tight mb-5">
+    <Surface tone="primary" size="lg">
+      <div className="mb-4">
+        <SectionLabel>{problem.eyebrow}</SectionLabel>
+      </div>
+
+      <SectionGrid>
+        <Col span={7}>
+          <h2
+            className="font-bold leading-[1.08] tracking-[-0.025em]"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 3.6vw, 50px)" }}
+          >
             {problem.headline}
           </h2>
-          <p className="text-[#B8B4E8] text-base sm:text-lg max-w-[640px] mx-auto leading-relaxed">{problem.copy}</p>
-        </Reveal>
+        </Col>
+        <Col span={5}>
+          <p className="text-[15px] leading-[1.65]" style={{ color: "var(--cr-text-secondary)" }}>
+            {problem.copy}
+          </p>
+        </Col>
+      </SectionGrid>
 
-        <Reveal delay={100} className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {/* Antes */}
-          <div className="bg-[#20203A] border border-[rgba(255,255,255,0.08)] rounded-[20px] p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-7 h-7 rounded-full bg-[rgba(255,95,126,0.16)] flex items-center justify-center">
-                <X className="w-3.5 h-3.5 text-[#FF5F7E]" />
-              </div>
-              <h3 className="font-heading font-semibold text-white">{problem.before.title}</h3>
-            </div>
-            <div className="space-y-2 mb-4">
+      <SectionGrid className="mt-12">
+        {/* Antes — denso, cansativo de ler: é esse o ponto */}
+        <Col span={6}>
+          <Surface tone="secondary" size="md" radius="lg" className="!h-full">
+            <p className="text-sm font-semibold mb-5">{problem.before.title}</p>
+            <div className="flex flex-col gap-2">
               {problem.before.items.map(item => (
-                <div key={item.label} className="flex items-center gap-2.5 bg-[#111126] border border-[rgba(255,255,255,0.06)] rounded-[10px] px-3 py-2.5">
-                  <Link2 className="w-3.5 h-3.5 text-[#7E78B8] shrink-0" />
-                  <span className="text-xs text-[#7E78B8] truncate">{item.url}</span>
+                <div
+                  key={item.label}
+                  className="flex items-center gap-2.5 px-3 py-2.5"
+                  style={{ background: "var(--surface-primary)", borderRadius: "var(--radius-sm)" }}
+                >
+                  <Link2 className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--cr-text-tertiary)" }} />
+                  <span className="text-xs shrink-0" style={{ color: "var(--cr-text-secondary)" }}>{item.label}</span>
+                  <span className="text-[11px] truncate" style={{ fontFamily: "var(--font-data)", color: "var(--cr-text-tertiary)" }}>
+                    {item.url}
+                  </span>
                 </div>
               ))}
-              <p className="text-xs text-[#5A5580] pl-1">{problem.before.moreLabel}...</p>
+              <p className="text-xs px-3 pt-1" style={{ color: "var(--cr-text-tertiary)" }}>{problem.before.moreLabel}…</p>
             </div>
-            <p className="text-xs text-[#7E78B8]">{problem.before.caption}</p>
-          </div>
+            <p className="text-xs mt-5" style={{ color: "var(--cr-text-tertiary)" }}>{problem.before.caption}</p>
+          </Surface>
+        </Col>
 
-          {/* Depois */}
-          <div className="card-highlight rounded-[20px] p-6">
-            <div className="flex items-center gap-2 mb-5">
-              <div className="w-7 h-7 rounded-full bg-[rgba(0,212,170,0.16)] flex items-center justify-center">
-                <Check className="w-3.5 h-3.5 text-[#00D4AA]" />
-              </div>
-              <h3 className="font-heading font-semibold text-white">{problem.after.title}</h3>
-            </div>
-            <div className="bg-[#111126] border border-[rgba(255,255,255,0.06)] rounded-[14px] p-4 mb-4">
-              <p className="text-sm text-white mb-2.5">{problem.after.message}</p>
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-[8px] bg-[rgba(108,99,255,0.16)] border border-[rgba(108,99,255,0.30)] text-xs font-medium text-[#8B84FF] mb-3">
-                {problem.after.url}
-              </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="aspect-square rounded-[8px] bg-[rgba(108,99,255,0.10)] flex items-center justify-center">
-                    <ShoppingBag className="w-4 h-4 text-[rgba(108,99,255,0.5)]" />
-                  </div>
-                ))}
+        {/* Depois — uma linha só */}
+        <Col span={6}>
+          <Surface tone="brand" size="md" radius="lg" className="!h-full">
+            <p className="text-sm font-semibold mb-5">{problem.after.title}</p>
+            <div className="px-4 py-4" style={{ background: "var(--surface-primary)", borderRadius: "var(--radius-md)" }}>
+              <p className="text-sm mb-3">{problem.after.message}</p>
+              <div
+                className="inline-flex items-center gap-2 px-3 py-2 text-xs font-medium max-w-full"
+                style={{ background: "var(--cr-brand-50)", color: "var(--cr-brand-700)", borderRadius: "var(--radius-sm)" }}
+              >
+                <Check className="w-3.5 h-3.5 shrink-0" />
+                <span className="truncate" style={{ fontFamily: "var(--font-data)" }}>{problem.after.url}</span>
               </div>
             </div>
-            <p className="text-xs text-[#B8B4E8]">{problem.after.caption}</p>
-          </div>
-        </Reveal>
+            <p className="text-xs mt-5" style={{ color: "var(--cr-text-secondary)" }}>{problem.after.caption}</p>
+          </Surface>
+        </Col>
+      </SectionGrid>
 
-        <p className="text-center text-sm text-[#7E78B8] mt-8">{problem.metaNote}</p>
-      </div>
-    </section>
+      <p className="text-xs mt-8" style={{ color: "var(--cr-text-tertiary)" }}>{problem.metaNote}</p>
+    </Surface>
   );
 }

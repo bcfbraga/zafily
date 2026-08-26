@@ -2,6 +2,8 @@ import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getPublicGallery, resolveCurrentUsername, recordImpressions, type Live } from "@/lib/lives-store";
 import { VitrineCarousel } from "@/components/zafily/VitrineCarousel";
+import { LiveGridCard } from "@/components/zafily/LiveGridCard";
+import { PublicFooter } from "@/components/zafily/PublicFooter";
 import { PublicProfileHeader } from "@/components/zafily/PublicProfileHeader";
 import { PublicProfileTabs } from "@/components/zafily/PublicProfileTabs";
 import { Package, Radio, Layers } from "lucide-react";
@@ -60,11 +62,32 @@ export default async function VitrinesIndexPage({ params }: Props) {
     }));
   const uncategorized = lives.filter(l => !l.liveDate && !l.sectionId);
 
+  // As lives entram em grade (capa + prévia dos produtos + contagem); as demais
+  // seções seguem como carrossel, que é onde a navegação horizontal ajuda.
   const groups = [
-    ...sectionGroups,
-    { title: "Outras vitrines", icon: undefined as React.ReactNode, lives: uncategorized },
-    { title: "Vitrines de Live", icon: <Radio className="w-4 h-4" style={{ color: "var(--cr-brand-600)" }} />, lives: liveShopping },
+    ...sectionGroups.map(g => ({ ...g, grid: false })),
+    { title: "Outras vitrines", icon: undefined as React.ReactNode, lives: uncategorized, grid: false },
+    { title: "Vitrines de Live", icon: <Radio className="w-4 h-4" style={{ color: "var(--cr-brand-600)" }} />, lives: liveShopping, grid: true },
   ].filter(g => g.lives.length > 0);
+
+  function renderGroupBody(group: (typeof groups)[number]) {
+    if (group.grid) {
+      return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-9">
+          {group.lives.map(live => (
+            <LiveGridCard key={live.id} live={live} username={profile.username} />
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div className="flex flex-col gap-y-10">
+        {group.lives.map(live => (
+          <VitrineSection key={live.id} live={live} username={profile.username} />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: "var(--cr-background)", color: "var(--cr-text-primary)", fontFamily: "var(--cr-font)" }}>
@@ -81,11 +104,7 @@ export default async function VitrinesIndexPage({ params }: Props) {
             <p className="cr-body-text">Nenhuma vitrine publicada ainda.</p>
           </div>
         ) : groups.length === 1 ? (
-          <div className="flex flex-col gap-y-10">
-            {groups[0].lives.map(live => (
-              <VitrineSection key={live.id} live={live} username={profile.username} />
-            ))}
-          </div>
+          renderGroupBody(groups[0])
         ) : (
           groups.map(group => (
             <section key={group.title} className="mb-10 last:mb-0">
@@ -93,22 +112,12 @@ export default async function VitrinesIndexPage({ params }: Props) {
                 {group.icon}
                 <h2 className="cr-card-title">{group.title}</h2>
               </div>
-              <div className="flex flex-col gap-y-10">
-                {group.lives.map(live => (
-                  <VitrineSection key={live.id} live={live} username={profile.username} />
-                ))}
-              </div>
+              {renderGroupBody(group)}
             </section>
           ))
         )}
       </div>
-
-      {/* ── Footer ──────────────────────────────────────────────── */}
-      <div className="py-6 text-center" style={{ borderTop: "1px solid var(--cr-border)" }}>
-        <p className="text-xs" style={{ color: "var(--cr-text-tertiary)" }}>
-          Criado com <span className="font-medium" style={{ color: "var(--cr-text-secondary)" }}>Zafily</span>
-        </p>
-      </div>
+      <PublicFooter />
     </div>
   );
 }

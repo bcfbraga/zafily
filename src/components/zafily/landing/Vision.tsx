@@ -1,17 +1,38 @@
 import { vision } from "@/lib/landing-copy";
-import { Reveal } from "./Reveal";
+import { Surface, SectionGrid, Col, SectionLabel } from "@/components/zafily/ds";
 
 export function Vision() {
   return (
-    <section className="py-24 px-6 bg-[#1A1A2E]">
-      <Reveal className="max-w-[760px] mx-auto text-center">
-        <p className="text-xs font-semibold tracking-wide uppercase text-[#8B84FF] mb-4">{vision.eyebrow}</p>
-        <h2 className="font-heading font-bold text-[32px] sm:text-[40px] leading-[1.15] sm:leading-[48px] tracking-tight mb-6">
-          {vision.headline}
-        </h2>
-        <p className="text-[#B8B4E8] text-base sm:text-lg leading-relaxed mb-8">{vision.copy}</p>
-        <p className="font-heading font-semibold text-lg sm:text-xl text-white">{vision.highlight}</p>
-      </Reveal>
-    </section>
+    <Surface tone="primary" size="lg">
+      <div className="mb-4">
+        <SectionLabel>{vision.eyebrow}</SectionLabel>
+      </div>
+
+      <SectionGrid>
+        <Col span={6}>
+          <h2
+            className="font-bold leading-[1.08] tracking-[-0.025em]"
+            style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 3.4vw, 46px)" }}
+          >
+            {vision.headline}
+          </h2>
+        </Col>
+        <Col span={6}>
+          <p className="text-[15px] leading-[1.7]" style={{ color: "var(--cr-text-secondary)" }}>{vision.copy}</p>
+        </Col>
+      </SectionGrid>
+
+      <div
+        className="mt-12 px-6 py-6 sm:px-8 sm:py-7"
+        style={{ background: "var(--surface-brand)", borderRadius: "var(--radius-lg)" }}
+      >
+        <p
+          className="font-bold leading-[1.2] tracking-[-0.02em] max-w-[60ch]"
+          style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(18px, 2vw, 26px)" }}
+        >
+          {vision.highlight}
+        </p>
+      </div>
+    </Surface>
   );
 }
