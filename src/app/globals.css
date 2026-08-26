@@ -68,11 +68,11 @@
   --color-text-muted: #7E78B8;
   --color-border-subtle: rgba(255, 255, 255, 0.08);
   --color-border-brand: rgba(247, 89, 173, 0.28);
-  --color-border-strong: rgba(184, 180, 232, 0.24);
+  --color-border-strong: rgba(12, 12, 12, 0.16);
   --shadow-card: 0 16px 48px rgba(0, 0, 0, 0.28);
   --shadow-elevated: 0 24px 80px rgba(0, 0, 0, 0.36);
   --shadow-indigo-glow: 0 0 32px rgba(247, 89, 173, 0.24);
-  --shadow-mint-glow: 0 0 28px rgba(0, 212, 170, 0.20);
+  --shadow-mint-glow: 0 0 28px rgba(247, 89, 173, 0.18);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -275,10 +275,10 @@
   --cr-radius-2xl: 32px;
   --cr-radius-full: 999px;
 
-  --cr-shadow-xs: 0 1px 2px rgba(36, 27, 53, 0.04);
-  --cr-shadow-sm: 0 4px 12px rgba(36, 27, 53, 0.06);
-  --cr-shadow-md: 0 12px 30px rgba(36, 27, 53, 0.08);
-  --cr-shadow-floating: 0 18px 48px rgba(36, 27, 53, 0.12);
+  --cr-shadow-xs: 0 1px 2px rgba(12, 12, 12, 0.04);
+  --cr-shadow-sm: 0 4px 12px rgba(12, 12, 12, 0.06);
+  --cr-shadow-md: 0 12px 30px rgba(12, 12, 12, 0.08);
+  --cr-shadow-floating: 0 18px 48px rgba(12, 12, 12, 0.12);
 
   --cr-transition-fast: 150ms ease;
   --cr-transition-base: 220ms ease;
@@ -401,10 +401,10 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(112, 71, 235, 0.2);
+  box-shadow: 0 4px 12px rgba(229, 48, 143, 0.2);
   transition: transform var(--cr-transition-fast), background var(--cr-transition-fast), box-shadow var(--cr-transition-fast);
 }
-.cr-button-primary:hover { transform: translateY(-1px); background: var(--cr-brand-700); box-shadow: 0 7px 18px rgba(112, 71, 235, 0.25); }
+.cr-button-primary:hover { transform: translateY(-1px); background: var(--cr-brand-700); box-shadow: 0 7px 18px rgba(229, 48, 143, 0.25); }
 .cr-button-primary:active { transform: translateY(0); }
 .cr-button-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
@@ -520,7 +520,7 @@
   transition: border-color var(--cr-transition-fast), box-shadow var(--cr-transition-fast);
 }
 .cr-form-input:hover { border-color: #cfc6dc; }
-.cr-form-input:focus { border-color: var(--cr-brand-500); box-shadow: 0 0 0 4px rgba(130, 89, 245, 0.13); }
+.cr-form-input:focus { border-color: var(--cr-brand-500); box-shadow: 0 0 0 4px rgba(247, 89, 173, 0.13); }
 
 .cr-settings-panel {
   padding: 24px;
@@ -561,7 +561,7 @@
 }
 
 :focus-visible {
-  outline: 3px solid rgba(130, 89, 245, 0.28);
+  outline: 3px solid rgba(247, 89, 173, 0.28);
   outline-offset: 3px;
 }
 

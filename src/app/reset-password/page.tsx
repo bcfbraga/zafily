@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
     return (
       <div className="zf-brand min-h-screen bg-[var(--cr-background)] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-[400px] text-center">
-          <CheckCircle2 className="w-12 h-12 text-[#00D4AA] mx-auto mb-4" />
+          <CheckCircle2 className="w-12 h-12 text-[var(--cr-success)] mx-auto mb-4" />
           <h1 className="font-heading font-bold text-2xl text-[var(--cr-text-primary)] mb-2">Senha redefinida</h1>
           <p className="text-sm text-[var(--cr-text-secondary)] mb-6">Sua senha foi alterada com sucesso.</p>
           <button

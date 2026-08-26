@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
     return (
       <div className="zf-brand min-h-screen bg-[var(--cr-background)] flex flex-col items-center justify-center px-4">
         <div className="w-full max-w-[400px] text-center">
-          <MailCheck className="w-12 h-12 text-[#00D4AA] mx-auto mb-4" />
+          <MailCheck className="w-12 h-12 text-[var(--cr-success)] mx-auto mb-4" />
           <h1 className="font-heading font-bold text-2xl text-[var(--cr-text-primary)] mb-2">Verifique seu email</h1>
           <p className="text-sm text-[var(--cr-text-secondary)] mb-6">
             Se houver uma conta com o email <span className="text-[var(--cr-text-primary)] font-medium">{email}</span>,

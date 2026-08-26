@@ -105,7 +105,7 @@ function SignupForm({ email }: { email: string }) {
     return (
       <Shell>
         <div className="text-center">
-          <CheckCircle2 className="w-12 h-12 text-[#00D4AA] mx-auto mb-4" />
+          <CheckCircle2 className="w-12 h-12 text-[var(--cr-success)] mx-auto mb-4" />
           <h1 className="font-heading font-bold text-2xl text-[var(--cr-text-primary)] mb-2">Confirme seu email</h1>
           <p className="text-sm text-[var(--cr-text-secondary)] mb-6">
             Enviamos um link de confirmação para <span className="text-[var(--cr-text-primary)] font-medium">{email}</span>.
@@ -128,7 +128,7 @@ function SignupForm({ email }: { email: string }) {
         <div className="space-y-2 mb-7">
           {perks.map((p) => (
             <div key={p} className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#00D4AA] shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[var(--cr-success)] shrink-0" />
               <span className="text-xs text-[var(--cr-text-secondary)]">{p}</span>
             </div>
           ))}
