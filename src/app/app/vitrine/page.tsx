@@ -4,13 +4,14 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Plus, Pencil, Trash2, Globe, CheckCircle2, FileText, Radio, Layers, X, GripVertical, Share2, Check, Package, ExternalLink
+  Plus, Pencil, Trash2, Globe, CheckCircle2, FileText, Radio, Layers, X, GripVertical, Share2, Check, Package, ExternalLink, Palette
 } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { SocialIcon, SOCIAL_PLATFORMS } from "@/components/zafily/SocialIcons";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
 import { Modal } from "@/components/zafily/Modal";
+import { ThemePickerModal } from "@/components/zafily/ThemePickerModal";
 import { PullToRefresh } from "@/components/zafily/PullToRefresh";
 import type { DesignSettings } from "@/lib/design-presets";
 import type { AccountStatus } from "@/lib/lives-store";
@@ -144,6 +145,7 @@ export default function VitrinePage() {
   const [dragLiveId, setDragLiveId] = useState<string | null>(null);
   const [overLiveId, setOverLiveId] = useState<string | null>(null);
   const [showActivationModal, setShowActivationModal] = useState(false);
+  const [pickingTheme, setPickingTheme] = useState(false);
 
   function loadData() {
     return fetch("/api/dashboard").then(r => r.json()).then(d => {
@@ -389,6 +391,7 @@ export default function VitrinePage() {
                 <QuickAction icon={<Pencil className="w-4 h-4" />} label="Editar dados" onClick={() => setEditingProfile(true)} />
                 <QuickAction icon={<ExternalLink className="w-4 h-4" />} label="Ver página" href={profile ? `/${profile.username}` : "#"} external />
                 <QuickAction icon={<Layers className="w-4 h-4" />} label="Editar Seções" onClick={() => setManagingSections(true)} />
+                <QuickAction icon={<Palette className="w-4 h-4" />} label="Design" onClick={() => setPickingTheme(true)} />
               </div>
 
               {lives.length === 0 ? (
@@ -447,6 +450,15 @@ export default function VitrinePage() {
           </button>
         </div>
       </Modal>
+
+      {pickingTheme && profile && (
+        <ThemePickerModal
+          current={profile.designSettings?.theme ?? ""}
+          photoUrl={profile.photoUrl}
+          onClose={() => setPickingTheme(false)}
+          onSaved={settings => setProfile(prev => prev ? { ...prev, designSettings: settings } : prev)}
+        />
+      )}
 
       {managingSections && (
         <ManageSectionsModal
