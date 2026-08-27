@@ -158,12 +158,14 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
     textColor: "#16162B",
   },
   "Adriele Nickhorn": {
-    // Contraponto quente ao preto e branco: rosé, vinho e sans geométrica
-    settings: { header: "Classic", wallpaper: "Solid", buttons: "Solid", text: "Poppins, Link Sans", colors: "Marsala" },
-    background: "#F7E9EC",
-    buttonBg: "#8C2F45",
+    // Também preto e branco. O que separa do tema da Pam não é cor, é o traço:
+    // sans em vez de serifada, botão preto sólido em vez de discreto, header
+    // minimal. Mesma paleta, temperamento mais gráfico.
+    settings: { header: "Minimal", wallpaper: "Solid", buttons: "Solid", text: "Inter, System", colors: "Preto & Branco" },
+    background: "#FAFAFA",
+    buttonBg: "#16162B",
     buttonText: "#FFFFFF",
-    textColor: "#2B1B33",
+    textColor: "#16162B",
   },
 };
 
