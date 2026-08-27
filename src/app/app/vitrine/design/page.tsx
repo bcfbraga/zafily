@@ -6,7 +6,7 @@ import { Topbar } from "@/components/zafily/Topbar";
 import { VitrineTabs } from "@/components/zafily/VitrineTabs";
 import { VitrinePreviewFrame, type PreviewLive, type PreviewSection } from "@/components/zafily/VitrinePreviewFrame";
 import { Modal } from "@/components/zafily/Modal";
-import type { DesignSettings } from "@/lib/design-presets";
+import { THEME_PRESETS, type DesignSettings } from "@/lib/design-presets";
 
 interface Profile {
   username: string;
@@ -15,67 +15,12 @@ interface Profile {
   designSettings: DesignSettings;
 }
 
-interface ThemePreset {
-  settings: Omit<DesignSettings, "theme">;
-  background: string;
-  buttonBg: string;
-  buttonBorder?: string;
-  buttonText: string;
-  textColor: string;
-}
-
-const THEME_PRESETS: Record<string, ThemePreset> = {
-  "Marsala": {
-    settings: { header: "Classic", wallpaper: "Gradient", buttons: "Glass", text: "Playfair, Inter", colors: "Marsala" },
-    background: "linear-gradient(160deg, #8C2F45 0%, #2B1B33 100%)",
-    buttonBg: "rgba(255,255,255,0.18)",
-    buttonText: "#FFFFFF",
-    textColor: "#FFFFFF",
-  },
-  "Minimalista": {
-    settings: { header: "Minimal", wallpaper: "Solid", buttons: "Outline", text: "Inter, System", colors: "Preto & Branco" },
-    background: "#FAFAFA",
-    buttonBg: "transparent",
-    buttonBorder: "var(--cr-text-primary)",
-    buttonText: "var(--cr-text-primary)",
-    textColor: "var(--cr-text-primary)",
-  },
-  "Dourado": {
-    settings: { header: "Bold", wallpaper: "Gradient", buttons: "Solid", text: "Poppins, Link Sans", colors: "Dourado" },
-    background: "linear-gradient(160deg, #F3D9A4 0%, #B9852F 100%)",
-    buttonBg: "var(--cr-text-primary)",
-    buttonText: "#FFFFFF",
-    textColor: "#3B2A12",
-  },
-  "Noite": {
-    settings: { header: "Classic", wallpaper: "Solid", buttons: "Glass", text: "Inter, System", colors: "Violeta" },
-    background: "var(--cr-text-primary)",
-    buttonBg: "rgba(255,255,255,0.1)",
-    buttonText: "#FFFFFF",
-    textColor: "#FFFFFF",
-  },
-  "Rosa Suave": {
-    settings: { header: "Minimal", wallpaper: "Solid", buttons: "Solid", text: "Playfair, Inter", colors: "Marsala" },
-    background: "#F7E9EC",
-    buttonBg: "#8C2F45",
-    buttonText: "#FFFFFF",
-    textColor: "#2B1B33",
-  },
-  "Violeta": {
-    settings: { header: "Bold", wallpaper: "Gradient", buttons: "Glass", text: "Poppins, Link Sans", colors: "Violeta" },
-    background: "linear-gradient(160deg, var(--cr-brand-500) 0%, #2B1B33 100%)",
-    buttonBg: "rgba(255,255,255,0.18)",
-    buttonText: "#FFFFFF",
-    textColor: "#FFFFFF",
-  },
-};
-
 const FIELD_OPTIONS = {
   header: ["Classic", "Minimal", "Bold"],
   wallpaper: ["Solid", "Gradient", "Foto"],
   buttons: ["Solid", "Outline", "Glass"],
   text: ["Poppins, Link Sans", "Inter, System", "Playfair, Inter"],
-  colors: ["Marsala", "Violeta", "Preto & Branco", "Dourado"],
+  colors: ["Marsala", "Preto & Branco", "Dourado"],
 } as const;
 
 type Field = keyof typeof FIELD_OPTIONS;

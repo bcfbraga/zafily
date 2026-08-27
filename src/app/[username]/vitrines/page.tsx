@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { themeCssVars } from "@/lib/design-presets";
 import { getPublicGallery, resolveCurrentUsername, recordImpressions, type Live } from "@/lib/lives-store";
 import { VitrineCarousel } from "@/components/zafily/VitrineCarousel";
 import { LiveGridCard } from "@/components/zafily/LiveGridCard";
@@ -90,7 +91,16 @@ export default async function VitrinesIndexPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--cr-background)", color: "var(--cr-text-primary)", fontFamily: "var(--cr-font)" }}>
+    <div
+      className="min-h-screen"
+      style={{
+        // O tema do perfil sobrescreve os tokens --cr-*; sem tema, cai no padrão
+        ...themeCssVars(profile.designSettings, profile.photoUrl),
+        background: "var(--cr-background)",
+        color: "var(--cr-text-primary)",
+        fontFamily: "var(--cr-font)",
+      }}
+    >
       <PublicProfileHeader profile={profile} />
       <div className="max-w-2xl mx-auto px-5">
         <PublicProfileTabs username={profile.username} />

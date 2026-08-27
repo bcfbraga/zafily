@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { themeCssVars } from "@/lib/design-presets";
 import { getPublicLinks } from "@/lib/links-store";
 import { resolveCurrentUsername } from "@/lib/lives-store";
 import { PublicFooter } from "@/components/zafily/PublicFooter";
@@ -33,7 +34,16 @@ export default async function CreatorProfilePage({ params }: Props) {
   const { profile, links } = result;
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--cr-background)", color: "var(--cr-text-primary)", fontFamily: "var(--cr-font)" }}>
+    <div
+      className="min-h-screen"
+      style={{
+        // O tema do perfil sobrescreve os tokens --cr-*; sem tema, cai no padrão
+        ...themeCssVars(profile.designSettings, profile.photoUrl),
+        background: "var(--cr-background)",
+        color: "var(--cr-text-primary)",
+        fontFamily: "var(--cr-font)",
+      }}
+    >
       <PublicProfileHeader profile={profile} />
       <div className="max-w-2xl mx-auto px-5">
         <PublicProfileTabs username={profile.username} />

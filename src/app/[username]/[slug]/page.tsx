@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { themeCssVars } from "@/lib/design-presets";
 import Image from "next/image";
 import { getPublicLive, getProfileByUsername, resolveCurrentUsername, resolveCurrentSlug, recordImpressions } from "@/lib/lives-store";
 import { PublicFooter } from "@/components/zafily/PublicFooter";
@@ -41,7 +42,16 @@ export default async function VitrinePage({ params }: Props) {
   await recordImpressions([live.id]);
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--cr-background)", color: "var(--cr-text-primary)", fontFamily: "var(--cr-font)" }}>
+    <div
+      className="min-h-screen"
+      style={{
+        // O tema do perfil sobrescreve os tokens --cr-*; sem tema, cai no padrão
+        ...themeCssVars(profile.designSettings, profile.photoUrl),
+        background: "var(--cr-background)",
+        color: "var(--cr-text-primary)",
+        fontFamily: "var(--cr-font)",
+      }}
+    >
 
       {/* ── Header ──────────────────────────────────────────────── */}
       <header className="hidden sm:block sticky top-0 z-10" style={{ background: "var(--cr-background)", borderBottom: "1px solid var(--cr-border)" }}>

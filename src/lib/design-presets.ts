@@ -126,3 +126,79 @@ export function resolveDesign(settings: DesignSettings | null | undefined, photo
     brand: palette.brand,
   };
 }
+
+// ─── Temas ───────────────────────────────────────────────────────────────────
+
+export interface ThemePreset {
+  settings: Omit<DesignSettings, "theme">;
+  /** Amostra usada no seletor do dashboard */
+  background: string;
+  buttonBg: string;
+  buttonBorder?: string;
+  buttonText: string;
+  textColor: string;
+}
+
+/**
+ * Temas nomeados. Ficam aqui, e não na tela do dashboard, porque agora a página
+ * pública também precisa deles — antes o editor tinha a própria lista e nada
+ * disso chegava ao visitante.
+ *
+ * "Violeta" saiu junto com os presets antigos: era #6C63FF, o roxo que os brand
+ * tokens proíbem e que foi removido do resto do produto.
+ */
+export const THEME_PRESETS: Record<string, ThemePreset> = {
+  "Pam Braga": {
+    // A configuração que ela já usava: serifada, preto e branco, botão discreto
+    settings: { header: "Classic", wallpaper: "Solid", buttons: "Glass", text: "Playfair, Inter", colors: "Preto & Branco" },
+    background: "#FAFAFA",
+    buttonBg: "rgba(0,0,0,0.06)",
+    buttonBorder: "rgba(0,0,0,0.1)",
+    buttonText: "#16162B",
+    textColor: "#16162B",
+  },
+  "Adriele Nickhorn": {
+    // Contraponto quente ao preto e branco: rosé, vinho e sans geométrica
+    settings: { header: "Classic", wallpaper: "Solid", buttons: "Solid", text: "Poppins, Link Sans", colors: "Marsala" },
+    background: "#F7E9EC",
+    buttonBg: "#8C2F45",
+    buttonText: "#FFFFFF",
+    textColor: "#2B1B33",
+  },
+};
+
+/**
+ * Traduz o tema para as variáveis --cr-* que as páginas públicas já consomem.
+ *
+ * Devolve o conjunto inteiro, não só o fundo: sobrescrever fundo sem
+ * sobrescrever superfície e borda deixaria cards claros sobre fundo escuro.
+ * `null` = perfil sem tema, e a página segue com os tokens padrão.
+ */
+export function themeCssVars(
+  settings: DesignSettings | null | undefined,
+  photoUrl: string | null
+): React.CSSProperties | undefined {
+  if (!settings?.theme || !THEME_PRESETS[settings.theme]) return undefined;
+
+  const d = resolveDesign(settings, photoUrl);
+  const escuro = d.textColor.toUpperCase() === "#FFFFFF";
+  const sobre = (a: number) => escuro ? `rgba(255,255,255,${a})` : `rgba(0,0,0,${a})`;
+
+  return {
+    "--cr-background": d.background,
+    "--cr-surface": escuro ? sobre(0.06) : "#FFFFFF",
+    "--cr-surface-soft": sobre(0.05),
+    "--cr-surface-hover": sobre(0.08),
+    "--cr-text-primary": d.textColor,
+    "--cr-text-secondary": d.mutedColor,
+    "--cr-text-tertiary": d.mutedColor,
+    "--cr-border": sobre(0.1),
+    "--cr-border-strong": sobre(0.18),
+    "--cr-brand-500": d.brand,
+    "--cr-brand-600": d.brand,
+    "--cr-brand-700": d.brand,
+    "--cr-font": d.fontBody,
+    "--font-body": d.fontBody,
+    "--font-heading": d.fontHeading,
+  } as React.CSSProperties;
+}
