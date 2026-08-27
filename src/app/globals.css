@@ -440,9 +440,6 @@
   font-weight: 600;
 }
 .cr-badge--yellow { background: #fff5d6; color: #80600e; }
-.cr-badge--pink { background: #fde8f2; color: #923d65; }
-.cr-badge--blue { background: #e9f1ff; color: #345f9f; }
-.cr-badge--green { background: #e7f7ef; color: #287451; }
 
 .cr-showcase-card {
   position: relative;

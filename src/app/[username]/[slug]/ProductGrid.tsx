@@ -89,9 +89,14 @@ export function ProductGrid({ products, discount, discountType, couponCode, show
                 >
                   {i + 1}
                 </div>
-                {/* Desconto — movido pra esquerda pra não colidir com o número */}
+                {/* Desconto — à esquerda para não colidir com o número. As cores
+                    vêm dos tokens de marca, não da classe --pink: aquela era rosa
+                    fixo e ignorava o tema do perfil. */}
                 {showPrices && discount && (
-                  <div className="cr-badge cr-badge--pink absolute top-2 left-2 shadow">
+                  <div
+                    className="cr-badge absolute top-2 left-2 shadow"
+                    style={{ background: "var(--cr-brand-100)", color: "var(--cr-brand-700)" }}
+                  >
                     -{discount}%
                   </div>
                 )}
