@@ -1,6 +1,6 @@
 {
   "framework": "nextjs",
-  "//regions": "O banco Supabase fica em São Paulo. Sem isto as funções rodam no padrão iad1 (Washington) e cada query vira uma ida aos EUA e volta: medido 28ms do Brasil contra ~600-900ms via iad1. gru1 põe a função ao lado do banco.",
+  "//regions": "INERTE NO PLANO HOBBY — testado: a config sobe mas o x-vercel-id segue gru1::iad1, porque escolher região de função exige plano pago. Fica aqui porque passa a valer no upgrade. O banco Supabase está em São Paulo e a função roda em Washington: a mesma query leva 28ms do Brasil e ~600-900ms via iad1.",
   "regions": ["gru1"],
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
