@@ -164,7 +164,7 @@ function rowToProfile(row: Record<string, unknown>): Profile {
     bio: (row.bio as string) ?? null,
     socialLinks: (row.social_links as SocialLink[]) ?? [],
     designSettings: { ...DEFAULT_DESIGN_SETTINGS, ...((row.design_settings as Partial<DesignSettings>) ?? {}) },
-    accountStatus: (row.account_status as AccountStatus) ?? "draft",
+    accountStatus: effectiveAccountStatus(row),
     mainGoal: (row.main_goal as string) ?? null,
     platformsUsed: (row.platforms_used as string) ?? null,
     onboardedAt: (row.onboarded_at as string) ?? null,
@@ -203,10 +203,47 @@ export async function getOrCreateProfile(userId: string, email: string): Promise
   return rowToProfile(created);
 }
 
+/**
+ * Status efetivo da conta: um plano válido libera a conta.
+ *
+ * Antes, `account_status` e o plano eram independentes — dava para ter Creator
+ * Elite pago e continuar sem conseguir publicar, e nada no app colocava o
+ * status em "active" (as contas ativas tinham sido mudadas à mão no banco).
+ *
+ * Duas garantias que a regra precisa respeitar:
+ *  - `suspended` continua bloqueando, mesmo com plano em dia. Suspensão é
+ *    decisão de moderação e não pode ser desfeita por pagamento.
+ *  - quem já está "active" segue ativo mesmo sem plano registrado, senão as
+ *    contas internas (sem plano preenchido) perderiam acesso.
+ */
+export function effectiveAccountStatus(row: {
+  account_status?: unknown;
+  plan?: unknown;
+  plan_expires_at?: unknown;
+}): AccountStatus {
+  const armazenado = (row.account_status as AccountStatus) ?? "draft";
+  if (armazenado === "suspended" || armazenado === "active") return armazenado;
+
+  const plano = typeof row.plan === "string" ? row.plan.trim() : "";
+  if (!plano) return armazenado;
+
+  // A validade é obrigatória, e é ela que separa plano contratado de teste.
+  // Toda conta nova nasce com "Teste grátis" e sem validade; aceitar plano sem
+  // data liberaria publicação para qualquer cadastro e derrubaria o portão.
+  if (!row.plan_expires_at) return armazenado;
+
+  const expira = new Date(row.plan_expires_at as string);
+  return expira.getTime() >= Date.now() ? "active" : armazenado;
+}
+
 export async function getAccountStatus(userId: string): Promise<AccountStatus> {
   const db: DB = getSupabase();
-  const { data } = await db.from("profiles").select("account_status").eq("user_id", userId).maybeSingle();
-  return (data?.account_status as AccountStatus) ?? "draft";
+  const { data } = await db
+    .from("profiles")
+    .select("account_status, plan, plan_expires_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return data ? effectiveAccountStatus(data) : "draft";
 }
 
 export async function updateProfile(
