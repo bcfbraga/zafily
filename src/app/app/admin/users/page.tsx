@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Key, Ban, ShieldCheck, Trash2, Copy, CheckCheck, Loader2, LayoutGrid, Pencil } from "lucide-react";
+import { Key, Ban, ShieldCheck, Trash2, Copy, CheckCheck, Loader2, LayoutGrid, Pencil, Plus } from "lucide-react";
 import { Topbar } from "@/components/zafily/Topbar";
 import { Modal } from "@/components/zafily/Modal";
 import { PLAN_OPTIONS } from "@/lib/plans";
@@ -46,6 +46,12 @@ export default function AdminUsersPage() {
   const [planValue, setPlanValue] = useState("");
   const [planExpiresValue, setPlanExpiresValue] = useState("");
   const [savingPlan, setSavingPlan] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [createBusy, setCreateBusy] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createdUser, setCreatedUser] = useState<{ email: string; password: string } | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/users")
@@ -65,6 +71,24 @@ export default function AdminUsersPage() {
         setLoading(false);
       });
   }, []);
+
+  async function createUser() {
+    setCreateBusy(true);
+    setCreateError(null);
+    const res = await fetch("/api/admin/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newName, email: newEmail }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setCreateBusy(false);
+    if (!res.ok) { setCreateError(data.error ?? "Erro ao criar usuário"); return; }
+
+    // A senha só aparece aqui: não fica guardada em lugar nenhum
+    setCreatedUser({ email: data.email, password: data.password });
+    setNewName(""); setNewEmail("");
+    fetch("/api/admin/users").then(r => r.json()).then(d => setUsers(Array.isArray(d) ? d : []));
+  }
 
   async function resetPassword(id: string) {
     setBusyId(id);
@@ -136,7 +160,19 @@ export default function AdminUsersPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <Topbar title="Usuários" description="Contas cadastradas na Zafily" />
+      <Topbar
+        title="Usuários"
+        description="Contas cadastradas na Zafily"
+        action={
+          <button
+            onClick={() => { setCreating(true); setCreateError(null); setCreatedUser(null); }}
+            className="inline-flex items-center gap-2 h-10 px-4 text-sm font-medium text-white rounded-[var(--radius-md)] transition-opacity hover:opacity-90"
+            style={{ background: "var(--surface-dark)" }}
+          >
+            <Plus className="w-4 h-4" /> Novo usuário
+          </button>
+        }
+      />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         {error && (
@@ -336,6 +372,91 @@ export default function AdminUsersPage() {
               Cancelar
             </button>
           </div>
+        </Modal>
+      )}
+      {creating && (
+        <Modal open onClose={() => setCreating(false)} title={createdUser ? "Conta criada" : "Novo usuário"}>
+          {createdUser ? (
+            // A senha aparece uma vez só; depois disso nem o admin recupera
+            <div>
+              <p className="text-sm mb-5" style={{ color: "var(--cr-text-secondary)" }}>
+                Anote a senha agora — ela não fica guardada e não dá para vê-la de novo.
+                Peça para a pessoa trocá-la no primeiro acesso.
+              </p>
+
+              <div className="p-4 rounded-xl mb-5" style={{ background: "var(--surface-secondary)" }}>
+                <p className="text-xs mb-1" style={{ color: "var(--cr-text-tertiary)" }}>E-mail</p>
+                <p className="text-sm font-medium mb-3" style={{ color: "var(--cr-text-primary)" }}>{createdUser.email}</p>
+                <p className="text-xs mb-1" style={{ color: "var(--cr-text-tertiary)" }}>Senha temporária</p>
+                <div className="flex items-center gap-2">
+                  <code className="flex-1 text-sm px-3 py-2 rounded-lg" style={{ background: "var(--surface-primary)", fontFamily: "var(--font-data)" }}>
+                    {createdUser.password}
+                  </code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${createdUser.email}\n${createdUser.password}`);
+                      setCopiedId("novo");
+                      setTimeout(() => setCopiedId(null), 2000);
+                    }}
+                    className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors"
+                    style={{ background: "var(--surface-primary)", color: "var(--cr-text-secondary)" }}
+                    title="Copiar e-mail e senha"
+                  >
+                    {copiedId === "novo" ? <CheckCheck className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => { setCreating(false); setCreatedUser(null); }}
+                className="w-full h-10 text-white text-sm font-semibold rounded-xl transition-opacity hover:opacity-90"
+                style={{ background: "var(--surface-dark)" }}
+              >
+                Concluir
+              </button>
+            </div>
+          ) : (
+            <div>
+              <p className="text-sm mb-5" style={{ color: "var(--cr-text-secondary)" }}>
+                A conta já entra liberada, sem passar pela solicitação de acesso. O e-mail
+                é criado como confirmado e a senha é gerada automaticamente.
+              </p>
+
+              <div className="space-y-4 mb-5">
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--cr-text-secondary)" }} htmlFor="nu-nome">Nome</label>
+                  <input
+                    id="nu-nome" value={newName} onChange={e => setNewName(e.target.value)}
+                    className="w-full h-11 px-3.5 text-sm rounded-[var(--radius-md)] focus:outline-none"
+                    style={{ background: "var(--surface-secondary)", color: "var(--cr-text-primary)" }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: "var(--cr-text-secondary)" }} htmlFor="nu-email">E-mail</label>
+                  <input
+                    id="nu-email" type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)}
+                    className="w-full h-11 px-3.5 text-sm rounded-[var(--radius-md)] focus:outline-none"
+                    style={{ background: "var(--surface-secondary)", color: "var(--cr-text-primary)" }}
+                  />
+                </div>
+              </div>
+
+              {createError && (
+                <div className="mb-4 p-3 rounded-xl text-sm" style={{ background: "#fdeceb", border: "1px solid #f3c9c9", color: "var(--cr-danger)" }}>
+                  {createError}
+                </div>
+              )}
+
+              <button
+                onClick={createUser}
+                disabled={createBusy || !newName.trim() || !newEmail.trim()}
+                className="w-full h-10 text-white text-sm font-semibold rounded-xl disabled:opacity-50 transition-opacity hover:opacity-90 flex items-center justify-center gap-2"
+                style={{ background: "var(--surface-dark)" }}
+              >
+                {createBusy ? <><Loader2 className="w-4 h-4 animate-spin" /> Criando...</> : "Criar conta"}
+              </button>
+            </div>
+          )}
         </Modal>
       )}
     </div>

@@ -76,6 +76,57 @@ function generatePassword(): string {
   return `${b64.slice(0, 12)}!Az9`;
 }
 
+export interface CreatedUser {
+  id: string;
+  email: string;
+  password: string;
+}
+
+/**
+ * Cria uma conta direto pelo admin, sem passar pelo fluxo de solicitar acesso.
+ *
+ * Dois passos são obrigatórios juntos: além do usuário no auth, é preciso
+ * deixar uma solicitação **aprovada** para o e-mail. `getOrCreateProfile`
+ * barra quem não tem uma, então criar só o usuário deixaria a pessoa trancada
+ * no primeiro login, sem perfil e sem mensagem útil.
+ *
+ * O e-mail já entra confirmado: quem cria é o admin, então não faz sentido
+ * exigir o passo de confirmação.
+ */
+export async function createManagedUser(email: string, name: string): Promise<CreatedUser> {
+  const auth = getAdminAuthClient();
+  const password = generatePassword();
+
+  const { data, error } = await auth.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
+  if (error) throw error;
+
+  const db: DB = getSupabase();
+  const { data: existing } = await db
+    .from("access_requests")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+
+  const approved = {
+    status: "approved",
+    invite_token: crypto.randomUUID(),
+    reviewed_at: new Date().toISOString(),
+  };
+
+  if (existing) {
+    // Já havia pedido para este e-mail: aprova em vez de duplicar
+    await db.from("access_requests").update(approved).eq("id", existing.id);
+  } else {
+    await db.from("access_requests").insert({ name, email, ...approved });
+  }
+
+  return { id: data.user!.id, email, password };
+}
+
 export async function resetUserPassword(userId: string): Promise<string> {
   const auth = getAdminAuthClient();
   const password = generatePassword();
