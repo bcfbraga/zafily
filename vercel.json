@@ -1,5 +1,7 @@
 {
   "framework": "nextjs",
+  "//regions": "O banco Supabase fica em São Paulo. Sem isto as funções rodam no padrão iad1 (Washington) e cada query vira uma ida aos EUA e volta: medido 28ms do Brasil contra ~600-900ms via iad1. gru1 põe a função ao lado do banco.",
+  "regions": ["gru1"],
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
