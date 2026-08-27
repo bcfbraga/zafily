@@ -30,17 +30,20 @@ export const COLOR_PALETTES: Record<string, ColorPalette> = {
     dark: { bg: "#2B1B33", text: "#FFFFFF", muted: "rgba(255,255,255,0.72)" },
     gradient: "linear-gradient(160deg, #8C2F45 0%, #2B1B33 100%)",
   },
-  "Violeta": {
-    brand: "#6C63FF",
-    light: { bg: "#F1F0FB", text: "#16162B", muted: "rgba(22,22,43,0.6)" },
-    dark: { bg: "#16162B", text: "#FFFFFF", muted: "rgba(255,255,255,0.72)" },
-    gradient: "linear-gradient(160deg, #6C63FF 0%, #2B1B33 100%)",
-  },
   "Preto & Branco": {
     brand: "#16162B",
     light: { bg: "#FAFAFA", text: "#16162B", muted: "rgba(22,22,43,0.6)" },
     dark: { bg: "#16162B", text: "#FFFFFF", muted: "rgba(255,255,255,0.72)" },
     gradient: "linear-gradient(160deg, #4B4768 0%, #16162B 100%)",
+  },
+  "Linho": {
+    // Extraída das referências da Adriele: base de linho/cru, texto preto e o
+    // azul petróleo do armário como único ponto de cor. Ela pediu texto sempre
+    // preto ou branco, então o azul fica só em acento — nunca em leitura.
+    brand: "#2F4A5C",
+    light: { bg: "#F5F1EA", text: "#1A1A1A", muted: "rgba(26,26,26,0.58)" },
+    dark: { bg: "#1A1A1A", text: "#FFFFFF", muted: "rgba(255,255,255,0.72)" },
+    gradient: "linear-gradient(160deg, #F5F1EA 0%, #E2D9CB 100%)",
   },
   "Dourado": {
     brand: "#B9852F",
@@ -158,14 +161,15 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
     textColor: "#16162B",
   },
   "Adriele Nickhorn": {
-    // Também preto e branco. O que separa do tema da Pam não é cor, é o traço:
-    // sans em vez de serifada, botão preto sólido em vez de discreto, header
-    // minimal. Mesma paleta, temperamento mais gráfico.
-    settings: { header: "Minimal", wallpaper: "Solid", buttons: "Solid", text: "Inter, System", colors: "Preto & Branco" },
-    background: "#FAFAFA",
-    buttonBg: "#16162B",
-    buttonText: "#FFFFFF",
-    textColor: "#16162B",
+    // Montado sobre as referências dela: fundo de linho, texto preto, botão
+    // contornado (o texto continua preto, como ela pediu) e serifada elegante,
+    // ecoando o "100% LINHO" das fotos. O azul entra só como acento.
+    settings: { header: "Classic", wallpaper: "Solid", buttons: "Outline", text: "Playfair, Inter", colors: "Linho" },
+    background: "#F5F1EA",
+    buttonBg: "transparent",
+    buttonBorder: "#1A1A1A",
+    buttonText: "#1A1A1A",
+    textColor: "#1A1A1A",
   },
 };
 

@@ -20,7 +20,7 @@ const FIELD_OPTIONS = {
   wallpaper: ["Solid", "Gradient", "Foto"],
   buttons: ["Solid", "Outline", "Glass"],
   text: ["Poppins, Link Sans", "Inter, System", "Playfair, Inter"],
-  colors: ["Marsala", "Preto & Branco", "Dourado"],
+  colors: ["Linho", "Marsala", "Preto & Branco", "Dourado"],
 } as const;
 
 type Field = keyof typeof FIELD_OPTIONS;
