@@ -173,6 +173,31 @@ export const THEME_PRESETS: Record<string, ThemePreset> = {
   },
 };
 
+
+/** Mistura duas cores hex. `t`=0 devolve `a`, `t`=1 devolve `b`. */
+function mix(a: string, b: string, t: number): string {
+  const n = (h: string) => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const [r1, g1, b1] = n(a);
+  const [r2, g2, b2] = n(b);
+  const c = (x: number, y: number) => Math.round(x + (y - x) * t).toString(16).padStart(2, "0");
+  return `#${c(r1, r2)}${c(g1, g2)}${c(b1, b2)}`;
+}
+
+/**
+ * Escala completa a partir da cor de marca do tema.
+ *
+ * Sobrescrever só 500/600/700 deixava --cr-brand-50/100/400 no rosa da Zafily,
+ * e o rosa vazava em bordas, chips e abas de páginas que já tinham tema.
+ */
+function brandScale(brand: string): Record<string, string> {
+  const claros: Array<[string, number]> = [["50", 0.94], ["100", 0.88], ["200", 0.76], ["300", 0.58], ["400", 0.3]];
+  const escuros: Array<[string, number]> = [["600", 0.12], ["700", 0.26], ["800", 0.42], ["900", 0.58]];
+  const out: Record<string, string> = { "--cr-brand-500": brand };
+  for (const [k, t] of claros) out[`--cr-brand-${k}`] = mix(brand, "#ffffff", t);
+  for (const [k, t] of escuros) out[`--cr-brand-${k}`] = mix(brand, "#000000", t);
+  return out;
+}
+
 /**
  * Traduz o tema para as variáveis --cr-* que as páginas públicas já consomem.
  *
@@ -200,9 +225,7 @@ export function themeCssVars(
     "--cr-text-tertiary": d.mutedColor,
     "--cr-border": sobre(0.1),
     "--cr-border-strong": sobre(0.18),
-    "--cr-brand-500": d.brand,
-    "--cr-brand-600": d.brand,
-    "--cr-brand-700": d.brand,
+    ...brandScale(d.brand),
     "--cr-font": d.fontBody,
     "--font-body": d.fontBody,
     "--font-heading": d.fontHeading,

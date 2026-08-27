@@ -128,8 +128,9 @@ export function ProductGrid({ products, discount, discountType, couponCode, show
                   return null;
                 })()}
                 <div
-                  className="w-full h-9 rounded-[var(--cr-radius-md)] flex items-center justify-center text-xs font-semibold tracking-wide transition-colors group-hover:bg-[var(--cr-brand-600)] group-hover:text-white group-hover:border-[var(--cr-brand-600)]"
-                  style={{ border: "1px solid var(--cr-border-strong)", color: "var(--cr-text-primary)" }}
+                  // Cor e borda ficam em classe, não em style inline: inline vence
+                  // o group-hover e o texto sumia no fundo escuro do hover.
+                  className="w-full h-9 rounded-[var(--cr-radius-md)] flex items-center justify-center text-xs font-semibold tracking-wide transition-colors border border-[var(--cr-border-strong)] text-[var(--cr-text-primary)] group-hover:bg-[var(--cr-brand-600)] group-hover:text-white group-hover:border-[var(--cr-brand-600)]"
                 >
                   VER PRODUTO →
                 </div>
