@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "//nota-regiao": "NAO adicionar \"regions\" enquanto o plano for Hobby: a Vercel REJEITA o deploy (nao ignora). Foi testado e travou tres commits sem aviso. O banco fica em Sao Paulo e a funcao em iad1; com plano pago, \"regions\": [\"gru1\"] resolve a latencia.",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
