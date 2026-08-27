@@ -470,75 +470,31 @@ export async function getPublicGallery(
   return { profile, sections, lives };
 }
 
+/**
+ * Uma ida ao banco em vez de três.
+ *
+ * Antes eram três consultas sequenciais (lives, live_products, RPCs de
+ * contagem). A função roda em iad1 e o banco está em São Paulo, então cada ida
+ * custa ~200ms de travessia, enquanto o trabalho no banco leva milissegundos —
+ * o gargalo era a distância, não a query. A RPC dashboard_lives devolve tudo
+ * agregado de uma vez; a equivalência com o cálculo anterior foi conferida
+ * campo a campo antes da troca.
+ */
 export async function listLives(userId: string): Promise<Live[]> {
   const db: DB = getSupabase();
-  const { data } = await db
-    .from("lives")
-    .select("*, live_products(count)")
-    .eq("user_id", userId)
-    .order("position", { ascending: true });
+  const { data } = await db.rpc("dashboard_lives", { p_user_id: userId });
 
-  const lives: Live[] = (data ?? []).map((row: Record<string, unknown>) => {
-    const products = row.live_products as Array<{ count: number }>;
-    return rowToLive(row, products?.[0]?.count ?? 0);
-  });
-
-  const liveIds = lives.map(l => l.id);
-  if (liveIds.length === 0) return lives;
-
-  const { data: productRows } = await db
-    .from("live_products")
-    .select("id, live_id, image_url, name, price, position")
-    .in("live_id", liveIds)
-    .order("position", { ascending: true });
-
-  const thumbsByLive = new Map<string, string[]>();
-  const previewsByLive = new Map<string, PreviewProduct[]>();
-  const liveIdByProductId = new Map<string, string>();
-  for (const row of (productRows ?? []) as Array<{ id: string; live_id: string; image_url: string | null; name: string | null; price: string | null }>) {
-    liveIdByProductId.set(row.id, row.live_id);
-    const previews = previewsByLive.get(row.live_id) ?? [];
-    if (previews.length < 5) {
-      previews.push({ id: row.id, name: row.name, imageUrl: row.image_url, price: row.price });
-      previewsByLive.set(row.live_id, previews);
-    }
-    if (!row.image_url) continue;
-    const list = thumbsByLive.get(row.live_id) ?? [];
-    if (list.length < 4) {
-      list.push(row.image_url);
-      thumbsByLive.set(row.live_id, list);
-    }
-  }
-
-  // Aggregated in Postgres (not fetched as raw rows) so historical totals
-  // never get truncated by PostgREST's per-request row cap once a live
-  // passes ~1000 clicks/views.
-  const productIds = [...liveIdByProductId.keys()];
-  const [{ data: clickCounts }, { data: viewCounts }] = await Promise.all([
-    productIds.length > 0
-      ? db.rpc("product_click_counts", { p_product_ids: productIds })
-      : Promise.resolve({ data: [] }),
-    db.rpc("live_impression_counts", { p_live_ids: liveIds }),
-  ]);
-
-  const clicksByLive = new Map<string, number>();
-  for (const row of (clickCounts ?? []) as Array<{ product_id: string; count: number }>) {
-    const liveId = liveIdByProductId.get(row.product_id);
-    if (!liveId) continue;
-    clicksByLive.set(liveId, (clicksByLive.get(liveId) ?? 0) + Number(row.count));
-  }
-
-  const viewsByLive = new Map<string, number>();
-  for (const row of (viewCounts ?? []) as Array<{ live_id: string; count: number }>) {
-    viewsByLive.set(row.live_id, Number(row.count));
-  }
-
-  return lives.map(l => ({
-    ...l,
-    thumbnails: thumbsByLive.get(l.id) ?? [],
-    previewProducts: previewsByLive.get(l.id) ?? [],
-    clicks: clicksByLive.get(l.id) ?? 0,
-    views: viewsByLive.get(l.id) ?? 0,
+  return ((data ?? []) as Array<Record<string, unknown>>).map(row => ({
+    ...rowToLive(row, Number(row.product_count ?? 0)),
+    thumbnails: (row.thumbnails as string[]) ?? [],
+    previewProducts: ((row.preview_products as Array<Record<string, unknown>>) ?? []).map(p => ({
+      id: p.id as string,
+      name: (p.name as string) ?? null,
+      imageUrl: (p.image_url as string) ?? null,
+      price: (p.price as string) ?? null,
+    })),
+    clicks: Number(row.clicks ?? 0),
+    views: Number(row.views ?? 0),
   }));
 }
 

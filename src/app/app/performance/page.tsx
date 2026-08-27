@@ -52,23 +52,17 @@ export default function PerformancePage() {
   const [sortBy, setSortBy] = useState<"views" | "date">("views");
 
   function loadData() {
-    return Promise.all([
-      fetch("/api/lives").then(r => r.json()),
-      fetch("/api/profile").then(r => r.json()),
-    ]).then(([livesData, profileData]) => {
-      setLives(Array.isArray(livesData) ? livesData : []);
-      setProfile(profileData ?? null);
+    return fetch("/api/dashboard").then(r => r.json()).then(d => {
+      setLives(Array.isArray(d?.lives) ? d.lives : []);
+      setProfile(d?.profile ?? null);
       setLoading(false);
     });
   }
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/lives").then(r => r.json()),
-      fetch("/api/profile").then(r => r.json()),
-    ]).then(([livesData, profileData]) => {
-      setLives(Array.isArray(livesData) ? livesData : []);
-      setProfile(profileData ?? null);
+    fetch("/api/dashboard").then(r => r.json()).then(d => {
+      setLives(Array.isArray(d?.lives) ? d.lives : []);
+      setProfile(d?.profile ?? null);
       setLoading(false);
     });
   }, []);

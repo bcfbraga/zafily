@@ -178,14 +178,10 @@ export default function DesignPage() {
   const [picker, setPicker] = useState<"theme" | Field | null>(null);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/profile").then(r => r.json()),
-      fetch("/api/lives").then(r => r.json()),
-      fetch("/api/vitrine-sections").then(r => r.json()),
-    ]).then(([profileData, livesData, sectionsData]) => {
-      setProfile(profileData);
-      setLives(Array.isArray(livesData) ? livesData : []);
-      setSections(Array.isArray(sectionsData) ? sectionsData : []);
+    fetch("/api/dashboard").then(r => r.json()).then(d => {
+      setProfile(d?.profile ?? null);
+      setLives(Array.isArray(d?.lives) ? d.lives : []);
+      setSections(Array.isArray(d?.sections) ? d.sections : []);
     });
   }, []);
 

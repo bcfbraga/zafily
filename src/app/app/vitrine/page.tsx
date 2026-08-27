@@ -146,27 +146,19 @@ export default function VitrinePage() {
   const [showActivationModal, setShowActivationModal] = useState(false);
 
   function loadData() {
-    return Promise.all([
-      fetch("/api/lives").then(r => r.json()),
-      fetch("/api/profile").then(r => r.json()),
-      fetch("/api/vitrine-sections").then(r => r.json()),
-    ]).then(([livesData, profileData, sectionsData]) => {
-      setLives(Array.isArray(livesData) ? livesData : []);
-      setProfile(profileData);
-      setSections(Array.isArray(sectionsData) ? sectionsData : []);
+    return fetch("/api/dashboard").then(r => r.json()).then(d => {
+      setLives(Array.isArray(d?.lives) ? d.lives : []);
+      setProfile(d?.profile ?? null);
+      setSections(Array.isArray(d?.sections) ? d.sections : []);
       setLoading(false);
     });
   }
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/lives").then(r => r.json()),
-      fetch("/api/profile").then(r => r.json()),
-      fetch("/api/vitrine-sections").then(r => r.json()),
-    ]).then(([livesData, profileData, sectionsData]) => {
-      setLives(Array.isArray(livesData) ? livesData : []);
-      setProfile(profileData);
-      setSections(Array.isArray(sectionsData) ? sectionsData : []);
+    fetch("/api/dashboard").then(r => r.json()).then(d => {
+      setLives(Array.isArray(d?.lives) ? d.lives : []);
+      setProfile(d?.profile ?? null);
+      setSections(Array.isArray(d?.sections) ? d.sections : []);
       setLoading(false);
     });
   }, []);

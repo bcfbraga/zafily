@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserId } from "@/lib/auth";
+import { getAuthUser, getUserId } from "@/lib/auth";
 import { getOrCreateProfile, updateProfile, updateUsername, AccessNotApprovedError } from "@/lib/lives-store";
-import { createClient } from "@/lib/supabase-server";
 import { isAdminEmail } from "@/lib/admin";
 
 export async function GET(req: NextRequest) {
-  let userId: string;
-  try { userId = await getUserId(req); } catch {
+  // Uma validação de token só: antes chamava getUserId() e getUser() em
+  // seguida, pagando a mesma travessia duas vezes pelo id e pelo e-mail.
+  let userId: string, email: string;
+  try {
+    const user = await getAuthUser(req);
+    userId = user.id;
+    email = user.email;
+  } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const email = user?.email ?? `${userId}@unknown`;
 
   let profile;
   try {
