@@ -991,12 +991,16 @@ function EditModal({ live, liveId, username, onClose, onSave }: EditModalProps) 
                   <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-lg">Clique para trocar</div>
                 </div>
               ) : (
-                <div className="w-full h-24 rounded-xl border-2 border-dashed border-black/[0.12] hover:border-violet-500 flex items-center justify-center gap-2 transition-colors">
+                <div className="w-full h-24 rounded-xl border-2 border-dashed border-black/[0.12] hover:border-[var(--cr-brand-400)] flex flex-col items-center justify-center gap-1 transition-colors">
                   <Upload className="w-5 h-5 text-[var(--cr-text-tertiary)]" />
                   <span className="text-sm text-[var(--cr-text-tertiary)]">Upload de imagem</span>
+                  <span className="text-xs font-medium text-[var(--cr-text-secondary)]">2046 × 844 px</span>
                 </div>
               )}
             </label>
+            <p className="text-xs text-[var(--cr-text-tertiary)]">
+              O formato do banner é 2046 × 844 px — outras proporções entram cortadas.
+            </p>
           </div>
           {error && <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{error}</div>}
           <div className="flex gap-3 pt-2">

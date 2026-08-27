@@ -211,11 +211,15 @@ export default function NovaLivePage() {
                 <div className="w-full h-36 rounded-xl border-2 border-dashed border-[var(--cr-border-strong)] hover:border-[var(--cr-brand-400)] flex flex-col items-center justify-center gap-2 transition-colors">
                   <Upload className="w-6 h-6 text-[var(--cr-text-tertiary)]" />
                   <span className="text-sm text-[var(--cr-text-tertiary)]">Clique para fazer upload</span>
+                  <span className="text-xs font-medium text-[var(--cr-text-secondary)]">2046 × 844 px</span>
                   <span className="text-xs text-[var(--cr-text-tertiary)]">JPG, PNG ou WebP · máx 5MB</span>
                 </div>
               )}
             </label>
-            <p className="text-xs text-[var(--cr-text-tertiary)]">Escolha uma imagem para representar sua live na vitrine e nos compartilhamentos.</p>
+            <p className="text-xs text-[var(--cr-text-tertiary)]">
+              Escolha uma imagem para representar sua live na vitrine e nos compartilhamentos.
+              O formato do banner é 2046 × 844 px — outras proporções entram cortadas.
+            </p>
           </div>
 
           {error && (
