@@ -359,7 +359,7 @@ export default function VitrinePage() {
           {loading ? (
             <div className="space-y-8 animate-pulse">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-full bg-[var(--cr-brand-100)] shrink-0" />
+                <div className="w-16 h-16 rounded-full bg-[var(--cr-surface-soft)] shrink-0" />
                 <div className="flex-1 min-w-0 pt-1 space-y-2.5">
                   <div className="h-4 w-40 rounded-full bg-[var(--cr-border)]" />
                   <div className="h-3.5 w-56 rounded-full bg-[var(--cr-border)]" />
@@ -368,7 +368,7 @@ export default function VitrinePage() {
               <div className="flex items-start justify-start gap-10 py-2">
                 {[1, 2, 3, 4, 5].map(i => (
                   <div key={i} className="flex flex-col items-center gap-2 w-20">
-                    <div className="w-14 h-14 rounded-full bg-[var(--cr-brand-100)]" />
+                    <div className="w-14 h-14 rounded-full bg-[var(--cr-surface-soft)]" />
                     <div className="h-2.5 w-12 rounded-full bg-[var(--cr-border)]" />
                   </div>
                 ))}
@@ -489,7 +489,7 @@ function ProfileHeader({ profile, onEdit }: { profile: Profile | null; onEdit: (
   const displayName = profile?.displayName || profile?.username || "";
   return (
     <div className="flex items-start gap-4 mb-6">
-      <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--cr-brand-100)] flex items-center justify-center shrink-0">
+      <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--cr-surface-soft)] flex items-center justify-center shrink-0">
         {profile?.photoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={profile.photoUrl} alt={displayName} className="w-full h-full object-cover" />

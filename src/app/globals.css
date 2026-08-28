@@ -308,16 +308,16 @@
   --cr-background: #ffffff;
   --cr-background-alt: #fbf1f6;
   --cr-surface: #ffffff;
-  --cr-surface-soft: #fbf1f6;
-  --cr-surface-hover: #f7e6ef;
+  --cr-surface-soft: #f5f5f5;
+  --cr-surface-hover: #ececec;
 
   --cr-text-primary: #0c0c0c;
   --cr-text-secondary: #816a76;
   --cr-text-tertiary: #a8959e;
   --cr-text-inverse: #ffffff;
 
-  --cr-border: #ebe0e6;
-  --cr-border-strong: #ddccd5;
+  --cr-border: #ececec;
+  --cr-border-strong: #dcdcdc;
 
   --cr-accent-pink: #f759ad;
 

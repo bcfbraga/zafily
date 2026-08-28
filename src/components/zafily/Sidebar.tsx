@@ -103,18 +103,18 @@ export function Sidebar() {
               href={href}
               title={collapsed ? label : undefined}
               className={cn(
-                "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors duration-150",
+                "flex items-center gap-3 h-10 rounded-[var(--radius-md)] text-sm font-medium transition-colors duration-150",
                 collapsed ? "justify-center px-0" : "px-3",
                 active
-                  ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+                  ? "bg-[var(--cr-surface-soft)] text-[var(--cr-text-primary)] font-semibold"
                   : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
               )}
             >
-              <Icon className={cn("w-4 h-4 shrink-0", active ? "text-[var(--cr-brand-500)]" : "")} />
+              <Icon className="w-4 h-4 shrink-0" />
               {!collapsed && (
                 <>
                   <span className="flex-1">{label}</span>
-                  {active && <ChevronRight className="w-3 h-3 text-[var(--cr-brand-500)]" />}
+                  {active && <ChevronRight className="w-3 h-3 text-[var(--cr-text-tertiary)]" />}
                 </>
               )}
             </Link>
@@ -135,28 +135,28 @@ export function Sidebar() {
               href="/app/admin/access-requests"
               title={collapsed ? "Pedidos de acesso" : undefined}
               className={cn(
-                "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
+                "flex items-center gap-3 h-10 rounded-[var(--radius-md)] text-sm font-medium transition-colors",
                 collapsed ? "justify-center px-0" : "px-3",
                 pathname === "/app/admin/access-requests"
-                  ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+                  ? "bg-[var(--cr-surface-soft)] text-[var(--cr-text-primary)] font-semibold"
                   : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
               )}
             >
-              <ShieldCheck className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/access-requests" ? "text-[var(--cr-brand-500)]" : "")} />
+              <ShieldCheck className="w-4 h-4 shrink-0" />
               {!collapsed && "Pedidos de acesso"}
             </Link>
             <Link
               href="/app/admin/users"
               title={collapsed ? "Usuários" : undefined}
               className={cn(
-                "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
+                "flex items-center gap-3 h-10 rounded-[var(--radius-md)] text-sm font-medium transition-colors",
                 collapsed ? "justify-center px-0" : "px-3",
                 pathname === "/app/admin/users"
-                  ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+                  ? "bg-[var(--cr-surface-soft)] text-[var(--cr-text-primary)] font-semibold"
                   : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
               )}
             >
-              <Users className={cn("w-4 h-4 shrink-0", pathname === "/app/admin/users" ? "text-[var(--cr-brand-500)]" : "")} />
+              <Users className="w-4 h-4 shrink-0" />
               {!collapsed && "Usuários"}
             </Link>
           </>
@@ -166,14 +166,14 @@ export function Sidebar() {
           href="/app/integrations"
           title={collapsed ? "Integrações" : undefined}
           className={cn(
-            "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
+            "flex items-center gap-3 h-10 rounded-[var(--radius-md)] text-sm font-medium transition-colors",
             collapsed ? "justify-center px-0" : "px-3",
             pathname === "/app/integrations"
-              ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+              ? "bg-[var(--cr-surface-soft)] text-[var(--cr-text-primary)] font-semibold"
               : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
           )}
         >
-          <Plug className={cn("w-4 h-4 shrink-0", pathname === "/app/integrations" ? "text-[var(--cr-brand-500)]" : "")} />
+          <Plug className="w-4 h-4 shrink-0" />
           {!collapsed && "Integrações"}
         </Link>
 
@@ -181,14 +181,14 @@ export function Sidebar() {
           href="/app/settings"
           title={collapsed ? "Configurações" : undefined}
           className={cn(
-            "flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium transition-colors",
+            "flex items-center gap-3 h-10 rounded-[var(--radius-md)] text-sm font-medium transition-colors",
             collapsed ? "justify-center px-0" : "px-3",
             pathname === "/app/settings"
-              ? "bg-[rgba(247, 89, 173,0.12)] text-[var(--cr-brand-700)]"
+              ? "bg-[var(--cr-surface-soft)] text-[var(--cr-text-primary)] font-semibold"
               : "text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-secondary)] hover:bg-black/[0.04]"
           )}
         >
-          <Settings className={cn("w-4 h-4 shrink-0", pathname === "/app/settings" ? "text-[var(--cr-brand-500)]" : "")} />
+          <Settings className="w-4 h-4 shrink-0" />
           {!collapsed && "Configurações"}
         </Link>
 
@@ -196,7 +196,7 @@ export function Sidebar() {
           onClick={handleLogout}
           title={collapsed ? "Sair" : undefined}
           className={cn(
-            "w-full flex items-center gap-3 h-10 rounded-[4px] text-sm font-medium text-[var(--cr-text-tertiary)] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors",
+            "w-full flex items-center gap-3 h-10 rounded-[var(--radius-md)] text-sm font-medium text-[var(--cr-text-tertiary)] hover:text-[#E11D48] hover:bg-[rgba(225,29,72,0.06)] transition-colors",
             collapsed ? "justify-center px-0" : "px-3"
           )}
         >
@@ -205,8 +205,8 @@ export function Sidebar() {
         </button>
 
         {!collapsed && (
-          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[4px] bg-black/[0.03]">
-            <div className="w-7 h-7 rounded-full bg-[var(--cr-brand-500)] flex items-center justify-center text-xs font-semibold text-white shrink-0">
+          <div className="mt-1 flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-md)] bg-black/[0.03]">
+            <div className="w-7 h-7 rounded-full bg-[var(--cr-surface-soft)] flex items-center justify-center text-xs font-semibold text-[var(--cr-text-primary)] shrink-0">
               {initial}
             </div>
             <div className="min-w-0">
@@ -217,7 +217,7 @@ export function Sidebar() {
         )}
         {collapsed && (
           <div className="flex justify-center mt-1">
-            <div className="w-7 h-7 rounded-full bg-[var(--cr-brand-500)] flex items-center justify-center text-xs font-semibold text-white">
+            <div className="w-7 h-7 rounded-full bg-[var(--cr-surface-soft)] flex items-center justify-center text-xs font-semibold text-[var(--cr-text-primary)]">
               {initial}
             </div>
           </div>

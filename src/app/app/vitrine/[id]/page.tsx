@@ -539,7 +539,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                 )}
                 <span>{productCount} produto{productCount !== 1 ? "s" : ""}</span>
                 {live.discount && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-bold border border-rose-500/20">
+                  <span className="px-1.5 py-0.5 rounded-full bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] text-[10px] font-bold border border-[var(--cr-border)]">
                     -{live.discount}% OFF
                   </span>
                 )}
@@ -641,7 +641,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-[var(--cr-text-primary)] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                      {product.price && <span className="text-[10px] text-[var(--cr-brand-500)] font-semibold">{product.price}</span>}
+                      {product.price && <span className="text-[10px] text-[var(--cr-text-primary)] font-semibold">{product.price}</span>}
                       {(product.clicks ?? 0) > 0 && (
                         <span className="text-[10px] text-[var(--cr-text-tertiary)]">{product.clicks} clique{product.clicks !== 1 ? "s" : ""}</span>
                       )}

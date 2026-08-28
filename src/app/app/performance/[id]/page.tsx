@@ -347,21 +347,21 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
               <div className="flex gap-4 flex-wrap">
                 <div className="flex-1 min-w-[180px] bg-white border border-[var(--cr-border)] rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-lg bg-[var(--cr-brand-100)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><Eye className="w-3.5 h-3.5" /></div>
+                    <div className="w-7 h-7 rounded-lg bg-[var(--cr-surface-soft)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><Eye className="w-3.5 h-3.5" /></div>
                     <span className="text-xs font-medium text-[var(--cr-text-secondary)]">Exibições</span>
                   </div>
                   <p className="text-2xl font-bold text-[var(--cr-text-primary)]">{formatCount(data.views)}</p>
                 </div>
                 <div className="flex-1 min-w-[180px] bg-white border border-[var(--cr-border)] rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-lg bg-[var(--cr-brand-100)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><MousePointerClick className="w-3.5 h-3.5" /></div>
+                    <div className="w-7 h-7 rounded-lg bg-[var(--cr-surface-soft)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><MousePointerClick className="w-3.5 h-3.5" /></div>
                     <span className="text-xs font-medium text-[var(--cr-text-secondary)]">Cliques totais</span>
                   </div>
                   <p className="text-2xl font-bold text-[var(--cr-text-primary)]">{formatCount(totalClicks)}</p>
                 </div>
                 <div className="flex-1 min-w-[180px] bg-white border border-[var(--cr-border)] rounded-2xl p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-7 h-7 rounded-lg bg-[var(--cr-brand-100)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><Percent className="w-3.5 h-3.5" /></div>
+                    <div className="w-7 h-7 rounded-lg bg-[var(--cr-surface-soft)] flex items-center justify-center text-[var(--cr-brand-700)] shrink-0"><Percent className="w-3.5 h-3.5" /></div>
                     <span className="text-xs font-medium text-[var(--cr-text-secondary)]">Cliques por exibição</span>
                   </div>
                   <p className="text-2xl font-bold text-[var(--cr-text-primary)]">{clicksPerView !== null ? clicksPerView.toFixed(1).replace(".", ",") : "—"}</p>
@@ -387,7 +387,7 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
                       return (
                         <div key={p.id} className="flex items-center gap-4 px-5 py-4">
                           <span className="w-5 text-xs font-semibold text-[var(--cr-text-tertiary)] text-right shrink-0 [font-variant-numeric:tabular-nums]">{i + 1}</span>
-                          <div className="w-10 h-10 rounded-lg bg-[var(--cr-brand-100)] overflow-hidden shrink-0 flex items-center justify-center">
+                          <div className="w-10 h-10 rounded-lg bg-[var(--cr-surface-soft)] overflow-hidden shrink-0 flex items-center justify-center">
                             {p.imageUrl
                               // eslint-disable-next-line @next/next/no-img-element
                               ? <img src={p.imageUrl} alt="" className="w-full h-full object-cover" />
@@ -401,7 +401,7 @@ export default function VitrinePerformancePage({ params }: { params: Promise<{ i
                                 <Trophy className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                               )}
                             </div>
-                            <div className="h-1.5 rounded-full bg-[var(--cr-brand-100)] overflow-hidden">
+                            <div className="h-1.5 rounded-full bg-[var(--cr-surface-soft)] overflow-hidden">
                               <div className="h-full rounded-full bg-[var(--cr-brand-600)]" style={{ width: `${barWidth}%` }} />
                             </div>
                           </div>
