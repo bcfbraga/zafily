@@ -2,10 +2,26 @@ import Image from "next/image";
 import { MapPin } from "lucide-react";
 import type { Profile } from "@/lib/lives-store";
 
-export function PublicProfileHeader({ profile }: { profile: Profile }) {
+/**
+ * `showNiche` existe para que a página de vitrines continue byte a byte como
+ * está no ar. O cabeçalho é compartilhado, e sem esta trava o dia em que
+ * alguém preenchesse "Cargo / título" nas configurações veria a página de
+ * vitrines mudar sozinha — que é justamente o que não pode acontecer.
+ */
+export function PublicProfileHeader({ profile, showNiche = false }: { profile: Profile; showNiche?: boolean }) {
   const displayName = profile.displayName || profile.username;
   return (
     <div className="max-w-2xl mx-auto px-5 pt-16 pb-10 text-center">
+      {/* Nicho acima do avatar: é o enquadramento ("Afiliada · Moda & Beleza")
+          que diz de cara do que a página trata, antes de quem a assina. */}
+      {showNiche && profile.roleTitle && (
+        <p
+          className="text-xs font-semibold uppercase tracking-wider mb-3"
+          style={{ color: "var(--cr-text-tertiary)" }}
+        >
+          {profile.roleTitle}
+        </p>
+      )}
       <div className="cr-avatar-wrapper mb-4">
         <div className="cr-avatar overflow-hidden flex items-center justify-center" style={{ background: "var(--cr-brand-50)" }}>
           {profile.photoUrl ? (

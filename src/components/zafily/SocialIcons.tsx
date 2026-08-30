@@ -1,4 +1,16 @@
-type Platform = "instagram" | "pinterest" | "youtube" | "tiktok" | "twitter";
+/** As redes com ícone próprio. A lista de redes em si é aberta — ver `SocialIcon`. */
+export type Platform = "instagram" | "pinterest" | "youtube" | "tiktok" | "twitter";
+
+/**
+ * Rótulo de exibição de uma rede. Para as conhecidas vem da lista; para
+ * qualquer outra, capitaliza o próprio identificador ("twitch" → "Twitch"),
+ * que é o suficiente para uma lista aberta sem exigir mais um campo no banco.
+ */
+export function socialLabel(platform: string): string {
+  const conhecida = SOCIAL_PLATFORMS.find(p => p.value === platform);
+  if (conhecida) return conhecida.label;
+  return platform.charAt(0).toUpperCase() + platform.slice(1);
+}
 
 export const SOCIAL_PLATFORMS: { value: Platform; label: string }[] = [
   { value: "instagram", label: "Instagram" },
@@ -8,7 +20,7 @@ export const SOCIAL_PLATFORMS: { value: Platform; label: string }[] = [
   { value: "twitter", label: "X / Twitter" },
 ];
 
-export function SocialIcon({ platform, className }: { platform: Platform; className?: string }) {
+export function SocialIcon({ platform, className }: { platform: string; className?: string }) {
   switch (platform) {
     case "instagram":
       return (
@@ -62,6 +74,15 @@ export function SocialIcon({ platform, className }: { platform: Platform; classN
             d="M4 4l7 8.5L4.3 20H6l5.8-6.3L16.5 20H20l-7.4-9L20 4h-1.7l-5.4 5.8L8 4H4z"
             fill="currentColor"
           />
+        </svg>
+      );
+    default:
+      // Rede fora da lista conhecida: globo genérico, para que a lista aberta
+      // não dependa de alguém desenhar um SVG antes.
+      return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+          <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M3 12h18M12 3c2.5 2.5 2.5 15 0 18M12 3c-2.5 2.5-2.5 15 0 18" stroke="currentColor" strokeWidth="1.8" />
         </svg>
       );
   }
