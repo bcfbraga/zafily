@@ -1,4 +1,5 @@
 import { getSupabase } from "./supabase";
+import type { ImportStatus } from "./metadata";
 import { isAdminEmail } from "./admin";
 import { getApprovedRequestByEmail, markInviteConsumed } from "./access-requests-store";
 
@@ -66,10 +67,18 @@ export interface LiveProduct {
   position: number;
   createdAt: string;
   clicks?: number;
+  /** Resultado da busca do link. `null` em produtos anteriores à migration 033. */
+  importStatus: ImportStatus | null;
+  importError: string | null;
 }
 
 export interface SocialLink {
-  platform: "instagram" | "pinterest" | "youtube" | "tiktok" | "twitter";
+  /**
+   * Identificador da rede. Aberto de propósito: o dashboard oferece as cinco
+   * com ícone próprio, mas qualquer outra pode ser gravada e a página pública
+   * a desenha com o ícone genérico.
+   */
+  platform: string;
   url: string;
 }
 
@@ -785,6 +794,8 @@ function rowToProduct(row: Record<string, unknown>): LiveProduct {
     productUrl: (row.product_url as string) ?? null,
     position: row.position as number,
     createdAt: row.created_at as string,
+    importStatus: (row.import_status as ImportStatus) ?? null,
+    importError: (row.import_error as string) ?? null,
   };
 }
 
@@ -807,6 +818,23 @@ export async function listProducts(liveId: string): Promise<LiveProduct[]> {
   }
 
   return products.map((p: LiveProduct) => ({ ...p, clicks: clicksByProduct.get(p.id) ?? 0 }));
+}
+
+/**
+ * Identidade dos produtos já na vitrine, para barrar duplicados na importação.
+ * Traz só as três colunas usadas na comparação — a lista completa passaria pela
+ * contagem de cliques, que aqui não serve para nada.
+ */
+export async function existingProductKeys(
+  liveId: string
+): Promise<{ url: string; productUrl: string | null; size: string | null }[]> {
+  const db: DB = getSupabase();
+  const { data } = await db.from("live_products").select("url, product_url, size").eq("live_id", liveId);
+  return ((data ?? []) as Record<string, unknown>[]).map(row => ({
+    url: row.url as string,
+    productUrl: (row.product_url as string) ?? null,
+    size: (row.size as string) ?? null,
+  }));
 }
 
 /**
@@ -834,7 +862,7 @@ export async function countProducts(liveId: string): Promise<number> {
 
 export async function addProduct(
   liveId: string,
-  data: { url: string; name?: string | null; imageUrl?: string | null; price?: string | null; category?: string | null; productUrl?: string | null; size?: string | null; position: number }
+  data: { url: string; name?: string | null; imageUrl?: string | null; price?: string | null; category?: string | null; productUrl?: string | null; size?: string | null; position: number; importStatus?: ImportStatus | null; importError?: string | null }
 ): Promise<LiveProduct> {
   const db: DB = getSupabase();
   const { data: row } = await db
@@ -849,6 +877,8 @@ export async function addProduct(
       product_url: data.productUrl ?? null,
       size: data.size ?? null,
       position: data.position,
+      import_status: data.importStatus ?? null,
+      import_error: data.importError ?? null,
     })
     .select()
     .single();

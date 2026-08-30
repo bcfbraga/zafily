@@ -42,6 +42,37 @@ export async function PATCH(
   if ("imageUrl" in body) patch.image_url = body.imageUrl ?? null;
   if (Object.keys(patch).length === 0) return NextResponse.json({ error: "Nenhum campo" }, { status: 400 });
   const supabase = getSupabase();
+
+  // A marca de erro da importação é sobre o estado atual do produto, não sobre
+  // o que a loja devolveu naquele dia. Se a usuária preencheu o que faltava à
+  // mão, o aviso tem de sumir sozinho — senão ela corrige e o alerta fica lá,
+  // acusando um problema que não existe mais.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: atual } = await (supabase as any)
+    .from("live_products")
+    .select("name, image_url")
+    .eq("id", productId)
+    .eq("live_id", id)
+    .single();
+
+  if (atual) {
+    const nome = ("name" in patch ? patch.name : atual.name) as string | null;
+    const imagem = ("image_url" in patch ? patch.image_url : atual.image_url) as string | null;
+    const temNome = !!nome?.trim();
+    const temImagem = !!imagem?.trim();
+    if (temNome && temImagem) {
+      patch.import_status = "ok";
+      patch.import_error = null;
+    } else if (temNome || temImagem) {
+      patch.import_status = "partial";
+      patch.import_error = temNome
+        ? "A imagem do produto não foi encontrada."
+        : "O nome do produto não foi encontrado.";
+    } else {
+      patch.import_status = "failed";
+      patch.import_error = "O produto está sem nome e sem imagem.";
+    }
+  }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error } = await (supabase as any)
     .from("live_products")

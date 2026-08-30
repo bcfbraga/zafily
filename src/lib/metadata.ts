@@ -1,9 +1,49 @@
+/**
+ * Resultado da busca de um link.
+ *
+ *   ok      → nome e imagem encontrados
+ *   partial → veio só um dos dois; publica, mas fica capenga
+ *   failed  → nada aproveitável, o link precisa de atenção
+ */
+export type ImportStatus = "ok" | "partial" | "failed";
+
 export interface UrlMetadata {
   name: string | null;
   imageUrl: string | null;
   price: string | null;
   category: string | null;
   productUrl: string | null;
+  status: ImportStatus;
+  /** Motivo em português, para mostrar à usuária. `null` quando `status === "ok"`. */
+  error: string | null;
+}
+
+/**
+ * Deriva o status a partir do que a busca conseguiu extrair. O nome e a imagem
+ * são o que a vitrine realmente precisa — preço e categoria são desejáveis, mas
+ * a usuária preenche à mão sem esforço.
+ */
+function classify(
+  meta: Pick<UrlMetadata, "name" | "imageUrl">,
+  motivoDaFalha: string,
+): { status: ImportStatus; error: string | null } {
+  const temNome = !!meta.name?.trim();
+  const temImagem = !!meta.imageUrl?.trim();
+  if (temNome && temImagem) return { status: "ok", error: null };
+  if (!temNome && !temImagem) return { status: "failed", error: motivoDaFalha };
+  return {
+    status: "partial",
+    error: temNome ? "A imagem do produto não foi encontrada." : "O nome do produto não foi encontrado.",
+  };
+}
+
+/** Traduz a resposta HTTP da loja em algo acionável. */
+function httpErrorMessage(status: number): string {
+  if (status === 404 || status === 410) return "O link não existe mais na loja (erro 404).";
+  if (status === 401 || status === 403) return "A loja bloqueou a leitura automática (erro 403).";
+  if (status === 429) return "A loja recusou por excesso de acessos — tente de novo em alguns minutos.";
+  if (status >= 500) return `A loja está fora do ar no momento (erro ${status}).`;
+  return `A loja respondeu com erro ${status}.`;
 }
 
 const AFFILIATE_DOMAINS = [
@@ -120,7 +160,11 @@ async function fetchVtexProduct(origin: string, slug: string): Promise<UrlMetada
     const category: string | null = (categoryTree.length > 0 ? categoryTree[categoryTree.length - 1].name : null)
       ?? inferCategoryFromName(name);
 
-    return { name, imageUrl, price, category, productUrl: `${origin}/${slug}/p` };
+    return {
+      name, imageUrl, price, category,
+      productUrl: `${origin}/${slug}/p`,
+      ...classify({ name, imageUrl }, "A loja não devolveu dados para este produto."),
+    };
   } catch { return null; }
 }
 
@@ -200,7 +244,7 @@ function inferCategoryFromName(name: string | null): string | null {
   return null;
 }
 
-function extractFromHtml(html: string): Omit<UrlMetadata, "productUrl"> {
+function extractFromHtml(html: string): Pick<UrlMetadata, "name" | "imageUrl" | "price" | "category"> {
   const ldBlocks = extractLdJson(html);
   const product = findProductLd(ldBlocks);
 
@@ -263,7 +307,7 @@ function extractFromHtml(html: string): Omit<UrlMetadata, "productUrl"> {
 // ── Main entry ───────────────────────────────────────────────────────────────
 
 export async function fetchUrlMetadata(affiliateUrl: string): Promise<UrlMetadata> {
-  const empty: UrlMetadata = { name: null, imageUrl: null, price: null, category: null, productUrl: null };
+  const vazio = { name: null, imageUrl: null, price: null, category: null };
 
   try {
     // Passo 1: resolve redirects de links de afiliado
@@ -287,11 +331,23 @@ export async function fetchUrlMetadata(affiliateUrl: string): Promise<UrlMetadat
       redirect: "follow",
     });
 
-    if (!res.ok) return { ...empty, productUrl };
+    if (!res.ok) {
+      return { ...vazio, productUrl, status: "failed", error: httpErrorMessage(res.status) };
+    }
     const html = await res.text();
     const meta = extractFromHtml(html);
-    return { ...meta, productUrl };
+    return {
+      ...meta,
+      productUrl,
+      ...classify(meta, "A página abriu, mas não tem dados de produto — confira se o link leva a um produto."),
+    };
   } catch {
-    return empty;
+    // Timeout, DNS, TLS: em nenhum desses casos chegamos a ver a página.
+    return {
+      ...vazio,
+      productUrl: null,
+      status: "failed",
+      error: "A loja não respondeu (link fora do ar ou tempo esgotado).",
+    };
   }
 }

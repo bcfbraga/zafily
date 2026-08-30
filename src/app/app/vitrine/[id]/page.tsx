@@ -7,7 +7,7 @@ import {
   ArrowLeft, Loader2, X, Upload, Calendar, Clock,
   Package, CheckCircle2, FileText, ExternalLink, Pencil,
   Copy, Check, GripVertical, Plus, ShoppingBag, Smartphone, Monitor,
-  Eye, EyeOff
+  Eye, EyeOff, AlertTriangle, Info
 } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
 import { SectionSelect } from "@/components/zafily/SectionSelect";
@@ -16,6 +16,7 @@ import { SplitEditorLayout } from "@/components/zafily/SplitEditorLayout";
 import { Modal } from "@/components/zafily/Modal";
 import { titleCase, discountLabel } from "@/lib/utils";
 import type { AccountStatus } from "@/lib/lives-store";
+import type { ImportReport } from "@/lib/link-import";
 
 interface Product {
   id: string;
@@ -27,6 +28,44 @@ interface Product {
   size: string | null;
   position: number;
   clicks?: number;
+  importStatus: "ok" | "partial" | "failed" | null;
+  importError: string | null;
+}
+
+/**
+ * Estado de importação de um produto. Produtos gravados antes da coluna
+ * `import_status` existir vêm com `null`; nesses o estado se deduz dos campos
+ * vazios, que é a mesma regra usada na gravação.
+ */
+function importIssue(p: Product): { level: "failed" | "partial"; message: string } | null {
+  const temNome = !!p.name?.trim();
+  const temImagem = !!p.imageUrl?.trim();
+
+  if (p.importStatus === "ok") return null;
+  if (p.importStatus === "failed") {
+    return { level: "failed", message: p.importError ?? "Não foi possível ler este link." };
+  }
+  if (p.importStatus === "partial") {
+    return { level: "partial", message: p.importError ?? "Faltaram dados neste link." };
+  }
+
+  // importStatus === null → produto anterior à migration
+  if (!temNome && !temImagem) return { level: "failed", message: "Este link não trouxe nome nem imagem." };
+  if (!temNome) return { level: "partial", message: "O nome do produto não foi encontrado." };
+  if (!temImagem) return { level: "partial", message: "A imagem do produto não foi encontrada." };
+  return null;
+}
+
+/** Encurta a URL para caber na lista sem virar uma parede de texto. */
+function shortUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    const caminho = u.pathname.replace(/\/+$/, "");
+    const texto = `${u.hostname.replace(/^www\./, "")}${caminho}`;
+    return texto.length > 52 ? `${texto.slice(0, 52)}…` : texto;
+  } catch {
+    return url.length > 52 ? `${url.slice(0, 52)}…` : url;
+  }
 }
 
 interface Live {
@@ -299,6 +338,124 @@ function VitrinePreview({ live, onReorder }: { live: Live; onReorder?: (newProdu
   );
 }
 
+// ── Relatório da importação ──────────────────────────────────────────────────
+// Antes disto, link quebrado e link repetido desapareciam sem aviso: o produto
+// entrava vazio ou simplesmente não entrava, e a usuária só descobria ao abrir
+// a vitrine publicada.
+
+const TONES = {
+  danger: {
+    box: "border-red-200 bg-red-50",
+    title: "text-red-800",
+    note: "text-red-700",
+    url: "text-red-900",
+  },
+  warning: {
+    box: "border-amber-200 bg-amber-50",
+    title: "text-amber-900",
+    note: "text-amber-800",
+    url: "text-amber-950",
+  },
+  neutral: {
+    box: "border-black/[0.10] bg-[var(--cr-surface-soft)]",
+    title: "text-[var(--cr-text-primary)]",
+    note: "text-[var(--cr-text-tertiary)]",
+    url: "text-[var(--cr-text-secondary)]",
+  },
+} as const;
+
+function ReportGroup({
+  tone, icon: Icon, title, items,
+}: {
+  tone: keyof typeof TONES;
+  icon: React.ElementType;
+  title: string;
+  items: { url: string; note: string }[];
+}) {
+  const t = TONES[tone];
+  return (
+    <div className={`rounded-xl border ${t.box} px-3 py-2.5`}>
+      <p className={`flex items-center gap-1.5 text-xs font-semibold ${t.title}`}>
+        <Icon className="w-3.5 h-3.5 shrink-0" />
+        {title}
+      </p>
+      <ul className="mt-1.5 space-y-1.5">
+        {items.map((item, i) => (
+          <li key={`${item.url}-${i}`} className="leading-tight">
+            <span className={`block text-[11px] font-medium break-all ${t.url}`}>{shortUrl(item.url)}</span>
+            <span className={`block text-[10px] ${t.note}`}>{item.note}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ImportReportPanel({ report, onDismiss }: { report: ImportReport; onDismiss: () => void }) {
+  const plural = (n: number, um: string, muitos: string) => (n === 1 ? um : muitos);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">
+          Resultado da importação
+        </p>
+        <button
+          onClick={onDismiss}
+          className="w-6 h-6 rounded-lg flex items-center justify-center text-[var(--cr-text-tertiary)] hover:text-[var(--cr-text-primary)] hover:bg-black/[0.05] transition-colors"
+          title="Dispensar aviso"
+        >
+          <X className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
+      {report.failed.length > 0 && (
+        <ReportGroup
+          tone="danger"
+          icon={AlertTriangle}
+          title={`${report.failed.length} ${plural(report.failed.length, "link com erro", "links com erro")}`}
+          items={report.failed.map(f => ({ url: f.url, note: f.reason }))}
+        />
+      )}
+
+      {report.partial.length > 0 && (
+        <ReportGroup
+          tone="warning"
+          icon={AlertTriangle}
+          title={`${report.partial.length} ${plural(report.partial.length, "link incompleto", "links incompletos")}`}
+          items={report.partial.map(f => ({ url: f.url, note: f.reason }))}
+        />
+      )}
+
+      {report.duplicates.length > 0 && (
+        <ReportGroup
+          tone="neutral"
+          icon={Copy}
+          title={`${report.duplicates.length} ${plural(report.duplicates.length, "link duplicado", "links duplicados")} — não ${plural(report.duplicates.length, "foi adicionado", "foram adicionados")}`}
+          items={report.duplicates.map(d => ({
+            url: d.url,
+            note: d.scope === "vitrine" ? "Este produto já está na vitrine." : "Repetido na lista que você colou.",
+          }))}
+        />
+      )}
+
+      {report.invalid.length > 0 && (
+        <ReportGroup
+          tone="neutral"
+          icon={Info}
+          title={`${report.invalid.length} ${plural(report.invalid.length, "entrada ignorada", "entradas ignoradas")}`}
+          items={report.invalid.map(url => ({ url, note: "Não é um link válido." }))}
+        />
+      )}
+
+      <p className="text-[10px] text-[var(--cr-text-tertiary)]">
+        Os links com erro entraram na lista mesmo assim, marcados — edite o produto para
+        preencher à mão, ou remova.
+      </p>
+    </div>
+  );
+}
+
 // ── Main page ────────────────────────────────────────────────────────────────
 export default function EditLivePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -326,6 +483,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [overIndex, setOverIndex] = useState<number | null>(null);
   const [editingSizeId, setEditingSizeId] = useState<string | null>(null);
   const [sizeInputVal, setSizeInputVal] = useState("");
+  const [importReport, setImportReport] = useState<ImportReport | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -349,6 +507,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
 
   const productItems = parseProductInput(urlsText);
   const productCount = live?.products.length ?? 0;
+  const productsWithIssues = (live?.products ?? []).filter(p => importIssue(p)).length;
   const slotsLeft = 100 - productCount;
 
   async function fetchProducts() {
@@ -364,8 +523,20 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     setFetching(false);
     if (!res.ok) { setFetchError(data.error ?? "Erro ao buscar produtos"); return; }
     setLive(prev => prev ? { ...prev, products: [...prev.products, ...data.products] } : prev);
+
+    // O painel só aparece quando há algo a dizer — importação limpa não merece
+    // um aviso de "tudo certo" ocupando espaço.
+    const report: ImportReport | null = data.report ?? null;
+    const temAviso = !!report && (
+      report.duplicates.length > 0 || report.invalid.length > 0 ||
+      report.failed.length > 0 || report.partial.length > 0
+    );
+    setImportReport(temAviso ? report : null);
+
     setUrlsText("");
-    setShowAddProducts(false);
+    // Com avisos na tela, fechar o painel esconderia justamente o que a usuária
+    // precisa ler.
+    if (!temAviso) setShowAddProducts(false);
   }
 
   async function removeProduct(productId: string) {
@@ -581,6 +752,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               />
               <p className="text-[10px] text-[var(--cr-text-tertiary)]">{productItems.length} de {slotsLeft} slots disponíveis · tamanho é lido automaticamente do texto acima do link (ex: &ldquo;Nome-M&rdquo;)</p>
               {fetchError && <p className="text-xs text-red-400">{fetchError}</p>}
+              {importReport && <ImportReportPanel report={importReport} onDismiss={() => setImportReport(null)} />}
               <div className="flex gap-2">
                 <button
                   onClick={fetchProducts}
@@ -600,10 +772,27 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
           {/* Product list (mini cards) */}
           {live.products.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider px-1">
-                {live.products.length} produto{live.products.length !== 1 ? "s" : ""} · arraste pela alça para reordenar
-              </p>
-              {live.products.map((product, i) => (
+              <div className="flex items-center gap-2 flex-wrap px-1">
+                <p className="text-[10px] font-semibold text-[var(--cr-text-tertiary)] uppercase tracking-wider">
+                  {live.products.length} produto{live.products.length !== 1 ? "s" : ""} · arraste pela alça para reordenar
+                </p>
+                {/* Numa lista de vinte produtos a borda vermelha some da dobra;
+                    a contagem diz que há algo a revisar antes de rolar. */}
+                {productsWithIssues > 0 && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200">
+                    <AlertTriangle className="w-2.5 h-2.5" />
+                    {productsWithIssues} com problema
+                  </span>
+                )}
+              </div>
+              {live.products.map((product, i) => {
+                const issue = importIssue(product);
+                // A borda do card carrega o aviso: some no arraste, porque ali
+                // a borda já está sinalizando o alvo do solte.
+                const bordaDoAviso = issue?.level === "failed"
+                  ? "border-red-300 bg-red-50/40 hover:border-red-400"
+                  : "border-amber-300 bg-amber-50/40 hover:border-amber-400";
+                return (
                 <div
                   key={product.id}
                   data-prod-idx={i}
@@ -617,6 +806,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                       ? "border-[var(--cr-brand-500)] bg-[var(--cr-brand-500)]/10"
                       : dragIndex === i
                       ? "border-black/[0.08] bg-white opacity-40"
+                      : issue
+                      ? bordaDoAviso
                       : "border-black/[0.06] bg-white hover:border-black/[0.12]"
                   }`}
                 >
@@ -640,6 +831,17 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-[var(--cr-text-primary)] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
+                    {issue && (
+                      <p
+                        title={issue.message}
+                        className={`flex items-start gap-1 mt-0.5 text-[10px] leading-tight ${
+                          issue.level === "failed" ? "text-red-700" : "text-amber-800"
+                        }`}
+                      >
+                        <AlertTriangle className="w-3 h-3 shrink-0 mt-px" />
+                        <span className="min-w-0">{issue.message}</span>
+                      </p>
+                    )}
                     <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
                       {product.price && <span className="text-[10px] text-[var(--cr-text-primary)] font-semibold">{product.price}</span>}
                       {(product.clicks ?? 0) > 0 && (
@@ -693,7 +895,8 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     </button>
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {/* Clear all */}
               {live.products.length > 0 && (
