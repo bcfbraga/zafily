@@ -51,3 +51,27 @@ export function discountLabel(discountType: "cart" | "coupon" | null | undefined
   if (discountType === "coupon" && couponCode) return `Cupom ${couponCode}`;
   return "Desconto aplicado direto no carrinho";
 }
+
+/**
+ * Compara dois itens por categoria, em ordem alfabética de pt-BR, com os sem
+ * categoria no fim.
+ *
+ * Devolve 0 dentro de uma mesma categoria: `Array.prototype.sort` é estável,
+ * então a ordem que já existia entre eles é preservada. Sem isso, agrupar
+ * embaralharia o que a usuária arrastou à mão dentro de cada grupo.
+ *
+ * A importação e o botão "agrupar por categoria" usam esta mesma função — se
+ * cada um tivesse a sua regra, agrupar mudaria a ordem de uma vitrine recém
+ * importada sem motivo aparente.
+ */
+export function compareByCategory(
+  a: { category: string | null },
+  b: { category: string | null }
+): number {
+  const ca = shortCategory(a.category)?.toLocaleLowerCase("pt-BR");
+  const cb = shortCategory(b.category)?.toLocaleLowerCase("pt-BR");
+  if (ca === cb) return 0;
+  if (!ca) return 1;
+  if (!cb) return -1;
+  return ca.localeCompare(cb, "pt-BR");
+}

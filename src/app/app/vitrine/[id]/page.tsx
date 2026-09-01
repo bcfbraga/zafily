@@ -7,14 +7,14 @@ import {
   ArrowLeft, Loader2, X, Upload, Calendar, Clock,
   Package, CheckCircle2, FileText, ExternalLink, Pencil,
   Copy, Check, GripVertical, Plus, ShoppingBag, Smartphone, Monitor,
-  Eye, EyeOff, AlertTriangle, Info
+  Eye, EyeOff, AlertTriangle, Info, Layers, Undo2
 } from "lucide-react";
 import { StoreSelect } from "@/components/zafily/StoreSelect";
 import { SectionSelect } from "@/components/zafily/SectionSelect";
 import { ActivationModal } from "@/components/zafily/ActivationModal";
 import { SplitEditorLayout } from "@/components/zafily/SplitEditorLayout";
 import { Modal } from "@/components/zafily/Modal";
-import { titleCase, discountLabel } from "@/lib/utils";
+import { titleCase, discountLabel, compareByCategory } from "@/lib/utils";
 import type { AccountStatus } from "@/lib/lives-store";
 import type { ImportReport } from "@/lib/link-import";
 
@@ -484,6 +484,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const [editingSizeId, setEditingSizeId] = useState<string | null>(null);
   const [sizeInputVal, setSizeInputVal] = useState("");
   const [importReport, setImportReport] = useState<ImportReport | null>(null);
+  // Ordem anterior ao agrupamento, para o desfazer. Agrupar 49 produtos num
+  // clique destrói uma ordenação feita à mão, e a vitrine pode já estar no ar.
+  const [orderBeforeGrouping, setOrderBeforeGrouping] = useState<Product[] | null>(null);
+  const [grouping, setGrouping] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -508,6 +512,7 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
   const productItems = parseProductInput(urlsText);
   const productCount = live?.products.length ?? 0;
   const productsWithIssues = (live?.products ?? []).filter(p => importIssue(p)).length;
+  const productsWithoutCategory = (live?.products ?? []).filter(p => !shortCat(p.category)).length;
   const slotsLeft = 100 - productCount;
 
   async function fetchProducts() {
@@ -599,6 +604,35 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     });
   }
 
+  /** Grava uma ordem e reflete na tela. Mesmo caminho usado pelo arraste. */
+  async function persistOrder(ordenados: Product[]) {
+    setLive(prev => prev ? { ...prev, products: ordenados } : prev);
+    await fetch(`/api/lives/${id}/products/reorder`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ order: ordenados.map(p => p.id) }),
+    });
+  }
+
+  async function groupByCategory() {
+    if (!live) return;
+    setGrouping(true);
+    const anterior = live.products;
+    // `sort` estável: dentro de uma categoria a ordem atual é mantida.
+    const agrupados = [...anterior].sort(compareByCategory);
+    setOrderBeforeGrouping(anterior);
+    await persistOrder(agrupados);
+    setGrouping(false);
+  }
+
+  async function undoGrouping() {
+    if (!orderBeforeGrouping) return;
+    setGrouping(true);
+    await persistOrder(orderBeforeGrouping);
+    setOrderBeforeGrouping(null);
+    setGrouping(false);
+  }
+
   function handleDragStart(index: number) { setDragIndex(index); }
   function handleDragOver(e: React.DragEvent, index: number) { e.preventDefault(); setOverIndex(index); }
   async function handleDrop() {
@@ -610,6 +644,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
     reordered.splice(overIndex, 0, moved);
     setLive(prev => prev ? { ...prev, products: reordered } : prev);
     setDragIndex(null); setOverIndex(null);
+    // Depois de arrastar à mão, "Desfazer" desapareceria com o ajuste junto —
+    // ele voltaria à ordem anterior ao agrupamento, apagando este arraste. O
+    // desfazer vale só enquanto nada aconteceu depois do agrupamento.
+    setOrderBeforeGrouping(null);
     await fetch(`/api/lives/${id}/products/reorder`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -784,6 +822,38 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     {productsWithIssues} com problema
                   </span>
                 )}
+
+                {/* Diz de antemão quantos vão parar no fim ao agrupar — sem
+                    isso a cauda desordenada da lista parece defeito. */}
+                {productsWithoutCategory > 0 && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--cr-surface-soft)] text-[var(--cr-text-tertiary)] border border-black/[0.08]">
+                    {productsWithoutCategory} sem categoria
+                  </span>
+                )}
+
+                <div className="ml-auto">
+                  {orderBeforeGrouping ? (
+                    <button
+                      onClick={undoGrouping}
+                      disabled={grouping}
+                      title="Voltar à ordem anterior ao agrupamento"
+                      className="h-7 px-2.5 inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-lg border border-black/[0.12] bg-white text-[var(--cr-text-primary)] hover:border-black/[0.24] disabled:opacity-40 transition-colors"
+                    >
+                      {grouping ? <Loader2 className="w-3 h-3 animate-spin" /> : <Undo2 className="w-3 h-3" />}
+                      Desfazer
+                    </button>
+                  ) : (
+                    <button
+                      onClick={groupByCategory}
+                      disabled={grouping || live.products.length < 2}
+                      title="Reordena a lista juntando os produtos da mesma categoria, em ordem alfabética"
+                      className="h-7 px-2.5 inline-flex items-center gap-1.5 text-[11px] font-semibold rounded-lg border border-black/[0.12] bg-[var(--cr-surface-soft)] text-[var(--cr-text-secondary)] hover:text-[var(--cr-text-primary)] hover:border-black/[0.24] disabled:opacity-40 transition-colors"
+                    >
+                      {grouping ? <Loader2 className="w-3 h-3 animate-spin" /> : <Layers className="w-3 h-3" />}
+                      Agrupar por categoria
+                    </button>
+                  )}
+                </div>
               </div>
               {live.products.map((product, i) => {
                 const issue = importIssue(product);
@@ -830,6 +900,11 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
                     }
                   </div>
                   <div className="flex-1 min-w-0">
+                    {shortCat(product.category) && (
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-[var(--cr-text-tertiary)] leading-tight truncate">
+                        {shortCat(product.category)}
+                      </p>
+                    )}
                     <p className="text-xs text-[var(--cr-text-primary)] truncate leading-tight">{product.name ? titleCase(product.name) : "Sem nome"}</p>
                     {issue && (
                       <p
@@ -926,12 +1001,10 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
         }
         previewPanel={
           <VitrinePreview live={live} onReorder={async (newProducts) => {
-            setLive(prev => prev ? { ...prev, products: newProducts } : prev);
-            await fetch(`/api/lives/${id}/products/reorder`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ order: newProducts.map(p => p.id) }),
-            });
+            // Mesma razão do arraste na lista: reordenar à mão invalida o
+            // desfazer do agrupamento.
+            setOrderBeforeGrouping(null);
+            await persistOrder(newProducts);
           }} />
         }
       />

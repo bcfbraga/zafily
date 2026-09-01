@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
 import { getLive, countProducts, addProduct, getAccountStatus, nextProductPosition, existingProductKeys } from "@/lib/lives-store";
 import { fetchUrlMetadata } from "@/lib/metadata";
-import { shortCategory } from "@/lib/utils";
+import { compareByCategory } from "@/lib/utils";
 import { identity, type DuplicateScope, type ImportReport } from "@/lib/link-import";
 
 const MAX_PRODUCTS = 100;
@@ -109,14 +109,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // foram colados. Dentro de uma mesma categoria a ordem de envio é mantida, e
   // produtos sem categoria vão para o fim.
   const sorted = aGravar.sort((a, b) => {
-    const ca = shortCategory(a.meta.category)?.toLocaleLowerCase("pt-BR");
-    const cb = shortCategory(b.meta.category)?.toLocaleLowerCase("pt-BR");
-    if (ca !== cb) {
-      if (!ca) return 1;
-      if (!cb) return -1;
-      return ca.localeCompare(cb, "pt-BR");
-    }
-    return a.ordemEnvio - b.ordemEnvio;
+    const porCategoria = compareByCategory(a.meta, b.meta);
+    return porCategoria !== 0 ? porCategoria : a.ordemEnvio - b.ordemEnvio;
   });
 
   // Sempre no fim da lista, para não embaralhar o que a usuária já ordenou.
