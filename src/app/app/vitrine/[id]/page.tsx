@@ -15,6 +15,7 @@ import { ActivationModal } from "@/components/zafily/ActivationModal";
 import { SplitEditorLayout } from "@/components/zafily/SplitEditorLayout";
 import { Modal } from "@/components/zafily/Modal";
 import { titleCase, discountLabel, compareByCategory } from "@/lib/utils";
+import { parseProductInput } from "@/lib/product-paste";
 import type { AccountStatus } from "@/lib/lives-store";
 import type { ImportReport } from "@/lib/link-import";
 
@@ -103,40 +104,6 @@ function shortCat(cat: string | null) {
   if (!cat) return null;
   const parts = cat.split("/").map(s => s.trim()).filter(Boolean);
   return parts[parts.length - 1] ?? null;
-}
-
-// ── Product paste parsing ──────────────────────────────────────────────────
-// Clients often send "nome do produto-M" on one line followed by the link on
-// the next (e.g. "jaqueta jeans gola alta azul-P"). Pick up the trailing size
-// off the label line so it doesn't have to be typed in again by hand.
-const SIZE_SUFFIX = /-\s*(PP|P|M|G|GG|GGG|XG|EG|EXG|U|\d{2,3})\s*$/i;
-
-function isValidUrl(text: string): boolean {
-  try {
-    const u = new URL(text);
-    return u.protocol === "http:" || u.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
-function parseProductInput(text: string): { url: string; size: string | null }[] {
-  const items: { url: string; size: string | null }[] = [];
-  let labelLine: string | null = null;
-
-  for (const raw of text.split("\n")) {
-    const line = raw.trim();
-    if (!line) continue;
-
-    if (isValidUrl(line)) {
-      const match = labelLine?.match(SIZE_SUFFIX);
-      items.push({ url: line, size: match ? match[1].toUpperCase() : null });
-      labelLine = null;
-    } else {
-      labelLine = line;
-    }
-  }
-  return items;
 }
 
 // ── Price helpers ────────────────────────────────────────────────────────────
@@ -783,12 +750,12 @@ export default function EditLivePage({ params }: { params: Promise<{ id: string 
               <textarea
                 value={urlsText}
                 onChange={e => setUrlsText(e.target.value)}
-                placeholder={"Nome do produto-M\nhttps://www.cea.com.br/produto...\n\nOutro produto-G\nhttps://www.cea.com.br/produto..."}
+                placeholder={"M\nhttps://www.cea.com.br/produto...\n\nNome do produto-G\nhttps://www.cea.com.br/produto..."}
                 rows={4}
                 disabled={fetching}
                 className="w-full bg-[var(--cr-surface-soft)] border border-black/[0.12] text-[var(--cr-text-primary)] placeholder:text-[var(--cr-text-tertiary)] rounded-xl px-3 py-2.5 text-xs focus:outline-none focus:border-[var(--cr-brand-500)] resize-none transition-all disabled:opacity-50"
               />
-              <p className="text-[10px] text-[var(--cr-text-tertiary)]">{productItems.length} de {slotsLeft} slots disponíveis · tamanho é lido automaticamente do texto acima do link (ex: &ldquo;Nome-M&rdquo;)</p>
+              <p className="text-[10px] text-[var(--cr-text-tertiary)]">{productItems.length} de {slotsLeft} slots disponíveis · o tamanho é lido da linha acima do link, seja ela só o tamanho (&ldquo;M&rdquo;) ou o nome com ele no fim (&ldquo;Nome-M&rdquo;)</p>
               {fetchError && <p className="text-xs text-red-400">{fetchError}</p>}
               {importReport && <ImportReportPanel report={importReport} onDismiss={() => setImportReport(null)} />}
               <div className="flex gap-2">
