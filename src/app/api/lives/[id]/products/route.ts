@@ -5,6 +5,12 @@ import { fetchUrlMetadata } from "@/lib/metadata";
 import { compareByCategory } from "@/lib/utils";
 import { identity, type DuplicateScope, type ImportReport } from "@/lib/link-import";
 
+// Cada link custa duas idas à loja (resolver o encurtador, depois buscar a
+// página), e a função roda em Virginia enquanto as lojas estão no Brasil. Um
+// lote de 20 links passa dos 10s padrão da Vercel e a requisição inteira morre
+// — nenhum produto entra, nem os que já tinham respondido.
+export const maxDuration = 60;
+
 const MAX_PRODUCTS = 100;
 const FREE_TIER_MAX_PRODUCTS = 5;
 
