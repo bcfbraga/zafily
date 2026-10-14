@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { CouponBar } from "@/components/zafily/CouponBar";
 import type { Metadata } from "next";
 import { themeCssVars } from "@/lib/design-presets";
 import Image from "next/image";
@@ -53,8 +54,10 @@ export default async function VitrinePage({ params }: Props) {
       }}
     >
 
+      {live.couponCode && <CouponBar code={live.couponCode} note={live.couponNote} />}
+
       {/* ── Header ──────────────────────────────────────────────── */}
-      <header className="hidden sm:block sticky top-0 z-10" style={{ background: "var(--cr-background)", borderBottom: "1px solid var(--cr-border)" }}>
+      <header className="hidden sm:block z-10" style={{ background: "var(--cr-background)", borderBottom: "1px solid var(--cr-border)" }}>
         <div className="max-w-3xl mx-auto px-5 h-14 flex items-center justify-between">
           <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: "var(--cr-text-tertiary)" }}>
             Vitrine
