@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserId } from "@/lib/auth";
-import { getLive } from "@/lib/lives-store";
-import { createClient } from "@/lib/supabase-server";
+import { getLive, reorderProducts } from "@/lib/lives-store";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   let userId: string;
@@ -16,12 +15,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const { order } = await req.json() as { order: string[] };
   if (!Array.isArray(order)) return NextResponse.json({ error: "order inválido" }, { status: 400 });
 
-  const supabase = await createClient();
-  await Promise.all(
-    order.map((productId, position) =>
-      (supabase as any).from("live_products").update({ position }).eq("id", productId).eq("live_id", id)
-    )
-  );
+  await reorderProducts(id, order);
 
   return NextResponse.json({ ok: true });
 }

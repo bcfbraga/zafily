@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
 import { CouponBar } from "@/components/zafily/CouponBar";
 import type { Metadata } from "next";
@@ -16,17 +17,68 @@ interface Props {
   params: Promise<{ username: string; slug: string }>;
 }
 
+// generateMetadata roda antes da página e pede exatamente os mesmos dados. Sem
+// memoizar, cada abertura da vitrine consultaria o banco duas vezes — o que
+// pesa justamente quando muita gente entra ao mesmo tempo, durante uma live.
+// São chamadas do Supabase, não `fetch`, então a memoização do Next não vale
+// aqui e o cache do React é o caminho indicado pela documentação.
+const loadLive = cache(getPublicLive);
+const loadProfile = cache(getProfileByUsername);
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { username } = await params;
-  return { title: `${titleCase(username)} - Feito por Zafily` };
+  const { username, slug } = await params;
+  const [live, profile] = await Promise.all([
+    loadLive(username, slug),
+    loadProfile(username),
+  ]);
+
+  const fallback = `${titleCase(username)} - Feito por Zafily`;
+  if (!live || !profile) return { title: fallback };
+
+  const creator = profile.displayName?.trim() || `@${profile.username}`;
+  const title = live.title.trim() || fallback;
+
+  const count = live.products.length;
+  const description = [
+    count > 0
+      ? `${count} produto${count === 1 ? "" : "s"} selecionado${count === 1 ? "" : "s"} por ${creator}`
+      : `Vitrine de ${creator}`,
+    live.discount ? `${live.discount}% OFF` : null,
+  ].filter(Boolean).join(" · ");
+
+  // A capa da live é o que a pessoa reconhece ao receber o link. Sem capa, a
+  // foto do perfil ainda diz de quem é a vitrine; sem nenhuma das duas, é
+  // melhor não mandar imagem do que mandar o ícone genérico do app.
+  const image = live.imageUrl ?? profile.photoUrl ?? null;
+
+  return {
+    title,
+    description,
+    alternates: { canonical: `/${profile.username}/${live.slug}` },
+    openGraph: {
+      type: "website",
+      siteName: "Zafily",
+      locale: "pt_BR",
+      title,
+      description,
+      url: `/${profile.username}/${live.slug}`,
+      ...(image && { images: [{ url: image, alt: title }] }),
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(image && { images: [image] }),
+    },
+  };
 }
 
 export default async function VitrinePage({ params }: Props) {
   const { username, slug } = await params;
 
   const [live, profile] = await Promise.all([
-    getPublicLive(username, slug),
-    getProfileByUsername(username),
+    loadLive(username, slug),
+    loadProfile(username),
   ]);
 
   if (!live || !profile) {

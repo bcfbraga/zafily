@@ -895,6 +895,15 @@ export async function deleteProduct(id: string, liveId: string): Promise<void> {
   await db.from("live_products").delete().eq("id", id).eq("live_id", liveId);
 }
 
+export async function reorderProducts(liveId: string, order: string[]): Promise<void> {
+  const db: DB = getSupabase();
+  await Promise.all(
+    order.map((productId, position) =>
+      db.from("live_products").update({ position }).eq("id", productId).eq("live_id", liveId)
+    )
+  );
+}
+
 // ─── Click / view tracking ──────────────────────────────────────────────────
 
 export async function getProductUrl(productId: string): Promise<string | null> {
